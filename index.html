@@ -918,8 +918,7 @@ One source of truth — for SQL, for BI, and for AI. Let me show an example.</di
   <h2>Metric views in action</h2>
   <pre class="code sm focus"><span class="c">-- Define metrics once, in a governed view</span>
 <span class="k">CREATE VIEW</span> sales_metrics <span class="hl">WITH METRICS</span>
-<span class="k">LANGUAGE</span> YAML
-<span class="k">AS</span> $$
+<span class="k">LANGUAGE</span> YAML <span class="k">AS</span> $$
   version: 0.1
   source: sales.orders
   dimensions:
@@ -930,16 +929,12 @@ One source of truth — for SQL, for BI, and for AI. Let me show an example.</di
   measures:
     - name: revenue
       expr: SUM(amount)
-    - name: active_users          <span class="c"># non-additive</span>
-      expr: COUNT(DISTINCT customer_id)
     - name: revenue_per_user      <span class="c"># ratio, always correct</span>
       expr: SUM(amount) / COUNT(DISTINCT customer_id)
 $$;
-
-<span class="c">-- Same definition, any breakdown -- GROUP BY ALL picks the dims</span>
+<span class="c">-- Same definition, any breakdown</span>
 <span class="k">SELECT</span> country, <span class="hl">MEASURE(revenue)</span>, <span class="hl">MEASURE(revenue_per_user)</span>
-<span class="k">FROM</span> sales_metrics
-<span class="k">GROUP BY ALL</span>;</pre>
+<span class="k">FROM</span> sales_metrics <span class="k">GROUP BY ALL</span>;</pre>
   <div class="slide-footer"><span>Metrics</span><span>9 / 100</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Metric views in action · XIAO · ~0:40
