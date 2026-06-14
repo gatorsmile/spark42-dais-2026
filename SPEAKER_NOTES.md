@@ -5,6 +5,8 @@
 
 **Split:** **Xiao presents slides 1–51.** **DB presents slides 52–100.** One handoff, at the end of slide 51.
 
+**Through-line (say it often):** *Spark 4.2 moves more of the modern data and AI stack into the engine itself.* The talk is organized around five audience benefits — and every section divider names its benefit, so keep repeating it: **(1) Define truth once · (2) Reach Spark from everywhere · (3) Run AI-native analytics in SQL · (4) Move changing data safely · (5) Operate & evolve predictably.**
+
 **Style:** Short, simple sentences — written to be easy to say aloud. Read them as written, slow and clear. Pause at each period. Lines in *(parentheses italics)* are stage directions, not spoken.
 
 **Pacing:** ~40 minutes. The code slides and the small roadmap slides should go fast — one or two short lines. If you run long, shorten the code slides first.
@@ -36,15 +38,10 @@ Good morning. Thank you for coming. I am Xiao Li. I work on Apache Spark at Data
 A quick note first. Spark 4.2 is built by the whole Apache Spark community. Hundreds of people. We are here to share their work. Everything we show today is open source.
 
 ### [3] Apache Spark™ 4.2 — Overview · **XIAO** · ~1:15
-Spark 4.2 is the third release in the 4.x line. More than 1,600 JIRAs. More than 260 contributors.
-Here is a simple way to see it — three pillars, all native to the engine.
-First, native semantics. Metric views give Spark a semantic layer. Plus new SQL analytics — vector search, data sketches, and geospatial.
-Second, native execution. Arrow makes PySpark faster by default. Spark Connect reaches Spark from any language. And Python Data Sources add connectors in pure Python.
-Third, native data movement. Change Data Capture, real-time streaming, and a stronger Data Source V2.
-Keep these three pillars in mind. The rest of the talk fills them in.
+Before the details, here is the one idea. Spark 4.2 moves more of the modern data and AI stack into the engine itself. Metrics, vector search, change data capture, Python, streaming, governance, operational visibility — more of it now lives in Spark. So you run fewer systems, and trust one engine. This is the third release in the 4.x line — over 1,600 JIRAs, from more than 260 contributors. Everything we show today maps to this one idea.
 
 ### [4] What we'll cover today · **XIAO** · ~0:45
-Here is our plan. We grouped 4.2 into four parts. First, metrics and Spark SQL. Second, PySpark and Spark Connect. Third, pipelines, streaming, and Data Source V2. And last, looking ahead — what is coming next. I will cover the first parts. DB will cover the rest.
+We organized the talk around five benefits — five things 4.2 does for you. One: define truth once — metric views. Two: reach Spark from everywhere — Spark Connect, PySpark, Arrow, and Python Data Sources. Three: run AI-native analytics in SQL — vector search, sketches, geospatial, and SQL improvements. Four: move changing data safely — Auto CDC, CHANGES, Data Source V2, and streaming. Five: operate and evolve predictably — the Web UI, Project Feather, and a faster release cadence. Every section maps to one of these. I will cover the first benefits. DB will cover the rest.
 
 ### [5] The features at a glance · **XIAO** · ~0:40
 This is the whole release on one slide. Six groups. About 24 features. We will not cover all of them. Please just see how much is here. Keep this slide as a map. Let's start with the foundation.
@@ -54,7 +51,7 @@ This is the whole release on one slide. Six groups. About 24 features. We will n
 ## 01 · METRICS & SEMANTIC MODELING — Slides 6–9 · XIAO
 
 ### [6] Section divider — Metrics & Semantic Modeling · **XIAO** · ~0:10
-Let's start with one of the most important features in 4.2: a semantic layer inside Spark.
+Benefit one: define truth once. Let's start with the semantic layer inside Spark.
 
 ### [7] Why a semantic layer is critical · **XIAO** · ~1:05
 Every company already has a semantic layer. But it is scattered. Words like "revenue," "active users," and "churn" are defined again and again — in BI tools, in dbt, in notebooks, in copy-pasted SQL.
@@ -78,7 +75,7 @@ You define the view once — the dimensions and the measures. Then look at the q
 ## 02 · SPARK CONNECT — Slides 10–13 · XIAO
 
 ### [10] Section divider — Spark Connect · **XIAO** · ~0:12
-This brings us to Spark Connect. This is how more and more applications talk to Spark.
+Benefit two: reach Spark from everywhere. First, Spark Connect — how more and more applications talk to Spark.
 
 ### [11] Architecture: gRPC in, Arrow out · **XIAO** · ~0:45
 The idea is simple. Your client builds a plan. It opens a gRPC stream to the server. The server resolves the plan, optimizes it, runs it on the executors, and sends Arrow batches back.
@@ -95,7 +92,7 @@ In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to 
 ## 03 · PYSPARK — Slides 14–30 · XIAO
 
 ### [14] Section divider — PySpark, Faster by Default · **XIAO** · ~0:12
-Now Python — the language most of you use with Spark. The headline is in the title: faster by default.
+Still benefit two — reach Spark from everywhere. Now Python, the language most of you use with Spark. The headline is in the title: faster by default.
 
 ### [15] Roadmap (Arrow by default) · **XIAO** · ~0:08
 *(One breath.)* Four things in the Python story. First — Arrow, on by default.
@@ -158,7 +155,7 @@ New in 4.2: you can profile these Python data sources, like UDFs — for time an
 ## 04 · SPARK SQL — Slides 31–51 · XIAO
 
 ### [31] Section divider — Spark SQL · **XIAO** · ~0:12
-Now Spark SQL. This release added the most features here. We split it into four themes.
+Benefit three: run AI-native analytics in SQL. This release added the most features here. We split it into four themes.
 
 ### [32] Roadmap (Vector search) · **XIAO** · ~0:08
 *(Point at item 1.)* We start with vector search.
@@ -232,7 +229,7 @@ Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds `G
 ## 05 · PIPELINES & AUTO CDC — Slides 52–55 · DB
 
 ### [52] Section divider — Declarative Pipelines & Auto CDC · **DB** · ~0:15
-Thank you, Xiao. Let's talk about a hard problem in data engineering — keeping a table in sync with a stream of changes.
+Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes.
 
 ### [53] Applying a change feed is the hard part · **DB** · ~0:50
 The common need: keep a copy of an operational table up to date. Rows are inserted, updated, deleted.
@@ -254,7 +251,7 @@ It runs inside Spark Declarative Pipelines. So checkpoints, retries, and idempot
 ## 06 · STRUCTURED STREAMING — Slides 56–60 · DB
 
 ### [56] Section divider — Structured Streaming · **DB** · ~0:12
-Streaming in 4.2 is about two things: changing a running query safely, and a state store you can trust.
+Still benefit four — move changing data safely. Now streaming. It is about two things: changing a running query safely, and a state store you can trust.
 
 ### [57] Evolve running pipelines safely · **DB** · ~0:40
 A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint.
@@ -274,7 +271,7 @@ The state store is the heart of stateful streaming. In 4.2 it is stronger. It ca
 ## 07 · DATA SOURCE V2 — Slides 61–75 · DB
 
 ### [61] Section divider — Data Source V2 · **DB** · ~0:15
-Next — Data Source V2. This is how Spark connects to data. It improved a lot this release.
+Still benefit four — move changing data safely. Now Data Source V2 — how Spark connects to data. It improved a lot this release.
 
 ### [62] One integration API for every data source · **DB** · ~0:40
 DSv2 is the standard API for data sources in Spark — Delta, Iceberg, and more. Users get the same SQL and behavior across sources. Connectors get DML, streaming, and Spark's optimizations.
@@ -340,7 +337,7 @@ For example: `WHERE udf(month(ts)) = 'JAN'` now prunes partitions in Iceberg and
 ## 08 · PERFORMANCE, UI & OPERATIONS — Slides 76–79 · DB
 
 ### [76] Section divider — Performance, UI & Operations · **DB** · ~0:12
-Last of the shipped features — things that make Spark faster, easier to see, and easier to run.
+Benefit five: operate and evolve predictably. First, the things that make Spark faster, easier to see, and easier to run.
 
 ### [77] A modern Spark Web UI · **DB** · ~0:30
 The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL plans — pan, zoom, search, and compare the first and final AQE plan side by side. And the environment page shows your non-default configs, with one-click export.
@@ -356,7 +353,7 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
 ## 09 · LOOKING AHEAD — Slides 80–97 · DB
 
 ### [80] Section divider — Looking Ahead · **DB** · ~0:15
-Everything so far ships in 4.2. This last part is ongoing work — already in progress for the next releases. We want to show you where Spark is going.
+Still benefit five — operate and evolve predictably. This last part is ongoing work, already in progress for the next releases. We want to show you where Spark is going.
 
 ### [81] Roadmap (five topics) · **DB** · ~0:12
 *(Gesture across the five.)* Five things ahead: Project Feather, a language-agnostic UDF protocol, nanosecond timestamps, real-time mode for stateful streaming, and a faster release cadence. We will touch each one.
