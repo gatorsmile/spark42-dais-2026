@@ -3,7 +3,7 @@
 
 **Speakers:** **XIAO** = Xiao Li (gatorsmile) · **DB** = DB Tsai (dbtsai)
 
-**Split:** **Xiao presents slides 1–51.** **DB presents slides 52–101.** One handoff, at the end of slide 51.
+**Split:** **Xiao presents slides 1–51.** **DB presents slides 52–100.** One handoff, at the end of slide 51.
 
 **Style:** Short, simple sentences — written to be easy to say aloud. Read them as written, slow and clear. Pause at each period. Lines in *(parentheses italics)* are stage directions, not spoken.
 
@@ -21,7 +21,7 @@
 | 07 · Data Source V2 | 61–75 | DB |
 | 08 · Performance, UI & Ops | 76–79 | DB |
 | 09 · Looking Ahead | 80–97 | DB |
-| Recap & close | 98–99 | DB |
+| Close (Thank you) | 98 | DB |
 
 ---
 
@@ -424,12 +424,9 @@ The quarterly cadence starts with 4.3. So 4.2 is the bridge release. The dev lis
 
 ---
 
-## CLOSE — Slides 98–99 · DB
+## CLOSE — Slide 98 · DB
 
-### [98] Now Available: Apache Spark™ 4.2 · **DB** · ~0:40
-So, that is 4.2. Three things to remember. One: analytics is now native — metric views, vector search, sketches, geospatial. Two: Python and data sources are faster and more open. Three: the data story — CDC, transactions, pipelines — grew up across SQL, DataFrames, and Data Source V2. It is available now. Please try it.
-
-### [99] Join the community today! · **DB + XIAO** · ~0:20
+### [98] Join the community today! · **DB + XIAO** · ~0:20
 *(DB:)* All of this is built by the Apache Spark community. And you can join. Get the release at spark.apache.org, the source on GitHub, and join the mailing lists. We welcome your contributions and your bug reports. *(XIAO:)* Thank you, DAIS. Enjoy the rest of the Summit.
 
 ---
