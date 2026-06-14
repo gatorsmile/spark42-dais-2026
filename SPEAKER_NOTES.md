@@ -30,7 +30,7 @@
 ### [1] The Upcoming Apache Spark™ 4.2 · **XIAO** · ~0:40
 Good morning. Thank you for coming. I am Xiao Li. I work on Apache Spark at Databricks.
 *(DB:)* And I am DB Tsai, also on the Spark team at Databricks.
-*(XIAO:)* Today we will show you what is new in Apache Spark 4.2. I will present the first half. DB will present the second half. The theme this year is: native analytics for data and AI. Let's start.
+*(XIAO:)* Today we will show you what is new in Apache Spark 4.2. I will present the first half. DB will present the second half. The theme this year is: native analytics for data and AI. The common thread is that Spark is absorbing more of the analytics stack into the engine. Let's start.
 
 ### [2] About us · **XIAO** · ~0:15
 A quick note first. Spark 4.2 is built by the whole Apache Spark community. Hundreds of people. We are here to share their work. Everything we show today is open source.

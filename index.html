@@ -154,6 +154,15 @@
   /* title slide */
   .slide.title-slide { justify-content: center; }
   .slide.title-slide h1 { font-size: 96px; }
+  .slide.title-slide .tagline {
+    margin: 30px 0 0; max-width: 1150px;
+    font-size: 56px; font-weight: 800; line-height: 1.08; letter-spacing: -0.01em;
+    color: var(--c-accent-2);
+  }
+  .slide.title-slide .tagline::before {
+    content: ""; display: block; width: 96px; height: 7px; border-radius: 4px;
+    background: var(--c-accent); margin: 0 0 24px;
+  }
   .slide.title-slide .speakers { margin-top: 44px; font-size: 27px; color: var(--c-muted); }
   .slide.title-slide .speakers b { color: var(--c-text); }
 
@@ -297,7 +306,7 @@
 <section class="slide title-slide active">
   <div class="eyebrow">Data + AI Summit 2026 <span class="tag">Apache Spark 4.2</span></div>
   <h1>The Upcoming<br/>Apache Spark&trade;&nbsp;4.2</h1>
-  <p class="sub">Native Analytics for Data and AI</p>
+  <div class="tagline">Native Analytics for Data and AI</div>
   <div class="speakers"><b>Xiao Li</b> &middot; Github: gatorsmile &middot; Databricks<br/><b>DB Tsai</b> &middot; Github: dbtsai &middot; Databricks</div>
   <div class="slide-footer"><span>The Upcoming Apache Spark 4.2</span><span>DAIS 2026</span></div>
   <div class="progress"><i></i></div>
@@ -305,7 +314,7 @@
 
 Good morning. Thank you for coming. I am Xiao Li. I work on Apache Spark at Databricks.
 (DB:) And I am DB Tsai, also on the Spark team at Databricks.
-(XIAO:) Today we will show you what is new in Apache Spark 4.2. I will present the first half. DB will present the second half. The theme this year is: native analytics for data and AI. Let&#x27;s start.</div>
+(XIAO:) Today we will show you what is new in Apache Spark 4.2. I will present the first half. DB will present the second half. The theme this year is: native analytics for data and AI. The common thread is that Spark is absorbing more of the analytics stack into the engine. Let&#x27;s start.</div>
 </section>
 
 <!-- ============ 2 · ABOUT US ============ -->
