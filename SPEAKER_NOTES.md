@@ -38,7 +38,7 @@ Good morning. Thank you for coming. I am Xiao Li. I work on Apache Spark at Data
 A quick note first. Spark 4.2 is built by the whole Apache Spark community. Hundreds of people. We are here to share their work. Everything we show today is open source.
 
 ### [3] Apache Spark™ 4.2 — Overview · **XIAO** · ~1:15
-Before the details, here is the one idea. Spark 4.2 moves more of the modern data and AI stack into the engine itself. Metrics, vector search, change data capture, Python, streaming, governance, operational visibility — more of it now lives in Spark. So you run fewer systems, and trust one engine. This is the third release in the 4.x line — over 1,600 JIRAs, from more than 260 contributors. Everything we show today maps to this one idea.
+Here is Spark 4.2 in one sentence. Spark 4.2 brings more semantic, AI, Python, CDC, and operational capabilities into the engine. The numbers: more than 1,600 resolved JIRAs, from more than 260 contributors. But one goal ties it together — make analytics and AI workloads more native to Spark. Everything we show today serves that goal.
 
 ### [4] What we'll cover today · **XIAO** · ~0:45
 We organized the talk around five benefits — five things 4.2 does for you. One: define truth once — metric views. Two: reach Spark from everywhere — Spark Connect, PySpark, Arrow, and Python Data Sources. Three: run AI-native analytics in SQL — vector search, sketches, geospatial, and SQL improvements. Four: move changing data safely — Auto CDC, CHANGES, Data Source V2, and streaming. Five: operate and evolve predictably — the Web UI, Project Feather, and a faster release cadence. Every section maps to one of these. I will cover the first benefits. DB will cover the rest.
