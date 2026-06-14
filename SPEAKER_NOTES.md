@@ -1,15 +1,15 @@
 # Speaker Notes — The Upcoming Apache Spark™ 4.2
-### DAIS 2026 keynote · two speakers · 80 slides
+### DAIS 2026 keynote · two speakers · 76 slides
 
 **Speakers:** XIAO = Xiao Li (gatorsmile) · DB = DB Tsai (dbtsai)
 
-**Split:** Xiao presents slides 1–38; DB presents 39–80. One handoff, at the end of the Spark SQL section.
+**Split:** Xiao presents slides 1–38; DB presents 39–76. One handoff, at the end of the Spark SQL section.
 
 **Through-line (say it often):** *Spark 4.2 moves more of the modern data and AI stack into the engine itself.* Five benefits — (1) Define truth once · (2) Reach Spark from everywhere · (3) Run AI-native analytics in SQL · (4) Move changing data safely · (5) Operate & evolve predictably.
 
 **Style:** Short, simple sentences; read slowly; pause at each period. *(parentheses)* are stage directions. Each **section divider** carries a **Today → Spark 4.2 → Monday** takeaway — land the Monday action.
 
-**Structure notes:** PySpark, Spark SQL, and Data Source V2 use a **corner progress strip** instead of roadmap slides. SQL keeps QUALIFY as the live demo plus a compatibility summary. Looking Ahead keeps its 5-topic roadmap; Feather is one 3-part slide, one nanosecond slide, and a merged release-cadence slide.
+**Structure notes:** PySpark, Spark SQL, Data Source V2, and Looking Ahead use a **corner progress strip** instead of repeated roadmap slides (Looking Ahead keeps one agenda roadmap and uses an amber strip = not-in-4.2). SQL keeps QUALIFY as the live demo plus a compatibility summary; Feather is one 3-part slide; one nanosecond slide; merged release-cadence slide.
 
 ---
 
@@ -293,41 +293,29 @@ Feather works on three areas: planning and scheduling, the cache format, and shu
 ### [67] Project Feather: a three-part plan · DB · ~0:55
 Feather has three parts. One — faster planning and scheduling: a single-pass analyzer, and running a small one-file query as a single task with no shuffle. Two — an Arrow columnar cache to replace the row-based df.cache, so re-reads are faster. Three — shuffle-free local execution: threads pass data through channels instead of shuffle files. Together, Spark works well on a laptop, and still scales to the cluster.
 
-### [68] Roadmap (UDF protocol) · DB · ~0:05
-(One breath.) Second — and this closes a real gap.
-
-### [69] Language-agnostic UDF protocol · DB · ~0:45
+### [68] Language-agnostic UDF protocol · DB · ~0:45
 Remember the Connect slide — clients in Go, Rust, Swift, and more. UDFs are the one thing Connect cannot give most of them. SPIP SPARK-55278 fixes this.
 Today, each language must rebuild the whole UDF stack. The planning rules are tied to Python. Serialized UDFs are tied to a runtime — a server upgrade can break them. And UDF execution is locked inside the cluster — so a heavy or GPU UDF makes you over-size the cluster.
 
-### [70] Three pillars · DB · ~0:40
+### [69] Three pillars · DB · ~0:40
 The design has three parts. One: plan UDFs by their shape — scalar, map, grouped map, table, aggregate — not by language. Two: one execution protocol — init, data, finish — over gRPC and Arrow, versioned, with back-pressure. Three: a worker spec — the client says how to start, connect, and clean up a worker: local process, container, or remote GPU. Each part can change without touching the others.
 
-### [71] Status & what it unlocks · DB · ~0:30
+### [70] Status & what it unlocks · DB · ~0:30
 Status: the SPIP vote passed. First code is landing in apache/spark, under /udf/worker. PySpark behavior does not change — one shared core, with pluggable transport. Socket stays the default. gRPC is opt-in.
 It unlocks UDFs in any language, runtimes that upgrade on their own, and heavy or GPU UDFs on separate workers.
 
-### [72] Roadmap (Nanosecond timestamps) · DB · ~0:05
-(One breath.) Third — a precision fix for interop.
-
-### [73] Nanosecond-precision timestamps · DB · ~0:40
+### [71] Nanosecond-precision timestamps · DB · ~0:40
 SPIP SPARK-56822. Today, Spark timestamps stop at microseconds. So nanosecond Parquet either fails, or falls back to a plain long — and loses the timestamp meaning.
 This adds parameterized types — TIMESTAMP(n), with n from 0 to 9. 6 is micros, 9 is nanos. The value model is compact, and keeps today's date range.
 It is fully backward compatible. The micro types stay the default. Nanosecond behavior only appears when you ask for it.
 
-### [74] Roadmap (Real-time stateful streaming) · DB · ~0:05
-(One breath.) Fourth — and this connects back to streaming.
-
-### [75] Real-time mode for stateful streaming · DB · ~0:40
+### [72] Real-time mode for stateful streaming · DB · ~0:40
 Earlier I mentioned real-time mode. SPARK-54699 extends it to stateful queries — with about 100 milliseconds latency. It builds on stateless real-time mode, which shipped in 4.1 — now with the same low latency for transformWithState and aggregations.
 Two parts make it work. A streaming shuffle — it sends data straight to the next task, instead of waiting for the batch. And concurrent stage scheduling — many stages run at the same time. The last part of the roadmap is how we ship all of this.
 
-### [76] Roadmap (Faster releases) · DB · ~0:05
-(One breath.) The last one is about cadence.
-
-### [77] Faster, predictable releases · DB · ~0:50
+### [73] Faster, predictable releases · DB · ~0:50
 And how we ship it. SPARK-54633 — a two-layer model: quarterly minor releases, and an annual major. Minors add features and APIs but freeze dependencies and defaults, so upgrades stay safe. Majors carry the breaking changes. Long-lived branches cut maintenance work, and the final minor of each major is an 18-month LTS. The quarterly cadence begins with 4.3 — so 4.2 is the bridge release, and 4.4 will be the LTS. Monday takeaway: plan your upgrades around the new quarterly cadence.
 
-### [78] Join the community today! · DB + XIAO · ~0:20
+### [74] Join the community today! · DB + XIAO · ~0:20
 (DB:) All of this is built by the Apache Spark community. And you can join. Get the release at spark.apache.org, the source on GitHub, and join the mailing lists. We welcome your contributions and your bug reports. (XIAO:) Thank you, DAIS. Enjoy the rest of the Summit.
 
