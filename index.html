@@ -125,6 +125,7 @@
 
   .cards { display: grid; gap: 24px; margin-top: 10px; }
   .cards.c2 { grid-template-columns: 1fr 1fr; }
+  .cards.c3 { grid-template-columns: repeat(3, 1fr); }
   .cards.c4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
   .card {
     background: var(--c-card); border: 1px solid var(--c-line); border-radius: 12px;
@@ -349,23 +350,33 @@ A quick note first. Spark 4.2 is built by the whole Apache Spark community. Hund
   <div class="eyebrow">Overview</div>
   <h2>Apache Spark&trade; 4.2</h2>
   <p class="sub">The third release in the 4.x line &mdash; 1,600+ resolved JIRAs from 260+ contributors</p>
-  <ul class="points">
-    <li>Governed <b>metric views</b> bring a semantic layer to Spark SQL &mdash; define business metrics once, query by any dimension</li>
-    <li>New analytics built into SQL: <b>vector similarity search</b>, <b>data sketches</b>, and native <b>geospatial types</b></li>
-    <li><b>Change Data Capture</b> becomes first-class &mdash; across SQL, DataFrames, Declarative Pipelines, and Data Source V2</li>
-    <li>PySpark <b>faster by default</b>: Arrow-optimized UDFs and Arrow IPC out of the box, plus <b>Python Data Sources</b></li>
-    <li>Structured Streaming <b>real-time mode</b>, a modern Web UI, and Java 25 support</li>
-  </ul>
+  <div class="cards c3">
+    <div class="card">
+      <span class="chip">Native Semantics</span>
+      <h3>Define meaning once</h3>
+      <p>Governed <b>metric views</b> bring a semantic layer to Spark SQL &mdash; plus new analytics built in: <b>vector search</b>, <b>data sketches</b>, and <b>geospatial</b> types</p>
+    </div>
+    <div class="card">
+      <span class="chip">Native Execution</span>
+      <h3>Faster, in any language</h3>
+      <p><b>Arrow</b> on by default makes PySpark faster; <b>Spark Connect</b> reaches Spark from any language; and <b>Python Data Sources</b> add connectors in pure Python</p>
+    </div>
+    <div class="card">
+      <span class="chip">Native Data Movement</span>
+      <h3>Change-aware by default</h3>
+      <p>First-class <b>Change Data Capture</b>, Structured Streaming <b>real-time mode</b>, and a maturing <b>Data Source V2</b> &mdash; DML, transactions, pushdown</p>
+    </div>
+  </div>
   <div class="slide-footer"><span>Overview &middot; Apache Spark 4.2</span><span>3 / 100</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Apache Spark™ 4.2 — Overview · XIAO · ~1:15
 
-Spark 4.2 is the third release in the 4.x line. More than 1,600 JIRAs. More than 260 contributors. Here are the main parts.
-One: metric views. A semantic layer inside Spark SQL. Define a metric once. Query it by any dimension.
-Two: new analytics in SQL — vector search, data sketches, and geospatial types.
-Three: Change Data Capture is now first-class — in SQL, DataFrames, pipelines, and Data Source V2.
-Four: PySpark is faster by default — Arrow UDFs and Arrow IPC, out of the box. Plus Python Data Sources.
-And more: streaming real-time mode, a new Web UI, and Java 25.</div>
+Spark 4.2 is the third release in the 4.x line. More than 1,600 JIRAs. More than 260 contributors.
+Here is a simple way to see it — three pillars, all native to the engine.
+First, native semantics. Metric views give Spark a semantic layer. Plus new SQL analytics — vector search, data sketches, and geospatial.
+Second, native execution. Arrow makes PySpark faster by default. Spark Connect reaches Spark from any language. And Python Data Sources add connectors in pure Python.
+Third, native data movement. Change Data Capture, real-time streaming, and a stronger Data Source V2.
+Keep these three pillars in mind. The rest of the talk fills them in.</div>
 </section>
 
 <!-- ============ 3 · AGENDA ============ -->

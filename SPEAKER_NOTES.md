@@ -36,12 +36,12 @@ Good morning. Thank you for coming. I am Xiao Li. I work on Apache Spark at Data
 A quick note first. Spark 4.2 is built by the whole Apache Spark community. Hundreds of people. We are here to share their work. Everything we show today is open source.
 
 ### [3] Apache Spark™ 4.2 — Overview · **XIAO** · ~1:15
-Spark 4.2 is the third release in the 4.x line. More than 1,600 JIRAs. More than 260 contributors. Here are the main parts.
-One: metric views. A semantic layer inside Spark SQL. Define a metric once. Query it by any dimension.
-Two: new analytics in SQL — vector search, data sketches, and geospatial types.
-Three: Change Data Capture is now first-class — in SQL, DataFrames, pipelines, and Data Source V2.
-Four: PySpark is faster by default — Arrow UDFs and Arrow IPC, out of the box. Plus Python Data Sources.
-And more: streaming real-time mode, a new Web UI, and Java 25.
+Spark 4.2 is the third release in the 4.x line. More than 1,600 JIRAs. More than 260 contributors.
+Here is a simple way to see it — three pillars, all native to the engine.
+First, native semantics. Metric views give Spark a semantic layer. Plus new SQL analytics — vector search, data sketches, and geospatial.
+Second, native execution. Arrow makes PySpark faster by default. Spark Connect reaches Spark from any language. And Python Data Sources add connectors in pure Python.
+Third, native data movement. Change Data Capture, real-time streaming, and a stronger Data Source V2.
+Keep these three pillars in mind. The rest of the talk fills them in.
 
 ### [4] What we'll cover today · **XIAO** · ~0:45
 Here is our plan. We grouped 4.2 into four parts. First, metrics and Spark SQL. Second, PySpark and Spark Connect. Third, pipelines, streaming, and Data Source V2. And last, looking ahead — what is coming next. I will cover the first parts. DB will cover the rest.
