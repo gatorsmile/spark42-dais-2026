@@ -2732,9 +2732,19 @@ spark.readStream.changes(<span class="s">"my_table"</span>)
     const sw = 1600, sh = 900;
     const vw = window.innerWidth, vh = window.innerHeight;
     const pad = vw < 760 ? 8 : 24;
-    deck.style.transform = `scale(${Math.min((vw - pad*2) / sw, (vh - pad*2) / sh)})`;
+    // On a narrow portrait phone, a 16:9 slide scaled to fit width becomes a tiny
+    // sliver. Rotate it 90deg so it fills the long screen edge — turn the phone
+    // sideways and the deck is full-screen and upright.
+    if (vh > vw && vw < 760) {
+      const s = Math.min((vh - pad*2) / sw, (vw - pad*2) / sh);
+      deck.style.transform = `rotate(90deg) scale(${s})`;
+    } else {
+      deck.style.transform = `scale(${Math.min((vw - pad*2) / sw, (vh - pad*2) / sh)})`;
+    }
   }
-  window.addEventListener('resize', fit); fit();
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', fit);
+  fit();
 
   function animateIn(slide) {
     const blocks = Array.from(slide.children).filter(el =>
