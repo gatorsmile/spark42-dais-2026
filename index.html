@@ -132,6 +132,15 @@
   pre.code .k   { color: var(--c-accent-2); font-weight: 700; } /* keyword */
   pre.code .s   { color: var(--c-good); }                  /* string */
   pre.code .hl  { background: var(--c-accent-soft); border-radius: 4px; padding: 0 4px; }
+  /* Focus mode for code slides: fade the block, spotlight the highlighted key line */
+  pre.code.focus { color:#46586b; }
+  pre.code.focus .c { color:#3d4b5a; }
+  pre.code.focus .k { color:#52647a; font-weight:600; }
+  pre.code.focus .s { color:#4f6273; }
+  pre.code.focus .hl { color:#f4f8fc; }
+  pre.code.focus .hl .k { color:var(--c-accent-2); }
+  pre.code.focus .hl .s { color:var(--c-good); }
+  pre.code.focus .hl .c { color:#9fb3c8; }
   pre.code.sm { font-size: 19px; line-height: 1.45; }
 
   .cards { display: grid; gap: 24px; margin-top: 10px; }
@@ -907,7 +916,7 @@ One source of truth — for SQL, for BI, and for AI. Let me show an example.</di
 <section class="slide">
   <div class="eyebrow">Metrics <span class="tag">In action</span></div>
   <h2>Metric views in action</h2>
-  <pre class="code sm"><span class="c">-- Define metrics once, in a governed view</span>
+  <pre class="code sm focus"><span class="c">-- Define metrics once, in a governed view</span>
 <span class="k">CREATE VIEW</span> sales_metrics <span class="hl">WITH METRICS</span>
 <span class="k">LANGUAGE</span> YAML
 <span class="k">AS</span> $$
@@ -1088,7 +1097,7 @@ This slide is simple: upgrade, and it is faster. In 4.2, Arrow Python UDFs are t
 <section class="slide">
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>Python UDFs: same code, now faster</h2>
-  <pre class="code"><span class="k">from</span> pyspark.sql.functions <span class="k">import</span> udf
+  <pre class="code focus"><span class="k">from</span> pyspark.sql.functions <span class="k">import</span> udf
 
 <span class="hl">@udf(<span class="s">"double"</span>)</span>
 <span class="k">def</span> shipping_cost(weight, zone):
@@ -1145,7 +1154,7 @@ There is also mapInArrow and applyInArrow at the DataFrame level. And if you kee
 <section class="slide">
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>Arrow UDFs in action</h2>
-  <pre class="code sm"><span class="c"># before: Pandas UDF - converts every batch to pandas and back</span>
+  <pre class="code sm focus"><span class="c"># before: Pandas UDF - converts every batch to pandas and back</span>
 @pandas_udf(<span class="s">"double"</span>)
 <span class="k">def</span> to_celsius(f: pd.Series) -&gt; pd.Series:
     <span class="k">return</span> (f - 32) * 5 / 9
@@ -1205,7 +1214,7 @@ A group of small but useful wins. PyCapsule support: zero-copy sharing with Pola
 <section class="slide">
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>PyCapsule interop in action</h2>
-  <pre class="code"><span class="c"># PySpark DataFrames speak the Arrow PyCapsule protocol</span>
+  <pre class="code focus"><span class="c"># PySpark DataFrames speak the Arrow PyCapsule protocol</span>
 df = spark.table(<span class="s">"orders"</span>).where(<span class="s">"amount &gt; 100"</span>)
 
 <span class="k">import</span> polars <span class="k">as</span> pl
@@ -1243,7 +1252,7 @@ In 4.2, hangs are visible. The worker dumps its stack trace. Idle workers can be
 <section class="slide">
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>UDF debugging in action</h2>
-  <pre class="code sm"><span class="c"># stuck worker? dump stacks on a timer, reap silent workers</span>
+  <pre class="code sm focus"><span class="c"># stuck worker? dump stacks on a timer, reap silent workers</span>
 spark.python.worker.tracebackDumpIntervalSeconds = 30
 spark.python.worker.killOnIdleTimeout            = <span class="k">true</span>
 spark.python.worker.idleTimeoutSeconds           = 60
@@ -1335,7 +1344,7 @@ One more thing for the AI era: give an LLM an API spec, and it can write a worki
 <section class="slide">
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>Python Data Sources in action</h2>
-  <pre class="code sm"><span class="k">from</span> pyspark.sql.datasource <span class="k">import</span> DataSource, DataSourceReader
+  <pre class="code sm focus"><span class="k">from</span> pyspark.sql.datasource <span class="k">import</span> DataSource, DataSourceReader
 
 <span class="k">class</span> WeatherSource(DataSource):
     <span class="k">def</span> name(cls): <span class="k">return</span> <span class="s">"weather"</span>
@@ -1425,7 +1434,7 @@ Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually y
 <section class="slide">
   <div class="eyebrow">Vector Search <span class="tag">In action</span></div>
   <h2>Vector functions in action</h2>
-  <pre class="code"><span class="c">-- Rank products by similarity to a query embedding</span>
+  <pre class="code focus"><span class="c">-- Rank products by similarity to a query embedding</span>
 <span class="k">SELECT</span> id,
        <span class="hl">vector_cosine_similarity(embedding, :query_vec)</span> <span class="k">AS</span> score,
        vector_l2_distance(embedding, :query_vec)       <span class="k">AS</span> dist
@@ -1467,7 +1476,7 @@ EXACT is brute force today. APPROX lets a future index help — without changing
 <section class="slide">
   <div class="eyebrow">Vector Search <span class="tag">In action</span></div>
   <h2>NEAREST BY in action</h2>
-  <pre class="code sm"><span class="c">-- Batch: top-10 recommendations for every user (similarity, largest first)</span>
+  <pre class="code sm focus"><span class="c">-- Batch: top-10 recommendations for every user (similarity, largest first)</span>
 <span class="k">SELECT</span> q.user_id, t.*
 <span class="k">FROM</span> users q
 <span class="k">INNER JOIN</span> products t
@@ -1525,7 +1534,7 @@ A few SQL features people asked for a long time. QUALIFY — filter on a window 
 <section class="slide">
   <div class="eyebrow">SQL <span class="tag">In action</span></div>
   <h2>QUALIFY in action</h2>
-  <pre class="code"><span class="c">-- Top 3 orders per customer - no nested subquery needed</span>
+  <pre class="code focus"><span class="c">-- Top 3 orders per customer - no nested subquery needed</span>
 <span class="k">SELECT</span> customer_id, order_id, amount
 <span class="k">FROM</span> orders
 <span class="hl"><span class="k">QUALIFY</span> ROW_NUMBER() <span class="k">OVER</span> (
@@ -1546,7 +1555,7 @@ A few SQL features people asked for a long time. QUALIFY — filter on a window 
 <section class="slide">
   <div class="eyebrow">SQL <span class="tag">In action</span></div>
   <h2>FILTER in window aggregates</h2>
-  <pre class="code"><span class="c">-- Conditional aggregates, evaluated within each window frame</span>
+  <pre class="code focus"><span class="c">-- Conditional aggregates, evaluated within each window frame</span>
 <span class="k">SELECT</span>
   val, cate,
   sum(val)   <span class="hl">FILTER (WHERE cate = <span class="s">'a'</span>)</span> <span class="k">OVER</span> (<span class="k">PARTITION BY</span> cate) <span class="k">AS</span> sum_a,
@@ -1562,7 +1571,7 @@ A few SQL features people asked for a long time. QUALIFY — filter on a window 
 <section class="slide">
   <div class="eyebrow">SQL <span class="tag">In action</span></div>
   <h2>PIVOT aliases &amp; the <code>|</code> pipe</h2>
-  <pre class="code"><span class="c">-- Alias the aggregates (s, a) and the pivot values (firstYear, secondYear)</span>
+  <pre class="code focus"><span class="c">-- Alias the aggregates (s, a) and the pivot values (firstYear, secondYear)</span>
 <span class="k">SELECT</span> firstYear_s, secondYear_s, firstYear_a, secondYear_a, c
 <span class="k">FROM</span> (<span class="k">SELECT</span> year y, course c, earnings e <span class="k">FROM</span> courseSales)
 <span class="k">PIVOT</span> (
@@ -1584,7 +1593,7 @@ A few SQL features people asked for a long time. QUALIFY — filter on a window 
 <section class="slide">
   <div class="eyebrow">SQL <span class="tag">In action</span></div>
   <h2>SQL scripting: cursors</h2>
-  <pre class="code"><span class="c">-- Row-by-row processing with a cursor + NOT FOUND handler</span>
+  <pre class="code focus"><span class="c">-- Row-by-row processing with a cursor + NOT FOUND handler</span>
 <span class="k">BEGIN</span>
   <span class="k">DECLARE</span> x INT;  <span class="k">DECLARE</span> done BOOLEAN <span class="k">DEFAULT</span> false;  <span class="k">DECLARE</span> total INT <span class="k">DEFAULT</span> 0;
   <span class="hl"><span class="k">DECLARE</span> sum_cursor <span class="k">CURSOR FOR</span> <span class="k">SELECT</span> id <span class="k">FROM</span> range(5)</span>;
@@ -1625,7 +1634,7 @@ SET PATH lets you find tables, functions, and variables across schemas — witho
 <section class="slide">
   <div class="eyebrow">SQL <span class="tag">In action</span></div>
   <h2>SET PATH in action</h2>
-  <pre class="code"><span class="c">-- Opt in once</span>
+  <pre class="code focus"><span class="c">-- Opt in once</span>
 <span class="k">SET</span> spark.sql.path.enabled = <span class="k">true</span>;
 
 <span class="c">-- Unqualified names now resolve by walking the path</span>
@@ -1705,7 +1714,7 @@ The best part: they merge. Store sketches as Delta columns. Then combine them fo
 <section class="slide">
   <div class="eyebrow">SQL <span class="tag">In action</span></div>
   <h2>Tuple sketches: distinct counts + a metric, mergeable</h2>
-  <pre class="code"><span class="c">-- One mergeable structure = distinct counting + a summed metric, per key</span>
+  <pre class="code focus"><span class="c">-- One mergeable structure = distinct counting + a summed metric, per key</span>
 <span class="c">-- tuple_sketch_agg_double(key, summary [, lgNomEntries=12] [, mode='sum'])</span>
 <span class="k">CREATE TABLE</span> category_sketches <span class="k">AS</span>
 <span class="k">SELECT</span> category,
@@ -1764,7 +1773,7 @@ Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds GE
 <section class="slide">
   <div class="eyebrow">Geospatial <span class="tag">In action</span></div>
   <h2>Geospatial in action</h2>
-  <pre class="code"><span class="c">-- Define geospatial columns</span>
+  <pre class="code focus"><span class="c">-- Define geospatial columns</span>
 <span class="k">CREATE TABLE</span> city_zones (
   zone_id INT, name STRING, boundary <span class="hl">GEOMETRY(4326)</span>
 );
@@ -1841,7 +1850,7 @@ It runs inside Spark Declarative Pipelines. So checkpoints, retries, and idempot
 <section class="slide">
   <div class="eyebrow">Pipelines &amp; Auto CDC <span class="tag">In action</span></div>
   <h2>Auto CDC in action</h2>
-  <pre class="code sm"><span class="c">-- 1. produce a change feed in SQL (SPARK-55668)</span>
+  <pre class="code sm focus"><span class="c">-- 1. produce a change feed in SQL (SPARK-55668)</span>
 <span class="k">CREATE STREAMING TABLE</span> user_changes <span class="k">AS</span>
   <span class="k">SELECT</span> * <span class="k">FROM</span> STREAM users CHANGES <span class="k">FROM</span> VERSION 10;
 
@@ -1899,7 +1908,7 @@ Now you name them, with IDENTIFIED BY. Identity is no longer the position. So yo
 <section class="slide">
   <div class="eyebrow">Streaming <span class="tag">In action</span></div>
   <h2>IDENTIFIED BY in action</h2>
-  <pre class="code"><span class="c">-- Name each source: identity is the name, not the position</span>
+  <pre class="code focus"><span class="c">-- Name each source: identity is the name, not the position</span>
 <span class="k">CREATE STREAMING TABLE</span> unified <span class="k">AS</span>
 <span class="k">SELECT</span> * <span class="k">FROM</span> STREAM orders   <span class="hl">IDENTIFIED BY orders_src</span>
 <span class="k">UNION ALL</span>
@@ -2053,7 +2062,7 @@ Spark does the hard part — removing carry-overs, detecting updates, collapsing
 <section class="slide">
   <div class="eyebrow">Data Source V2 <span class="tag">In action</span></div>
   <h2>Reading changes in action</h2>
-  <pre class="code sm"><span class="c">-- batch · version range</span>
+  <pre class="code sm focus"><span class="c">-- batch · version range</span>
 <span class="k">SELECT</span> * <span class="k">FROM</span> t <span class="hl">CHANGES FROM VERSION 10 TO VERSION 20</span>;
 
 <span class="c">-- batch · timestamp range, exclusive lower bound</span>
@@ -2133,7 +2142,7 @@ There is new INSERT ... REPLACE syntax, and BY NAME with REPLACE WHERE. MERGE ge
 <section class="slide">
   <div class="eyebrow">Data Source V2 <span class="tag">In action</span></div>
   <h2>Schema evolution in action</h2>
-  <pre class="code"><span class="c">-- Source gained a new column `coupon` - let the target evolve</span>
+  <pre class="code focus"><span class="c">-- Source gained a new column `coupon` - let the target evolve</span>
 <span class="k">INSERT INTO</span> sales_target <span class="hl">WITH SCHEMA EVOLUTION</span>
 <span class="k">SELECT</span> * <span class="k">FROM</span> sales_source;
 
@@ -2506,7 +2515,7 @@ It is fully backward compatible. The micro types stay the default. Nanosecond be
   <div class="la-badge">Looking Ahead</div>
   <div class="eyebrow">Looking Ahead <span class="tag">In action</span></div>
   <h2>Declaring nanosecond timestamps</h2>
-  <pre class="code"><span class="c">-- Explicit fractional-second precision (n = 0..9; 9 = nanoseconds)</span>
+  <pre class="code focus"><span class="c">-- Explicit fractional-second precision (n = 0..9; 9 = nanoseconds)</span>
 <span class="k">CREATE TABLE</span> trades (
   ts        <span class="hl">TIMESTAMP_NTZ(9)</span>,   <span class="c">-- no time zone</span>
   exec_time <span class="hl">TIMESTAMP_LTZ(9)</span>    <span class="c">-- instant / local time zone</span>
