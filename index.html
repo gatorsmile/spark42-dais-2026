@@ -99,6 +99,10 @@
     letter-spacing: .14em; text-transform: uppercase;
   }
   .slide .la-badge::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--c-warn); flex: none; }
+  /* PySpark persistent topic-progress strip (replaces repeated roadmap slides) */
+  .slide .pyprog { position:absolute; top:42px; right:56px; z-index:6; display:flex; gap:8px; }
+  .slide .pyprog span { padding:6px 13px; border-radius:999px; border:1px solid var(--c-line); color:var(--c-dim); font-size:14px; font-weight:700; letter-spacing:.02em; white-space:nowrap; }
+  .slide .pyprog span.on { border-color:var(--c-accent); color:var(--c-accent-2); background:var(--c-accent-soft); }
 
   ul.points { margin: 8px 0 0; padding: 0; list-style: none; }
   ul.points > li {
@@ -1080,22 +1084,8 @@ Still benefit two — reach Spark from everywhere. Now Python, the language most
 </section>
 
 <!-- roadmap: PySpark 1 -->
-<section class="slide break la-roadmap">
-  <div class="eyebrow">PySpark &middot; Roadmap</div>
-  <ol class="roadmap">
-      <li class="active"><span class="n">01</span><div class="txt"><h3>Arrow by default</h3><p>Faster Python execution, zero code change</p></div></li>
-      <li><span class="n">02</span><div class="txt"><h3>Native Arrow UDFs</h3><p>Write on columns, skip the copies</p></div></li>
-      <li><span class="n">03</span><div class="txt"><h3>Interop &amp; debugging</h3><p>Zero-copy exchange, debug where UDFs run</p></div></li>
-      <li><span class="n">04</span><div class="txt"><h3>Python Data Sources</h3><p>Connectors in pure Python, a growing ecosystem</p></div></li>
-  </ol>
-  <div class="slide-footer"><span>PySpark</span><span>15</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Roadmap (Arrow by default) · XIAO · ~0:08
-
-(One breath.) Four things in the Python story. First — Arrow, on by default.</div>
-</section>
-
 <section class="slide">
+  <div class="pyprog"><span class="on">1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span>3 &middot; Interop</span><span>4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark</div>
   <h2>Arrow on by default</h2>
   <ul class="points">
@@ -1104,7 +1094,7 @@ Still benefit two — reach Spark from everywhere. Now Python, the language most
     <li>Arrow-backed input skips ColumnarToRow conversion on the way into Python UDFs</li>
     <li>Upgrade to 4.2 and pick up the speedups with <b>zero code changes</b></li>
   </ul>
-  <div class="slide-footer"><span>PySpark</span><span>16</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>15</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Arrow on by default · XIAO · ~0:40
 
@@ -1112,6 +1102,7 @@ This slide is simple: upgrade, and it is faster. In 4.2, Arrow Python UDFs are t
 </section>
 
 <section class="slide">
+  <div class="pyprog"><span class="on">1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span>3 &middot; Interop</span><span>4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>Python UDFs: same code, now faster</h2>
   <pre class="code focus"><span class="k">from</span> pyspark.sql.functions <span class="k">import</span> udf
@@ -1125,7 +1116,7 @@ df.select(shipping_cost(<span class="s">"weight"</span>, <span class="s">"zone"<
 <span class="c"># Spark 4.2 runs this as an Arrow-optimized UDF automatically:
 #   - no useArrow=True, no code changes
 #   - vectorized Arrow data exchange instead of pickled rows</span></pre>
-  <div class="slide-footer"><span>PySpark</span><span>17</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>16</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Python UDFs: same code, now faster · XIAO · ~0:25
 
@@ -1133,22 +1124,8 @@ df.select(shipping_cost(<span class="s">"weight"</span>, <span class="s">"zone"<
 </section>
 
 <!-- roadmap: PySpark 2 -->
-<section class="slide break la-roadmap">
-  <div class="eyebrow">PySpark &middot; Roadmap</div>
-  <ol class="roadmap">
-      <li><span class="n">01</span><div class="txt"><h3>Arrow by default</h3><p>Faster Python execution, zero code change</p></div></li>
-      <li class="active"><span class="n">02</span><div class="txt"><h3>Native Arrow UDFs</h3><p>Write on columns, skip the copies</p></div></li>
-      <li><span class="n">03</span><div class="txt"><h3>Interop &amp; debugging</h3><p>Zero-copy exchange, debug where UDFs run</p></div></li>
-      <li><span class="n">04</span><div class="txt"><h3>Python Data Sources</h3><p>Connectors in pure Python, a growing ecosystem</p></div></li>
-  </ol>
-  <div class="slide-footer"><span>PySpark</span><span>18</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Roadmap (Native Arrow UDFs) · XIAO · ~0:06
-
-(One breath.) If you change your code a little, you can go faster — native Arrow UDFs.</div>
-</section>
-
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span class="on">2 &middot; Arrow UDFs</span><span>3 &middot; Interop</span><span>4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark</div>
   <h2>Native Arrow UDFs: write on columns, skip the copies</h2>
   <ul class="points">
@@ -1158,7 +1135,7 @@ df.select(shipping_cost(<span class="s">"weight"</span>, <span class="s">"zone"<
     <li><code>mapInArrow</code> / <code>applyInArrow</code> for whole-batch and per-group processing at the DataFrame level</li>
     <li>Keep your existing Pandas UDFs: the Arrow-backed pandas backend makes them <b>~2&times; faster</b> with zero code changes</li>
   </ul>
-  <div class="slide-footer"><span>PySpark</span><span>19</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>17</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Native Arrow UDFs: write on columns, skip the copies · XIAO · ~0:50
 
@@ -1169,6 +1146,7 @@ There is also mapInArrow and applyInArrow at the DataFrame level. And if you kee
 </section>
 
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span class="on">2 &middot; Arrow UDFs</span><span>3 &middot; Interop</span><span>4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>Arrow UDFs in action</h2>
   <pre class="code sm focus"><span class="c"># before: Pandas UDF - converts every batch to pandas and back</span>
@@ -1188,7 +1166,7 @@ There is also mapInArrow and applyInArrow at the DataFrame level. And if you kee
 @arrow_udf(<span class="s">"double"</span>)
 <span class="k">def</span> weighted_mean(v: pa.Array, w: pa.Array) -&gt; float:
     <span class="k">return</span> pc.sum(pc.multiply(v, w)).as_py() / pc.sum(w).as_py()</pre>
-  <div class="slide-footer"><span>PySpark</span><span>20</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>18</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Arrow UDFs in action · XIAO · ~0:25
 
@@ -1196,22 +1174,8 @@ There is also mapInArrow and applyInArrow at the DataFrame level. And if you kee
 </section>
 
 <!-- roadmap: PySpark 3 -->
-<section class="slide break la-roadmap">
-  <div class="eyebrow">PySpark &middot; Roadmap</div>
-  <ol class="roadmap">
-      <li><span class="n">01</span><div class="txt"><h3>Arrow by default</h3><p>Faster Python execution, zero code change</p></div></li>
-      <li><span class="n">02</span><div class="txt"><h3>Native Arrow UDFs</h3><p>Write on columns, skip the copies</p></div></li>
-      <li class="active"><span class="n">03</span><div class="txt"><h3>Interop &amp; debugging</h3><p>Zero-copy exchange, debug where UDFs run</p></div></li>
-      <li><span class="n">04</span><div class="txt"><h3>Python Data Sources</h3><p>Connectors in pure Python, a growing ecosystem</p></div></li>
-  </ol>
-  <div class="slide-footer"><span>PySpark</span><span>21</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Roadmap (Interop &amp; debugging) · XIAO · ~0:06
-
-(One breath.) Third — interop and developer experience.</div>
-</section>
-
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span class="on">3 &middot; Interop</span><span>4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark</div>
   <h2>Better interop &amp; developer experience</h2>
   <ul class="points">
@@ -1221,7 +1185,7 @@ There is also mapInArrow and applyInArrow at the DataFrame level. And if you kee
     <li>Optional strict column-resolution mode catches ambiguous DataFrame references early</li>
     <li>pandas API on Spark: broader axis=1 support (any, all, rank, idxmax, idxmin, nunique)</li>
   </ul>
-  <div class="slide-footer"><span>PySpark</span><span>22</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>19</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Better interop &amp; developer experience · XIAO · ~0:40
 
@@ -1229,6 +1193,7 @@ A group of small but useful wins. PyCapsule support: zero-copy sharing with Pola
 </section>
 
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span class="on">3 &middot; Interop</span><span>4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>PyCapsule interop in action</h2>
   <pre class="code focus"><span class="c"># PySpark DataFrames speak the Arrow PyCapsule protocol</span>
@@ -1242,7 +1207,7 @@ duckdb.sql(<span class="s">"SELECT count(*) FROM df"</span>) <span class="c"># q
 
 <span class="c"># Data flows through Arrow - no pandas round-trip
 # (materializes the result on the client)</span></pre>
-  <div class="slide-footer"><span>PySpark</span><span>23</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>20</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>PyCapsule interop in action · XIAO · ~0:30
 
@@ -1250,6 +1215,7 @@ duckdb.sql(<span class="s">"SELECT count(*) FROM df"</span>) <span class="c"># q
 </section>
 
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span class="on">3 &middot; Interop</span><span>4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark</div>
   <h2>Debug UDFs where they run</h2>
   <ul class="points">
@@ -1258,7 +1224,7 @@ duckdb.sql(<span class="s">"SELECT count(*) FROM df"</span>) <span class="c"># q
     <li><b>Unified profiling</b> for Python, Pandas, and Arrow UDFs: CPU calls &amp; time, and line-by-line memory &mdash; works on Spark Connect too</li>
     <li><b>Structured UDF logging</b> in 4.2: use Python's <code>logging</code> inside the UDF, then query the logs back as a table</li>
   </ul>
-  <div class="slide-footer"><span>PySpark</span><span>24</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>21</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Debug UDFs where they run · XIAO · ~0:45
 
@@ -1267,6 +1233,7 @@ In 4.2, hangs are visible. The worker dumps its stack trace. Idle workers can be
 </section>
 
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span class="on">3 &middot; Interop</span><span>4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>UDF debugging in action</h2>
   <pre class="code sm focus"><span class="c"># stuck worker? dump stacks on a timer, reap silent workers</span>
@@ -1284,7 +1251,7 @@ spark.profile.show(type=<span class="s">"memory"</span>)   <span class="c"># lin
 spark.conf.set(<span class="s">"spark.sql.pyspark.worker.logging.enabled"</span>, <span class="s">"true"</span>)
 <span class="c">#   ... logging.info("null input skipped") inside the UDF ...</span>
 <span class="k">SELECT</span> * <span class="k">FROM</span> <span class="hl">python_worker_logs()</span>;  <span class="c">-- query logs as a table</span></pre>
-  <div class="slide-footer"><span>PySpark</span><span>25</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>22</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>UDF debugging in action · XIAO · ~0:25
 
@@ -1293,22 +1260,8 @@ spark.conf.set(<span class="s">"spark.sql.pyspark.worker.logging.enabled"</span>
 
 <!-- python data sources: ecosystem -->
 <!-- roadmap: PySpark 4 -->
-<section class="slide break la-roadmap">
-  <div class="eyebrow">PySpark &middot; Roadmap</div>
-  <ol class="roadmap">
-      <li><span class="n">01</span><div class="txt"><h3>Arrow by default</h3><p>Faster Python execution, zero code change</p></div></li>
-      <li><span class="n">02</span><div class="txt"><h3>Native Arrow UDFs</h3><p>Write on columns, skip the copies</p></div></li>
-      <li><span class="n">03</span><div class="txt"><h3>Interop &amp; debugging</h3><p>Zero-copy exchange, debug where UDFs run</p></div></li>
-      <li class="active"><span class="n">04</span><div class="txt"><h3>Python Data Sources</h3><p>Connectors in pure Python, a growing ecosystem</p></div></li>
-  </ol>
-  <div class="slide-footer"><span>PySpark</span><span>26</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Roadmap (Python Data Sources) · XIAO · ~0:06
-
-(One breath.) And fourth — my favorite — Python Data Sources.</div>
-</section>
-
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span>3 &middot; Interop</span><span class="on">4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark</div>
   <h2>Python Data Sources: connectors in pure Python</h2>
   <ul class="points">
@@ -1318,7 +1271,7 @@ spark.conf.set(<span class="s">"spark.sql.pyspark.worker.logging.enabled"</span>
     <li>A real <b>ecosystem</b> &mdash; the community <code>pyspark-data-sources</code> package ships ready-made connectors: Hugging&nbsp;Face, Google Sheets, Kaggle, Arrow/Lance, Salesforce, fake data&hellip;</li>
     <li><b>AI-generated data sources</b>: hand an LLM an API spec and it scaffolds a working <code>DataSource</code> &mdash; the long tail of connectors, on demand</li>
   </ul>
-  <div class="slide-footer"><span>PySpark</span><span>27</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>23</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Python Data Sources: connectors in pure Python · XIAO · ~0:50
 
@@ -1331,6 +1284,7 @@ One more thing for the AI era: give an LLM an API spec, and it can write a worki
 
 <!-- python data sources: logo wall -->
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span>3 &middot; Interop</span><span class="on">4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark <span class="tag">Ecosystem</span></div>
   <h2>A growing Python Data Source ecosystem</h2>
   <div class="logowall">
@@ -1350,7 +1304,7 @@ One more thing for the AI era: give an LLM an API spec, and it can write a worki
     <div class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/></svg><span>Stripe</span></div>
   </div>
   <p class="sub" style="margin-top:36px; font-size:21px">Community connectors (<code>pyspark-data-sources</code>) &amp; AI-generated custom sources &mdash; read &amp; write any of these from Spark, in pure Python</p>
-  <div class="slide-footer"><span>PySpark</span><span>28</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>24</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>A growing Python Data Source ecosystem · XIAO · ~0:30
 
@@ -1359,6 +1313,7 @@ One more thing for the AI era: give an LLM an API spec, and it can write a worki
 
 <!-- python data sources: in action -->
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span>3 &middot; Interop</span><span class="on">4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>Python Data Sources in action</h2>
   <pre class="code sm focus"><span class="k">from</span> pyspark.sql.datasource <span class="k">import</span> DataSource, DataSourceReader
@@ -1375,7 +1330,7 @@ One more thing for the AI era: give an LLM an API spec, and it can write a worki
 
 spark.dataSource.<span class="hl">register</span>(WeatherSource)
 spark.read.<span class="hl">format(<span class="s">"weather"</span>)</span>.option(<span class="s">"region"</span>, <span class="s">"EU"</span>).load().show()</pre>
-  <div class="slide-footer"><span>PySpark</span><span>29</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>25</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Python Data Sources in action · XIAO · ~0:25
 
@@ -1384,6 +1339,7 @@ spark.read.<span class="hl">format(<span class="s">"weather"</span>)</span>.opti
 
 <!-- python data sources: profiling (SPARK-55161 / PR 53945) -->
 <section class="slide">
+  <div class="pyprog"><span>1 &middot; Arrow</span><span>2 &middot; Arrow UDFs</span><span>3 &middot; Interop</span><span class="on">4 &middot; Data Sources</span></div>
   <div class="eyebrow">PySpark <span class="tag">New in 4.2</span></div>
   <h2>Profiling Python Data Sources</h2>
   <ul class="points">
@@ -1392,7 +1348,7 @@ spark.read.<span class="hl">format(<span class="s">"weather"</span>)</span>.opti
     <li>See where time and allocations go inside your <code>read</code> / <code>write</code> code &mdash; surfaced via <code>spark.profile.show()</code> / <code>.dump()</code></li>
     <li>Turns a custom connector from a <b>black box</b> into something you can measure and tune</li>
   </ul>
-  <div class="slide-footer"><span>PySpark</span><span>30</span></div>
+  <div class="slide-footer"><span>PySpark</span><span>26</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Profiling Python Data Sources · XIAO · ~0:35
 
@@ -1410,7 +1366,7 @@ New in 4.2: you can profile these Python data sources, like UDFs — for time an
     <div class="now"><span class="tk-label">Spark 4.2</span>Vector functions, NEAREST BY, QUALIFY, sketches, and geospatial &mdash; built in.</div>
     <div class="mon"><span class="tk-label">Monday</span>Replace a cross-join plus ROW_NUMBER top-K with NEAREST BY.</div>
   </div>
-  <div class="slide-footer"><span>Spark SQL</span><span>31</span></div>
+  <div class="slide-footer"><span>Spark SQL</span><span>27</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Spark SQL · XIAO · ~0:12
 
@@ -1426,7 +1382,7 @@ Benefit three: run AI-native analytics in SQL. This release added the most featu
       <li><span class="n">03</span><div class="txt"><h3>Data sketches</h3><p>Approximate, mergeable analytics</p></div></li>
       <li><span class="n">04</span><div class="txt"><h3>Geospatial</h3><p>Native geometry types &amp; functions</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Spark SQL</span><span>32</span></div>
+  <div class="slide-footer"><span>Spark SQL</span><span>28</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (Vector search) · XIAO · ~0:08
 
@@ -1446,7 +1402,7 @@ Benefit three: run AI-native analytics in SQL. This release added the most featu
       </ul></li>
     <li>Score similarity at Spark scale in SQL or DataFrames &mdash; the scoring building blocks for the new <b>NEAREST BY</b> top-K join</li>
   </ul>
-  <div class="slide-footer"><span>Vector Search</span><span>33</span></div>
+  <div class="slide-footer"><span>Vector Search</span><span>29</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Query embeddings where your data lives · XIAO · ~0:45
 
@@ -1468,7 +1424,7 @@ Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually y
 <span class="k">SELECT</span> category, vector_avg(embedding) <span class="k">AS</span> centroid
 <span class="k">FROM</span>   products
 <span class="k">GROUP BY</span> category;</pre>
-  <div class="slide-footer"><span>Vector Search</span><span>34</span></div>
+  <div class="slide-footer"><span>Vector Search</span><span>30</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Vector functions in action · XIAO · ~0:25
 
@@ -1485,7 +1441,7 @@ Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually y
     <li><code>INNER</code> (default) drops unmatched query rows; <code>LEFT OUTER</code> keeps them with NULL base columns</li>
     <li><code>EXACT</code> is brute-force KNN today; <code>APPROX</code> lets future ANN indexes kick in <b>without changing the query</b> &mdash; index presence never silently changes results</li>
   </ul>
-  <div class="slide-footer"><span>Vector Search</span><span>35</span></div>
+  <div class="slide-footer"><span>Vector Search</span><span>31</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>NEAREST BY: top-K ranking join · XIAO · ~0:50
 
@@ -1514,7 +1470,7 @@ EXACT is brute force today. APPROX lets a future index help — without changing
 
 <span class="c">-- LEFT OUTER keeps unmatched query rows (base cols NULL);</span>
 <span class="c">-- EXACT = brute force, APPROX &rarr; future ANN indexes</span></pre>
-  <div class="slide-footer"><span>Vector Search</span><span>36</span></div>
+  <div class="slide-footer"><span>Vector Search</span><span>32</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>NEAREST BY in action · XIAO · ~0:25
 
@@ -1530,7 +1486,7 @@ EXACT is brute force today. APPROX lets a future index help — without changing
       <li><span class="n">03</span><div class="txt"><h3>Data sketches</h3><p>Approximate, mergeable analytics</p></div></li>
       <li><span class="n">04</span><div class="txt"><h3>Geospatial</h3><p>Native geometry types &amp; functions</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Spark SQL</span><span>37</span></div>
+  <div class="slide-footer"><span>Spark SQL</span><span>33</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (SQL language) · XIAO · ~0:06
 
@@ -1546,7 +1502,7 @@ EXACT is brute force today. APPROX lets a future index help — without changing
     <li>PIVOT clause supports aliases; pipe syntax accepts <code>|</code> as an alternative to <code>|&gt;</code></li>
     <li>SQL scripting adds cursor support for row-by-row processing</li>
   </ul>
-  <div class="slide-footer"><span>SQL</span><span>38</span></div>
+  <div class="slide-footer"><span>SQL</span><span>34</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Write window logic naturally · XIAO · ~0:40
 
@@ -1567,7 +1523,7 @@ A few SQL features people asked for a long time. QUALIFY — filter on a window 
 <span class="k">SELECT</span> * <span class="k">FROM</span> events
 <span class="k">QUALIFY</span> ROW_NUMBER() <span class="k">OVER</span> (
           <span class="k">PARTITION BY</span> event_id <span class="k">ORDER BY</span> ts <span class="k">DESC</span>) = 1;</pre>
-  <div class="slide-footer"><span>SQL</span><span>39</span></div>
+  <div class="slide-footer"><span>SQL</span><span>35</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>QUALIFY in action · XIAO · ~0:18
 
@@ -1575,123 +1531,20 @@ A few SQL features people asked for a long time. QUALIFY — filter on a window 
 </section>
 
 <section class="slide">
-  <div class="eyebrow">SQL <span class="tag">In action</span></div>
-  <h2>FILTER in window aggregates</h2>
-  <pre class="code focus"><span class="c">-- Conditional aggregates, evaluated within each window frame</span>
-<span class="k">SELECT</span>
-  val, cate,
-  sum(val)   <span class="hl">FILTER (WHERE cate = <span class="s">'a'</span>)</span> <span class="k">OVER</span> (<span class="k">PARTITION BY</span> cate) <span class="k">AS</span> sum_a,
-  count(val) <span class="hl">FILTER (WHERE val &gt; 1)</span>    <span class="k">OVER</span> (<span class="k">ORDER BY</span> val)      <span class="k">AS</span> cnt_gt1
-<span class="k">FROM</span> testData;</pre>
-  <div class="slide-footer"><span>SQL</span><span>40</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>FILTER in window aggregates · XIAO · ~0:18
-
-(Code slide.) A conditional running total. The FILTER is on the window aggregate.</div>
-</section>
-
-<section class="slide">
-  <div class="eyebrow">SQL <span class="tag">In action</span></div>
-  <h2>PIVOT aliases &amp; the <code>|</code> pipe</h2>
-  <pre class="code focus"><span class="c">-- Alias the aggregates (s, a) and the pivot values (firstYear, secondYear)</span>
-<span class="k">SELECT</span> firstYear_s, secondYear_s, firstYear_a, secondYear_a, c
-<span class="k">FROM</span> (<span class="k">SELECT</span> year y, course c, earnings e <span class="k">FROM</span> courseSales)
-<span class="k">PIVOT</span> (
-  sum(e) <span class="hl">s</span>, avg(e) <span class="hl">a</span>
-  <span class="k">FOR</span> y <span class="k">IN</span> (2012 <span class="hl">AS firstYear</span>, 2013 <span class="hl">secondYear</span>)
-);
-
-<span class="c">-- '|' now works anywhere '|&gt;' did</span>
-<span class="k">TABLE</span> courseSales
-<span class="hl">|</span>  <span class="k">WHERE</span> earnings &gt; 100
-<span class="hl">|</span>  <span class="k">AGGREGATE</span> sum(earnings) <span class="k">AS</span> total <span class="k">GROUP BY</span> course;</pre>
-  <div class="slide-footer"><span>SQL</span><span>41</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>PIVOT aliases &amp; the | pipe · XIAO · ~0:18
-
-(Code slide.) Aliased pivot columns, and the pipe syntax.</div>
-</section>
-
-<section class="slide">
-  <div class="eyebrow">SQL <span class="tag">In action</span></div>
-  <h2>SQL scripting: cursors</h2>
-  <pre class="code focus"><span class="c">-- Row-by-row processing with a cursor + NOT FOUND handler</span>
-<span class="k">BEGIN</span>
-  <span class="k">DECLARE</span> x INT;  <span class="k">DECLARE</span> done BOOLEAN <span class="k">DEFAULT</span> false;  <span class="k">DECLARE</span> total INT <span class="k">DEFAULT</span> 0;
-  <span class="hl"><span class="k">DECLARE</span> sum_cursor <span class="k">CURSOR FOR</span> <span class="k">SELECT</span> id <span class="k">FROM</span> range(5)</span>;
-  <span class="k">DECLARE CONTINUE HANDLER FOR NOT FOUND</span> <span class="k">SET</span> done = true;
-
-  <span class="hl"><span class="k">OPEN</span> sum_cursor</span>;
-  <span class="k">REPEAT</span>
-    <span class="hl"><span class="k">FETCH</span> sum_cursor <span class="k">INTO</span> x</span>;
-    <span class="k">IF NOT</span> done <span class="k">THEN</span> <span class="k">SET</span> total = total + x; <span class="k">END IF</span>;
-  <span class="k">UNTIL</span> done <span class="k">END REPEAT</span>;
-  <span class="hl"><span class="k">CLOSE</span> sum_cursor</span>;
-
-  <span class="k">VALUES</span> (total);   <span class="c">-- returns 10</span>
-<span class="k">END</span>;</pre>
-  <div class="slide-footer"><span>SQL</span><span>42</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>SQL scripting: cursors · XIAO · ~0:18
-
-(Code slide.) A cursor — row-by-row logic, in pure SQL.</div>
-</section>
-
-<section class="slide">
-  <div class="eyebrow">SQL</div>
-  <h2>SQL search path: SET PATH</h2>
+  <div class="eyebrow">SQL <span class="tag">Compatibility</span></div>
+  <h2>SQL compatibility improvements</h2>
   <ul class="points">
-    <li>Resolve tables, functions, and variables across namespaces without fully qualifying names</li>
-    <li><code>SET PATH</code> controls the lookup order; <code>CURRENT_PATH()</code> shows what's active</li>
-    <li>The path is persisted in views and SQL UDFs and shown in DESCRIBE &mdash; results stay reproducible</li>
-    <li>Eases migrations from databases with schema search paths, like PostgreSQL</li>
+    <li><b>Search path</b> &mdash; <code>SET PATH</code> resolves tables, functions, and variables across schemas without full names; it&rsquo;s persisted in views and shown in <code>DESCRIBE</code>, easing PostgreSQL migration</li>
+    <li><b>Richer types</b> &mdash; the <code>TIME</code> type now works across JSON, CSV, XML, ORC, and Avro; <code>TIMESTAMP WITH LOCAL TIME ZONE</code> is supported in SQL syntax</li>
+    <li><b>More built-ins</b> &mdash; <code>IGNORE</code>/<code>RESPECT NULLS</code> for <code>array_agg</code> and <code>collect_list/set</code>; top-K <code>max_by</code>/<code>min_by</code>; and <code>time_bucket</code> for time-series rollups</li>
   </ul>
-  <div class="slide-footer"><span>SQL</span><span>43</span></div>
+  <div class="slide-footer"><span>SQL</span><span>36</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>SQL search path: SET PATH · XIAO · ~0:35
+  <div class="notes" hidden>SQL compatibility improvements &middot; XIAO &middot; ~0:40
 
-SET PATH lets you find tables, functions, and variables across schemas — without writing the full name. SET PATH sets the order. CURRENT_PATH() shows what is active. The path is saved in views and SQL UDFs, and shown in DESCRIBE — so results stay the same. This helps if you migrate from PostgreSQL.</div>
+A quick compatibility round. SET PATH resolves names across schemas without the full path, and it is saved in views, so results stay reproducible &mdash; this helps PostgreSQL migrations. The type system is more complete: the TIME type works across more formats, and TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus IGNORE NULLS, top-K max_by and min_by, and time_bucket. Monday takeaway: if you are porting SQL from another database, these close common gaps.</div>
 </section>
 
-<section class="slide">
-  <div class="eyebrow">SQL <span class="tag">In action</span></div>
-  <h2>SET PATH in action</h2>
-  <pre class="code focus"><span class="c">-- Opt in once</span>
-<span class="k">SET</span> spark.sql.path.enabled = <span class="k">true</span>;
-
-<span class="c">-- Unqualified names now resolve by walking the path</span>
-<span class="hl"><span class="k">SET PATH</span> = analytics.core, ml.features</span>;
-<span class="k">SELECT</span> * <span class="k">FROM</span> daily_kpis;     <span class="c">-- finds analytics.core.daily_kpis</span>
-
-<span class="c">-- Inspect, extend, or reset</span>
-<span class="k">SELECT</span> CURRENT_PATH();
-<span class="k">SET PATH</span> = PATH, sandbox.tmp; <span class="c">-- append to the current path</span>
-<span class="k">SET PATH</span> = DEFAULT_PATH;      <span class="c">-- back to the session default</span></pre>
-  <div class="slide-footer"><span>SQL</span><span>44</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>SET PATH in action · XIAO · ~0:18
-
-(Code slide.) Set the path once. Then use short names. DESCRIBE shows the path the view saved.</div>
-</section>
-
-<section class="slide">
-  <div class="eyebrow">SQL</div>
-  <h2>A more complete type system</h2>
-  <ul class="points">
-    <li><b>TIME</b> type now works across JSON, CSV, XML, ORC, and Avro &mdash; plus implicit casts from STRING</li>
-    <li><code>TIMESTAMP WITH LOCAL TIME ZONE</code> is supported in SQL syntax</li>
-    <li>IGNORE NULLS / RESPECT NULLS for <code>array_agg</code>, <code>collect_list</code>, and <code>collect_set</code></li>
-    <li><code>max_by</code> / <code>min_by</code> with top-K elements, and <code>time_bucket</code> for time-series rollups</li>
-  </ul>
-  <div class="slide-footer"><span>SQL</span><span>45</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>A more complete type system · XIAO · ~0:35
-
-A few type improvements. The TIME type now works in JSON, CSV, XML, ORC, and Avro, with casts from string. TIMESTAMP WITH LOCAL TIME ZONE is in SQL syntax. IGNORE NULLS and RESPECT NULLS for array_agg, collect_list, and collect_set. Plus top-K max_by and min_by, and time_bucket for time series.</div>
-</section>
-
-<!-- sketches intro -->
-<!-- roadmap: Spark SQL 3 -->
 <section class="slide break la-roadmap">
   <div class="eyebrow">Spark SQL &middot; Roadmap</div>
   <ol class="roadmap">
@@ -1700,7 +1553,7 @@ A few type improvements. The TIME type now works in JSON, CSV, XML, ORC, and Avr
       <li class="active"><span class="n">03</span><div class="txt"><h3>Data sketches</h3><p>Approximate, mergeable analytics</p></div></li>
       <li><span class="n">04</span><div class="txt"><h3>Geospatial</h3><p>Native geometry types &amp; functions</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Spark SQL</span><span>46</span></div>
+  <div class="slide-footer"><span>Spark SQL</span><span>37</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (Data sketches) · XIAO · ~0:06
 
@@ -1723,7 +1576,7 @@ A few type improvements. The TIME type now works in JSON, CSV, XML, ORC, and Avr
     <li><b>Composable &amp; mergeable</b> &mdash; store sketches as Delta columns, then merge precomputed sketches for any time range in milliseconds, no re-scan of raw data</li>
     <li><b>Interoperable</b> with the open <b>Apache DataSketches</b> ecosystem &mdash; sketches built in Spark merge with other engines</li>
   </ul>
-  <div class="slide-footer"><span>SQL</span><span>47</span></div>
+  <div class="slide-footer"><span>SQL</span><span>38</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Data sketches: approximate, mergeable analytics · XIAO · ~0:55
 
@@ -1751,7 +1604,7 @@ The best part: they merge. Store sketches as Delta columns. Then combine them fo
 
 <span class="c">-- Mergeable: roll up daily sketches with no re-scan of the raw rows</span>
 <span class="k">SELECT</span> <span class="hl">tuple_union_agg_double(sketch)</span> <span class="k">AS</span> rollup <span class="k">FROM</span> daily_sketches;</pre>
-  <div class="slide-footer"><span>SQL</span><span>48</span></div>
+  <div class="slide-footer"><span>SQL</span><span>39</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Tuple sketches in action · XIAO · ~0:30
 
@@ -1767,7 +1620,7 @@ The best part: they merge. Store sketches as Delta columns. Then combine them fo
       <li><span class="n">03</span><div class="txt"><h3>Data sketches</h3><p>Approximate, mergeable analytics</p></div></li>
       <li class="active"><span class="n">04</span><div class="txt"><h3>Geospatial</h3><p>Native geometry types &amp; functions</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Spark SQL</span><span>49</span></div>
+  <div class="slide-footer"><span>Spark SQL</span><span>40</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (Geospatial) · XIAO · ~0:06
 
@@ -1785,7 +1638,7 @@ The best part: they merge. Store sketches as Delta columns. Then combine them fo
     <li>Read and write natively in <b>Parquet</b> &mdash; types &amp; SRID preserved; available across SQL, DataFrames, PySpark, and the Thrift server</li>
     <li>Aligned with the open Parquet &amp; Iceberg geospatial spec for cross-engine interoperability</li>
   </ul>
-  <div class="slide-footer"><span>Geospatial</span><span>50</span></div>
+  <div class="slide-footer"><span>Geospatial</span><span>41</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Native geospatial types · XIAO · ~0:45
 
@@ -1810,7 +1663,7 @@ Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds GE
        <span class="hl">ST_AsBinary(boundary)</span> <span class="k">AS</span> wkb
 <span class="k">FROM</span> city_zones;</pre>
   <p class="sub">Shipped functions: <code>ST_GeomFromWKB</code>, <code>ST_GeogFromWKB</code>, <code>ST_AsBinary</code>, <code>ST_Srid</code>, <code>ST_SetSrid</code></p>
-  <div class="slide-footer"><span>Geospatial</span><span>51</span></div>
+  <div class="slide-footer"><span>Geospatial</span><span>42</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Geospatial in action · XIAO · ~0:30
 
@@ -1829,7 +1682,7 @@ Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds GE
     <div class="now"><span class="tk-label">Spark 4.2</span>Declare keys, order, and deletes; Spark reconciles it.</div>
     <div class="mon"><span class="tk-label">Monday</span>Replace custom foreachBatch plus MERGE with Auto CDC where it fits.</div>
   </div>
-  <div class="slide-footer"><span>Auto CDC</span><span>52</span></div>
+  <div class="slide-footer"><span>Auto CDC</span><span>43</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Declarative Pipelines &amp; Auto CDC · DB · ~0:15
 
@@ -1845,7 +1698,7 @@ Thank you, Xiao. Benefit four: move changing data safely. Let&#x27;s start with 
     <li>The hard parts: events arrive out of order and across micro-batch boundaries, change events can be partial, and retries must stay idempotent</li>
     <li>Hand-rolled <code>foreachBatch</code> + MERGE with tombstone tracking easily runs to dozens or hundreds of lines of code</li>
   </ul>
-  <div class="slide-footer"><span>Auto CDC</span><span>53</span></div>
+  <div class="slide-footer"><span>Auto CDC</span><span>44</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Applying a change feed is the hard part · DB · ~0:50
 
@@ -1864,7 +1717,7 @@ The hand-written version — foreachBatch plus MERGE plus tombstones — is ofte
     <li>In 4.2: Python <code>create_auto_cdc_flow()</code> and Spark Connect, storing SCD Type 1 &mdash; SQL syntax and SCD Type 2 history are on the way</li>
     <li>Lives in Spark Declarative Pipelines &mdash; checkpoints, dependencies, retries, and idempotency are handled for you</li>
   </ul>
-  <div class="slide-footer"><span>Auto CDC</span><span>54</span></div>
+  <div class="slide-footer"><span>Auto CDC</span><span>45</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Auto CDC: declare it, Spark reconciles it · DB · ~0:55
 
@@ -1895,7 +1748,7 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
     stored_as_scd_type=<span class="s">"1"</span>,
 )
 <span class="c">-- SQL apply syntax (CREATE FLOW … AUTO CDC INTO …) is on the way</span></pre>
-  <div class="slide-footer"><span>Auto CDC</span><span>55</span></div>
+  <div class="slide-footer"><span>Auto CDC</span><span>46</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Auto CDC in action · DB · ~0:30
 
@@ -1913,7 +1766,7 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
     <div class="now"><span class="tk-label">Spark 4.2</span>Name sources with IDENTIFIED BY; a self-healing state store.</div>
     <div class="mon"><span class="tk-label">Monday</span>Name your streaming sources so you can evolve them safely.</div>
   </div>
-  <div class="slide-footer"><span>Streaming</span><span>56</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>47</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Structured Streaming · DB · ~0:12
 
@@ -1929,7 +1782,7 @@ Still benefit four — move changing data safely. Now streaming. It is about two
     <li><code>DataStreamWriter.name()</code> enables the same evolution story for sinks</li>
     <li>Available across SQL table-valued functions, Scala, and PySpark (Classic and Connect)</li>
   </ul>
-  <div class="slide-footer"><span>Streaming</span><span>57</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>48</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Evolve running pipelines safely · DB · ~0:40
 
@@ -1952,7 +1805,7 @@ df.writeStream.name(<span class="s">"main_sink"</span>).toTable(<span class="s">
 
 <span class="c">-- Later: add, remove, or reorder sources
 -- without breaking the checkpoint</span></pre>
-  <div class="slide-footer"><span>Streaming</span><span>58</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>49</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>IDENTIFIED BY in action · DB · ~0:20
 
@@ -1967,7 +1820,7 @@ df.writeStream.name(<span class="s">"main_sink"</span>).toTable(<span class="s">
     <li>LeftSemi stream-stream joins use less state-store space</li>
     <li><b>Real-time mode trigger</b> is now accessible from PySpark</li>
   </ul>
-  <div class="slide-footer"><span>Streaming</span><span>59</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>50</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Richer joins, lower latency · DB · ~0:35
 
@@ -1982,7 +1835,7 @@ Streaming joins get richer. Inner and LeftSemi stream-stream joins now run in Up
     <li>Row checksums and checkpoint checksum verification detect corruption early</li>
     <li>Lagging snapshot uploads are handled automatically &mdash; now on by default</li>
   </ul>
-  <div class="slide-footer"><span>Streaming</span><span>60</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>51</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>A state store you can trust · DB · ~0:35
 
@@ -2000,7 +1853,7 @@ The state store is the heart of stateful streaming. In 4.2 it is stronger. It ca
     <div class="now"><span class="tk-label">Spark 4.2</span>One CHANGES API, atomic DML, and smarter pushdown &mdash; read-time CDC.</div>
     <div class="mon"><span class="tk-label">Monday</span>Read changes with one CHANGES query, not per-engine functions.</div>
   </div>
-  <div class="slide-footer"><span>Data Source V2</span><span>61</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>52</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Data Source V2 · DB · ~0:15
 
@@ -2016,7 +1869,7 @@ Still benefit four — move changing data safely. Now Data Source V2 — how Spa
     <li>Evolving fast in 4.1 and 4.2: row-level DML, CDC, schema evolution, transactions, and smarter pushdown all live here</li>
     <li>Go deeper at this Summit: <b>&ldquo;Spark DSV2: Growing Up Fast&rdquo;</b> &mdash; Szehon Ho &amp; Anton Okolnychyi</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>62</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>53</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One integration API for every data source · DB · ~0:40
 
@@ -2033,7 +1886,7 @@ There is a full talk at this Summit: &quot;Spark DSV2: Growing Up Fast,&quot; by
       <li><span class="n">02</span><div class="txt"><h3>Smarter writes</h3><p>Atomic MERGE, DML &amp; schema evolution</p></div></li>
       <li><span class="n">03</span><div class="txt"><h3>Smarter pushdown</h3><p>Push partition predicates to the source</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Data Source V2</span><span>63</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>54</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (Reading changes) · DB · ~0:06
 
@@ -2049,7 +1902,7 @@ There is a full talk at this Summit: &quot;Spark DSV2: Growing Up Fast,&quot; by
     <li>Every change carries the row values, the operation (<code>_change_type</code>), and the order (<code>_commit_version</code>, <code>_commit_timestamp</code>)</li>
     <li>CDC is load-bearing infra: incremental ETL, audit, replication &mdash; and vector search, materialized views, and streaming tables refresh on commit</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>64</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>55</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Ask the table: &quot;what changed?&quot; · DB · ~0:45
 
@@ -2067,7 +1920,7 @@ CDC is important infrastructure. It powers incremental ETL, audit, and replicati
     <li>By the numbers: 206M batch CDC queries in 60 days &mdash; and 68% of them need no stored change files at all</li>
     <li>Spark 4.2 makes <b>read-time CDC first-class</b>: only the reader pays, and any engine can write the table</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>65</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>56</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Two problems with CDC today · DB · ~0:50
 
@@ -2088,7 +1941,7 @@ So 4.2 makes read-time CDC first-class. Only the reader pays. And any engine can
     <li>Spark owns the post-processing: carry-over removal, update detection, and net-change collapse</li>
     <li>Connectors ship a tiny contract: one interface, three capability booleans, plus rowId / rowVersion</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>66</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>57</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One CHANGES API for any DSv2 source · DB · ~0:45
 
@@ -2116,7 +1969,7 @@ spark.read.option(<span class="s">"startingVersion"</span>, 10)
 spark.readStream.changes(<span class="s">"my_table"</span>)
 
 <span class="c">-- output: data columns + _change_type, _commit_version, _commit_timestamp</span></pre>
-  <div class="slide-footer"><span>Data Source V2</span><span>67</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>58</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Reading changes in action · DB · ~0:25
 
@@ -2133,7 +1986,7 @@ spark.readStream.changes(<span class="s">"my_table"</span>)
     <li>Within a commit, removed + added rows matched by row_id become updates (preimage + postimage); lone adds are inserts, lone removes are deletes</li>
     <li>Requires Row Tracking (on by default in Databricks, opt-in in Delta OSS) &mdash; write-time CDC stays available for special workloads</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>68</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>59</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Delta goes read-time — by default · DB · ~0:50
 
@@ -2151,7 +2004,7 @@ It needs Row Tracking — on by default in Databricks, opt-in in Delta OSS. Writ
       <li class="active"><span class="n">02</span><div class="txt"><h3>Smarter writes</h3><p>Atomic MERGE, DML &amp; schema evolution</p></div></li>
       <li><span class="n">03</span><div class="txt"><h3>Smarter pushdown</h3><p>Push partition predicates to the source</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Data Source V2</span><span>69</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>60</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (Smarter writes) · DB · ~0:06
 
@@ -2168,7 +2021,7 @@ It needs Row Tracking — on by default in Databricks, opt-in in Delta OSS. Writ
     <li>MERGE fixes: schema evolution with WHEN MATCHED THEN DELETE, nested-field preservation</li>
     <li><code>TABLESAMPLE SYSTEM</code> block sampling, with pushdown to DSv2 and JDBC sources</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>70</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>61</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Smarter writes: INSERT &amp; MERGE · DB · ~0:40
 
@@ -2191,7 +2044,7 @@ There is new INSERT ... REPLACE syntax, and BY NAME with REPLACE WHERE. MERGE ge
 <span class="c">-- 4.2 also adds:
 --   INSERT INTO ... REPLACE ON / USING
 --   BY NAME combined with REPLACE WHERE</span></pre>
-  <div class="slide-footer"><span>Data Source V2</span><span>71</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>62</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Schema evolution in action · DB · ~0:20
 
@@ -2207,7 +2060,7 @@ There is new INSERT ... REPLACE syntax, and BY NAME with REPLACE WHERE. MERGE ge
     <li>Connectors validate concurrent commits at commit time &mdash; stale reads fail cleanly instead of corrupting data</li>
     <li>Engine-level today: single-statement DML; multi-statement and cross-catalog transactions are future work</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>72</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>63</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Transactions: atomic, isolated DML · DB · ~0:40
 
@@ -2225,7 +2078,7 @@ This is for single-statement DML today. Multi-statement and cross-catalog transa
     <li>MERGE and INSERT support <code>WITH SCHEMA EVOLUTION</code>: add or widen columns as data arrives, with the connector deciding which changes are valid (e.g., Delta type widening)</li>
     <li>Consistent table refresh in 4.2: Spark refreshes before writes and non-pinned reads, so views over external tables stay correct</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>73</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>64</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Observable, evolvable DML · DB · ~0:35
 
@@ -2240,7 +2093,7 @@ DML is observable now. MERGE, UPDATE, and DELETE report metrics — rows inserte
       <li><span class="n">02</span><div class="txt"><h3>Smarter writes</h3><p>Atomic MERGE, DML &amp; schema evolution</p></div></li>
       <li class="active"><span class="n">03</span><div class="txt"><h3>Smarter pushdown</h3><p>Push partition predicates to the source</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Data Source V2</span><span>74</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>65</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (Smarter pushdown) · DB · ~0:06
 
@@ -2256,7 +2109,7 @@ DML is observable now. MERGE, UPDATE, and DELETE report metrics — rows inserte
     <li>Works across scans, metadata-only <code>DELETE WHERE</code>, and runtime filters</li>
     <li>Example win: <code>WHERE udf(month(ts)) = 'JAN'</code> now prunes partitions in Iceberg and Delta scans</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>75</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>66</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Smarter pushdown: PartitionPredicate · DB · ~0:35
 
@@ -2276,7 +2129,7 @@ For example: WHERE udf(month(ts)) = &#x27;JAN&#x27; now prunes partitions in Ice
     <div class="now"><span class="tk-label">Spark 4.2</span>Faster Parquet and codegen, leaner memory, a modern UI, Java 25.</div>
     <div class="mon"><span class="tk-label">Monday</span>Upgrade to 4.2 and pick up speed and stability with no code change.</div>
   </div>
-  <div class="slide-footer"><span>Others</span><span>76</span></div>
+  <div class="slide-footer"><span>Others</span><span>67</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Performance, UI &amp; Operations · DB · ~0:12
 
@@ -2291,7 +2144,7 @@ Benefit five: operate and evolve predictably. First, the things that make Spark 
     <li><b>Interactive SQL plans</b> &mdash; pan, zoom, search, and compare initial vs final AQE plans side by side</li>
     <li>Environment page highlights non-default configs, with one-click export</li>
   </ul>
-  <div class="slide-footer"><span>Others</span><span>77</span></div>
+  <div class="slide-footer"><span>Others</span><span>68</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>A modern Spark Web UI · DB · ~0:30
 
@@ -2307,7 +2160,7 @@ The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL pl
     <li><b>Leaner memory</b> &mdash; bounded external merge and eager memory release cut OOMs</li>
     <li><b>Faster I/O</b> &mdash; zero-copy transfers and lower JVM&harr;Python overhead</li>
   </ul>
-  <div class="slide-footer"><span>Others</span><span>78</span></div>
+  <div class="slide-footer"><span>Others</span><span>69</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Faster &amp; leaner · DB · ~0:35
 
@@ -2323,7 +2176,7 @@ On performance, four points. Faster scans — better vectorized Parquet reading.
     <li><b>History Server</b> scales: multiple log directories and on-demand metadata loading</li>
     <li><b>Consistent results</b>: query-level retry for indeterminate shuffles, with accurate SQL metrics under AQE</li>
   </ul>
-  <div class="slide-footer"><span>Others</span><span>79</span></div>
+  <div class="slide-footer"><span>Others</span><span>70</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Runtime &amp; operations · DB · ~0:35
 
@@ -2341,7 +2194,7 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
     <div class="now"><span class="tk-label">Coming</span>Project Feather, a UDF protocol for any language, and nanosecond time.</div>
     <div class="mon"><span class="tk-label">Monday</span>Follow the SPIPs, try the previews, and plan around the quarterly cadence.</div>
   </div>
-  <div class="slide-footer"><span>Looking Ahead</span><span>80</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>71</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Looking Ahead · DB · ~0:15
 
@@ -2359,7 +2212,7 @@ Still benefit five — operate and evolve predictably. This last part is ongoing
       <li><span class="n">04</span><div class="txt"><h3>Real-time mode for stateful streaming</h3><p>~100 ms latency for stateful queries</p></div></li>
       <li><span class="n">05</span><div class="txt"><h3>Faster, predictable releases</h3><p>A more frequent, predictable release cadence</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Looking Ahead</span><span>81</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>72</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (five topics) · DB · ~0:12
 
@@ -2377,7 +2230,7 @@ Still benefit five — operate and evolve predictably. This last part is ongoing
     <li>Queries over &lt;100 MB of data can still take seconds: planning, scheduling, serialization, and shuffle machinery built for distributed execution</li>
     <li>Three focus areas: query compilation &amp; task scheduling, cache format efficiency, shuffle overhead</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>82</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>73</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Project Feather: fast local queries · DB · ~0:45
 
@@ -2390,61 +2243,21 @@ Feather works on three areas: planning and scheduling, the cache format, and shu
 <section class="slide">
   <div class="la-badge">Looking Ahead</div>
   <div class="eyebrow">Looking Ahead &middot; Project Feather</div>
-  <h2>Faster planning &amp; scheduling</h2>
+  <h2>A three-part plan</h2>
   <ul class="points">
-    <li><b>Single-pass analyzer</b>: bottom-up resolution that is more predictable, more reliable, and near-linear in query size</li>
-    <li>Run a whole query as a <b>single task &amp; stage</b> when the scan is one small file &mdash; skipping unnecessary shuffles</li>
-    <li>AQE: identity-based stage hashing so the rule loop never blocks on unrelated work</li>
-    <li>Prefer shuffle hash join when broadcasting would move more data than necessary</li>
-    <li>Inline small stage descriptions into task descriptions instead of broadcasting them</li>
+    <li><b>Faster planning &amp; scheduling</b> &mdash; a single-pass analyzer; run a one-file query as a single task, with no shuffle</li>
+    <li><b>Arrow columnar cache</b> &mdash; replace the row-oriented <code>df.cache</code> with a compressed Arrow cache: smaller, with faster re-reads</li>
+    <li><b>Shuffle-free local execution</b> &mdash; a multithreaded local mode where threads pass data through channels instead of shuffle files</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>83</span></div>
+  <p class="sub" style="margin-top:30px">Together: Spark that works at laptop scale, with a clear path back to the cluster.</p>
+  <div class="slide-footer"><span>Looking Ahead</span><span>74</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Faster planning &amp; scheduling · DB · ~0:35
+  <div class="notes" hidden>Project Feather: a three-part plan &middot; DB &middot; ~0:55
 
-On planning: a single-pass analyzer — more predictable, and near-linear in query size. When the input is one small file, run the whole query as one task — with no shuffle. AQE gets better stage hashing. And better join and broadcast choices. Less overhead before your answer.</div>
+Feather has three parts. One &mdash; faster planning and scheduling: a single-pass analyzer, and running a small one-file query as a single task with no shuffle. Two &mdash; an Arrow columnar cache to replace the row-based df.cache, so re-reads are faster. Three &mdash; shuffle-free local execution: threads pass data through channels instead of shuffle files. Together, Spark works well on a laptop, and still scales to the cluster.</div>
 </section>
 
 <!-- 60 -->
-<section class="slide">
-  <div class="la-badge">Looking Ahead</div>
-  <div class="eyebrow">Looking Ahead &middot; Project Feather</div>
-  <h2>Arrow-based DataFrame cache</h2>
-  <ul class="points">
-    <li>Interactive local analysis = load once, cache, iterate &mdash; <code>df.cache</code> is a core experience, not a storage detail</li>
-    <li>Today's cache uses a row-oriented format: every re-read pays avoidable CPU and memory cost</li>
-    <li>Moving to an <b>Arrow columnar cache</b> with IPC compression: smaller footprint, faster second/third/fourth queries</li>
-    <li>Implementation is underway</li>
-  </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>84</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Arrow-based DataFrame cache · DB · ~0:30
-
-On caching: local analysis means load once, cache, and repeat. df.cache is a core feature.
-Today the cache is row-based. So every reread costs extra CPU and memory. We are moving to an Arrow columnar cache, with compression. Smaller, and faster on the second and third query. This work is in progress.</div>
-</section>
-
-<!-- 61 -->
-<section class="slide">
-  <div class="la-badge">Looking Ahead</div>
-  <div class="eyebrow">Looking Ahead &middot; Project Feather</div>
-  <h2>Shuffle-free local execution</h2>
-  <ul class="points">
-    <li>Disk-based blocking shuffles are right for clusters &mdash; overkill when everything runs in one JVM</li>
-    <li>New multithreaded local mode: <b>FIFO channels between threads</b> replace shuffle files</li>
-    <li>Back-pressure keeps producers in check; pipelined execution lets downstream operators start as soon as data arrives</li>
-    <li>Applies only when the planner is confident the query fits safely in one JVM</li>
-    <li>Together with faster planning and the Arrow cache: Spark that works for laptop-scale data, with a clear path back to the cluster</li>
-  </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>85</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Shuffle-free local execution · DB · ~0:35
-
-On shuffle: disk shuffle is right for clusters — but too much for one JVM. There is a new multithreaded local mode. Threads pass data through channels, instead of shuffle files. With back-pressure and pipelining. It runs only when the query fits safely in one JVM.
-Together — faster planning, Arrow cache, and no shuffle — Spark works well on a laptop, and still scales to the cluster.</div>
-</section>
-
-<!-- looking-ahead roadmap 2 -->
 <section class="slide break la-roadmap">
   <div class="la-badge">Looking Ahead</div>
   <div class="eyebrow">Looking Ahead &middot; Roadmap</div>
@@ -2455,7 +2268,7 @@ Together — faster planning, Arrow cache, and no shuffle — Spark works well o
       <li><span class="n">04</span><div class="txt"><h3>Real-time mode for stateful streaming</h3><p>~100 ms latency for stateful queries</p></div></li>
       <li><span class="n">05</span><div class="txt"><h3>Faster, predictable releases</h3><p>A more frequent, predictable release cadence</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Looking Ahead</span><span>86</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>75</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (UDF protocol) · DB · ~0:05
 
@@ -2474,7 +2287,7 @@ Together — faster planning, Arrow cache, and no shuffle — Spark works well o
     <li>Serialized UDFs are tied to a runtime &mdash; server upgrades can quietly break them</li>
     <li>UDF execution is caged in the cluster: heavy or GPU UDFs force over-sized clusters</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>87</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>76</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Language-agnostic UDF protocol · DB · ~0:45
 
@@ -2493,7 +2306,7 @@ Today, each language must rebuild the whole UDF stack. The planning rules are ti
     <li><b>Declarative worker spec</b>: the client declares how to start, connect, and clean up &mdash; local process, container, or remote / GPU worker</li>
     <li>Each pillar makes one thing replaceable without touching the others</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>88</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>77</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Three pillars · DB · ~0:40
 
@@ -2510,7 +2323,7 @@ The design has three parts. One: plan UDFs by their shape — scalar, map, group
     <li>PySpark behavior unchanged: one shared processing core, transport becomes pluggable (socket stays the default; gRPC is opt-in)</li>
     <li>Unlocks UDFs in any language, runtimes that upgrade independently of Spark, and heavy / GPU UDFs on dedicated workers</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>89</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>78</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Status &amp; what it unlocks · DB · ~0:30
 
@@ -2529,7 +2342,7 @@ It unlocks UDFs in any language, runtimes that upgrade on their own, and heavy o
       <li><span class="n">04</span><div class="txt"><h3>Real-time mode for stateful streaming</h3><p>~100 ms latency for stateful queries</p></div></li>
       <li><span class="n">05</span><div class="txt"><h3>Faster, predictable releases</h3><p>A more frequent, predictable release cadence</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Looking Ahead</span><span>90</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>79</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (Nanosecond timestamps) · DB · ~0:05
 
@@ -2548,7 +2361,7 @@ It unlocks UDFs in any language, runtimes that upgrade on their own, and heavy o
     <li>Compact value model: epoch <b>micros</b> (long) + <b>nanos-within-micro</b> (0&ndash;999) &mdash; keeps today's calendar range, avoids the single-INT64-nanos &ldquo;range cliff&rdquo;</li>
     <li><b>Additive &amp; backward compatible</b> &mdash; existing micro types stay the default; nanosecond behavior appears only when <code>(n)</code> is given</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>91</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>80</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Nanosecond-precision timestamps · DB · ~0:40
 
@@ -2558,33 +2371,6 @@ It is fully backward compatible. The micro types stay the default. Nanosecond be
 </section>
 
 <!-- nanos 2 -->
-<section class="slide">
-  <div class="la-badge">Looking Ahead</div>
-  <div class="eyebrow">Looking Ahead <span class="tag">In action</span></div>
-  <h2>Declaring nanosecond timestamps</h2>
-  <pre class="code focus"><span class="c">-- Explicit fractional-second precision (n = 0..9; 9 = nanoseconds)</span>
-<span class="k">CREATE TABLE</span> trades (
-  ts        <span class="hl">TIMESTAMP_NTZ(9)</span>,   <span class="c">-- no time zone</span>
-  exec_time <span class="hl">TIMESTAMP_LTZ(9)</span>    <span class="c">-- instant / local time zone</span>
-);
-
-<span class="c">-- SQL-standard spellings are equivalent:</span>
-<span class="c">--   TIMESTAMP(9) WITHOUT TIME ZONE      == TIMESTAMP_NTZ(9)</span>
-<span class="c">--   TIMESTAMP(9) WITH LOCAL TIME ZONE   == TIMESTAMP_LTZ(9)</span>
-
-<span class="c">-- Read nanosecond Parquet as real timestamps (no nanosAsLong fallback)</span>
-<span class="k">SELECT</span> ts <span class="k">FROM</span> trades
-<span class="k">WHERE</span> ts &gt;= <span class="s">TIMESTAMP_NTZ '2026-06-14 09:30:00.123456789'</span>;</pre>
-  <p class="sub">New Catalyst types <code>TimestampNTZNanosType(n)</code> / <code>TimestampLTZNanosType(n)</code>, wired end-to-end (parser, codegen, Parquet, casts) via the Types Framework &middot; unlocks interop with Pandas/PyArrow, Trino, ClickHouse &amp; DuckDB</p>
-  <div class="slide-footer"><span>Looking Ahead</span><span>92</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Declaring nanosecond timestamps · DB · ~0:20
-
-(Code slide.) New Catalyst types, wired end to end — parser, codegen, Parquet, casts. This gives clean interop with PyArrow, Trino, ClickHouse, and DuckDB.</div>
-</section>
-
-<!-- looking-ahead roadmap 4 -->
-<!-- looking-ahead roadmap 4 -->
 <section class="slide break la-roadmap">
   <div class="la-badge">Looking Ahead</div>
   <div class="eyebrow">Looking Ahead &middot; Roadmap</div>
@@ -2595,7 +2381,7 @@ It is fully backward compatible. The micro types stay the default. Nanosecond be
       <li class="active"><span class="n">04</span><div class="txt"><h3>Real-time mode for stateful streaming</h3><p>~100 ms latency for stateful queries</p></div></li>
       <li><span class="n">05</span><div class="txt"><h3>Faster, predictable releases</h3><p>A more frequent, predictable release cadence</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Looking Ahead</span><span>93</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>81</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (Real-time stateful streaming) · DB · ~0:05
 
@@ -2612,7 +2398,7 @@ It is fully backward compatible. The micro types stay the default. Nanosecond be
     <li><b>Streaming shuffle</b>: a push-based exchange streams upstream task output straight to downstream tasks, pipelining work instead of waiting on batch boundaries</li>
     <li><b>Concurrent stage scheduling</b>: multiple plan stages run at once, so stateful operators keep pace with the pipelined data flow</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>94</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>82</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Real-time mode for stateful streaming · DB · ~0:40
 
@@ -2630,7 +2416,7 @@ Two parts make it work. A streaming shuffle — it sends data straight to the ne
       <li><span class="n">04</span><div class="txt"><h3>Real-time mode for stateful streaming</h3><p>~100 ms latency for stateful queries</p></div></li>
       <li class="active"><span class="n">05</span><div class="txt"><h3>Faster, predictable releases</h3><p>A more frequent, predictable release cadence</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Looking Ahead</span><span>95</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>83</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (Faster releases) · DB · ~0:05
 
@@ -2643,46 +2429,19 @@ Two parts make it work. A streaming shuffle — it sends data straight to the ne
   <div class="eyebrow">Looking Ahead &middot; Release Cadence</div>
   <h2>Faster, predictable releases</h2>
   <ul class="points">
-    <li><b>SPIP SPARK-54633</b>: a two-layer model &mdash; <b>quarterly</b> minor releases (every 3 months) and <b>annual</b> major releases</li>
-    <li>Minors ship new features, performance, and API additions &mdash; but <b>freeze dependencies, behavior, and config defaults</b>, so upgrades stay drop-in safe</li>
-    <li>Majors are the once-a-year home for dependency bumps, breaking changes, and large refactors</li>
-    <li>Long-lived <code>branch-4.x</code> / <code>branch-5.x</code> cut active maintenance branches from 6+ to <b>2&ndash;3</b>; the final minor of each major becomes an <b>18-month LTS</b></li>
-    <li>The quarterly cadence begins with <b>4.3</b> &mdash; 4.2 is the bridge release; the dev list also <b>voted to retire monthly preview releases</b> now that minors ship every quarter</li>
+    <li><b>SPIP SPARK-54633</b>: a two-layer model &mdash; <b>quarterly</b> minor releases and an <b>annual</b> major release</li>
+    <li>Minors add features and APIs but <b>freeze dependencies, behavior, and config defaults</b>, so upgrades stay safe; majors carry the breaking changes</li>
+    <li>Long-lived branches cut active maintenance, and the <b>final minor of each major is an 18-month LTS</b></li>
+    <li>The quarterly cadence <b>begins with 4.3</b> &mdash; 4.2 is the bridge release, and <b>4.4 is the LTS</b>; monthly preview releases retire now that minors ship every quarter</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>96</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>84</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Faster, predictable releases · DB · ~0:50
+  <div class="notes" hidden>Faster, predictable releases &middot; DB &middot; ~0:50
 
-SPIP SPARK-54633 — a two-layer release model. Minor releases every quarter. Major releases every year.
-Minors add features, performance, and APIs. But they freeze dependencies, behavior, and config defaults. So upgrades are safe.
-Majors are once a year — for dependency upgrades and breaking changes.
-Long-lived branches cut maintenance branches from 6-plus to 2 or 3. And the last minor of each major is an 18-month LTS.
-The quarterly cadence starts with 4.3. So 4.2 is the bridge release. The dev list also voted to stop the monthly preview releases.</div>
+And how we ship it. SPARK-54633 &mdash; a two-layer model: quarterly minor releases, and an annual major. Minors add features and APIs but freeze dependencies and defaults, so upgrades stay safe. Majors carry the breaking changes. Long-lived branches cut maintenance work, and the final minor of each major is an 18-month LTS. The quarterly cadence begins with 4.3 &mdash; so 4.2 is the bridge release, and 4.4 will be the LTS. Monday takeaway: plan your upgrades around the new quarterly cadence.</div>
 </section>
 
 <!-- 66 -->
-<section class="slide">
-  <div class="la-badge">Looking Ahead</div>
-  <div class="eyebrow">Looking Ahead &middot; Release Cadence</div>
-  <h2>An example release calendar</h2>
-  <div class="cards c4">
-    <div class="card"><span class="chip">Jun 2026 &middot; Minor</span>
-      <h3>4.2</h3><p>This release (the bridge) &mdash; ~6-month maintenance window into late 2026</p></div>
-    <div class="card"><span class="chip">~Sep 2026 &middot; Minor</span>
-      <h3>4.3</h3><p>First release on the quarterly cadence &mdash; new features &amp; APIs, frozen dependencies</p></div>
-    <div class="card"><span class="chip">~Dec 2026 &middot; Minor &middot; LTS</span>
-      <h3>4.4</h3><p>Final minor of 4.x &mdash; the <b>18-month LTS</b> target for the ecosystem</p></div>
-    <div class="card"><span class="chip">Jan 2027 &middot; Major</span>
-      <h3>5.0</h3><p>Annual major &mdash; dependency upgrades, breaking changes, and large refactors</p></div>
-  </div>
-  <div class="slide-footer"><span>Looking Ahead</span><span>97</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>An example release calendar · DB · ~0:35
-
-(Walk the four cards.) An example calendar. 4.2 this month — the bridge. 4.3 around September — first on the quarterly cadence. 4.4 around December — the last 4.x minor, and the 18-month LTS. And 5.0 in January — the yearly major. The dates are examples. The rhythm is the promise.</div>
-</section>
-
-<!-- ============ 66 · CLOSING ============ -->
 <section class="slide break">
   <div class="spark-logo"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M10.812 0c-.425.013-.845.215-1.196.605a3.593 3.593 0 00-.493.722c-.355.667-.425 1.415-.556 2.143a551.9 551.9 0 00-.726 4.087c-.027.16-.096.227-.244.273C5.83 8.386 4.06 8.94 2.3 9.514c-.387.125-.773.289-1.114.506-1.042.665-1.196 1.753-.415 2.71.346.422.79.715 1.284.936 1.1.49 2.202.976 3.3 1.47.019.01.036.013.053.019h-.004l1.306.535c0 .023.002.045 0 .073-.2 2.03-.39 4.063-.58 6.095-.04.419-.012.831.134 1.23.317.87 1.065 1.148 1.881.701.372-.204.666-.497.937-.818 1.372-1.623 2.746-3.244 4.113-4.872.111-.133.205-.15.363-.098.349.117.697.231 1.045.347h.001c.02.012.045.02.073.03l.142.042c1.248.416 2.68.775 3.929 1.19.4.132.622.164 1.045.098.311-.048.592-.062.828-.236.602-.33.995-.957.988-1.682-.005-.427-.154-.813-.35-1.186-.82-1.556-1.637-3.113-2.461-4.666-.078-.148-.076-.243.037-.375 1.381-1.615 2.756-3.236 4.133-4.855.272-.32.513-.658.653-1.058.308-.878-.09-1.57-1-1.741a2.783 2.783 0 00-1.235.069c-1.974.521-3.947 1.041-5.918 1.57-.175.047-.26.015-.355-.144a353.08 353.08 0 00-2.421-4.018 4.61 4.61 0 00-.652-.849c-.371-.37-.802-.549-1.227-.536zm.172 3.703a.592.592 0 01.189.211c.87 1.446 1.742 2.89 2.609 4.338.07.118.135.16.277.121 1.525-.41 3.052-.813 4.579-1.217.367-.098.735-.193 1.103-.289a.399.399 0 01-.1.2c-1.259 1.48-2.516 2.962-3.779 4.438-.11.13-.12.22-.04.37.937 1.803 1.768 3.309 2.498 4.76l-3.696-1.019c-.538-.18-1.077-.358-1.615-.539-.163-.055-.25-.03-.36.1-1.248 1.488-2.504 2.97-3.759 4.454a.398.398 0 01-.18.132c.035-.378.068-.757.104-1.136.149-1.572.297-3.144.451-4.716-.03-.318.117-.405-.322-.545-1.493-.593-3.346-1.321-4.816-1.905a.595.595 0 01.24-.134c1.797-.57 3.595-1.14 5.394-1.705.127-.04.199-.092.211-.233.013-.148.05-.294.076-.441.241-1.363.483-2.726.726-4.088.068-.386.14-.771.21-1.157z"/></svg><span>Apache Spark&trade;</span></div>
   <div class="eyebrow">Thank you</div>
@@ -2695,7 +2454,7 @@ The quarterly cadence starts with 4.3. So 4.2 is the bridge release. The dev lis
       <a href="https://spark.apache.org/community/"><span>spark.apache.org/community</span></a>
     </div>
   </div>
-  <div class="slide-footer"><span>Q &amp; A</span><span>98</span></div>
+  <div class="slide-footer"><span>Q &amp; A</span><span>85</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Join the community today! · DB + XIAO · ~0:20
 
@@ -3189,7 +2948,7 @@ The quarterly cadence starts with 4.3. So 4.2 is the bridge release. The dev lis
 
   function animateIn(slide) {
     const blocks = Array.from(slide.children).filter(el =>
-      !el.classList.contains('slide-footer') && !el.classList.contains('progress') && !el.classList.contains('notes') && !el.classList.contains('la-badge'));
+      !el.classList.contains('slide-footer') && !el.classList.contains('progress') && !el.classList.contains('notes') && !el.classList.contains('la-badge') && !el.classList.contains('pyprog'));
     blocks.forEach(el => { el.classList.add('anim'); el.classList.remove('in'); el.style.transitionDelay = '0ms'; });
     void slide.offsetWidth;
     blocks.forEach((el, k) => { el.style.transitionDelay = (k * 85) + 'ms'; el.classList.add('in'); });
