@@ -34,7 +34,7 @@ This is the whole release on one slide. Six groups. About 24 features. We will n
 ## Section 01 · Metrics — Metrics & Semantic Modeling
 
 ### [6] Section divider — Metrics & Semantic Modeling · XIAO · ~0:10
-Benefit one: define truth once. Let's start with the semantic layer inside Spark. And the Monday takeaway: move your top dashboard metrics into a metric view.
+Benefit one: define truth once. Let's start with the semantic layer inside Spark. And the takeaway: move your top dashboard metrics into a metric view.
 
 ### [7] Why a semantic layer is critical · XIAO · ~1:05
 Every company already has a semantic layer. But it is scattered. Words like "revenue," "active users," and "churn" are defined again and again — in BI tools, in dbt, in notebooks, in copy-pasted SQL.
@@ -57,7 +57,7 @@ You define the view once — the dimensions and the measures. Then look at the q
 ## Section 02 · Connect — Spark Connect
 
 ### [10] Section divider — Spark Connect · XIAO · ~0:12
-Benefit two: reach Spark from everywhere. First, Spark Connect — how more and more applications talk to Spark. Monday takeaway: call Spark with Connect from your service's own language.
+Benefit two: reach Spark from everywhere. First, Spark Connect — how more and more applications talk to Spark. Takeaway: call Spark with Connect from your service's own language.
 
 ### [11] Architecture: gRPC in, Arrow out · XIAO · ~0:45
 The idea is simple. Your client builds a plan. It opens a gRPC stream to the server. The server resolves the plan, optimizes it, runs it on the executors, and sends Arrow batches back.
@@ -73,7 +73,7 @@ In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to 
 ## Section 03 · Python — PySpark, Faster by Default
 
 ### [14] Section divider — PySpark, Faster by Default · XIAO · ~0:12
-Still benefit two — reach Spark from everywhere. Now Python, the language most of you use with Spark. The headline is in the title: faster by default. Monday takeaway: upgrade for free speedups, and use @arrow_udf on hot paths.
+Still benefit two — reach Spark from everywhere. Now Python, the language most of you use with Spark. The headline is in the title: faster by default. Takeaway: upgrade for free speedups, and use @arrow_udf on hot paths.
 
 ### [15] Arrow on by default · XIAO · ~0:40
 This slide is simple: upgrade, and it is faster. In 4.2, Arrow Python UDFs are the default. Your old UDFs just run faster. Arrow IPC between the JVM and Python is on by default. And Arrow input skips an extra conversion step. Upgrade to 4.2 and get this speed — with no code change.
@@ -123,7 +123,7 @@ New in 4.2: you can profile these Python data sources, like UDFs — for time an
 ## Section 04 · New SQL Analytics — Spark SQL
 
 ### [27] Section divider — Spark SQL · XIAO · ~0:12
-Benefit three: run AI-native analytics in SQL. This release added the most features here. We split it into four themes. Monday takeaway: replace a cross-join plus ROW_NUMBER top-K with NEAREST BY.
+Benefit three: run AI-native analytics in SQL. This release added the most features here. We split it into four themes. Takeaway: replace a cross-join plus ROW_NUMBER top-K with NEAREST BY.
 
 ### [28] Query embeddings where your data lives · XIAO · ~0:45
 Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually you run a separate vector system. In 4.2, Spark adds built-in vector functions. So you can score similarity where your data already is — with no extra system. Distance and similarity functions. Norm and normalize. And avg and sum for vectors. These are the building blocks for the new NEAREST BY join.
@@ -147,7 +147,7 @@ A few SQL features people asked for a long time. QUALIFY — filter on a window 
 (Code slide.) Top-N per group. No subquery. Just QUALIFY.
 
 ### [34] SQL compatibility improvements · XIAO · ~0:40
-A quick compatibility round. SET PATH resolves names across schemas without the full path, and it is saved in views, so results stay reproducible — this helps PostgreSQL migrations. The type system is more complete: the TIME type works across more formats, and TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus IGNORE NULLS, top-K max_by and min_by, and time_bucket. Monday takeaway: if you are porting SQL from another database, these close common gaps.
+A quick compatibility round. SET PATH resolves names across schemas without the full path, and it is saved in views, so results stay reproducible — this helps PostgreSQL migrations. The type system is more complete: the TIME type works across more formats, and TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus IGNORE NULLS, top-K max_by and min_by, and time_bucket. Takeaway: if you are porting SQL from another database, these close common gaps.
 
 ### [35] Data sketches: approximate, mergeable analytics · XIAO · ~0:55
 Sketches are small, probabilistic summaries. One pass. Small memory. About 1 to 2% error. Approximate answers — but exact decisions.
@@ -169,7 +169,7 @@ Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds GE
 ## Section 05 · Pipelines & Auto CDC — Spark Declarative Pipelines & Auto CDC
 
 ### [39] Section divider — Declarative Pipelines & Auto CDC · DB · ~0:15
-Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Monday takeaway: replace custom foreachBatch plus MERGE with Auto CDC where it fits.
+Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: replace custom foreachBatch plus MERGE with Auto CDC where it fits.
 
 ### [40] Applying a change feed is the hard part · DB · ~0:50
 The common need: keep a copy of an operational table up to date. Rows are inserted, updated, deleted.
@@ -190,7 +190,7 @@ It runs inside Spark Declarative Pipelines. So checkpoints, retries, and idempot
 ## Section 06 · Streaming — Structured Streaming
 
 ### [43] Section divider — Structured Streaming · DB · ~0:12
-Still benefit four — move changing data safely. Now streaming. It is about two things: changing a running query safely, and a state store you can trust. Monday takeaway: name your streaming sources so you can evolve them safely.
+Still benefit four — move changing data safely. Now streaming. It is about two things: changing a running query safely, and a state store you can trust. Takeaway: name your streaming sources so you can evolve them safely.
 
 ### [44] Evolve running pipelines safely · DB · ~0:40
 A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint.
@@ -209,7 +209,7 @@ The state store is the heart of stateful streaming. In 4.2 it is stronger. It ca
 ## Section 07 · Data Source V2 — Data Source V2
 
 ### [48] Section divider — Data Source V2 · DB · ~0:15
-Still benefit four — move changing data safely. Now Data Source V2 — how Spark connects to data. It improved a lot this release. Monday takeaway: read changes with one CHANGES query, not per-engine functions.
+Still benefit four — move changing data safely. Now Data Source V2 — how Spark connects to data. It improved a lot this release. Takeaway: read changes with one CHANGES query, not per-engine functions.
 
 ### [49] One integration API for every data source · DB · ~0:40
 DSv2 is the standard API for data sources in Spark — Delta, Iceberg, and more. Users get the same SQL and behavior across sources. Connectors get DML, streaming, and Spark's optimizations.
@@ -265,7 +265,7 @@ For example: WHERE udf(month(ts)) = 'JAN' now prunes partitions in Iceberg and D
 ## Section 08 · Others — Performance, UI & Operations
 
 ### [60] Section divider — Performance, UI & Operations · DB · ~0:12
-Benefit five: operate and evolve predictably. First, the things that make Spark faster, easier to see, and easier to run. Monday takeaway: upgrade to 4.2 and pick up speed and stability with no code change.
+Benefit five: operate and evolve predictably. First, the things that make Spark faster, easier to see, and easier to run. Takeaway: upgrade to 4.2 and pick up speed and stability with no code change.
 
 ### [61] A modern Spark Web UI · DB · ~0:30
 The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL plans — pan, zoom, search, and compare the first and final AQE plan side by side. And the environment page shows your non-default configs, with one-click export.
@@ -280,7 +280,7 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
 ## Section 09 · Ongoing Work — Looking Ahead
 
 ### [64] Section divider — Looking Ahead · DB · ~0:15
-Still benefit five — operate and evolve predictably. This last part is ongoing work, already in progress for the next releases. We want to show you where Spark is going. Monday takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.
+Still benefit five — operate and evolve predictably. This last part is ongoing work, already in progress for the next releases. We want to show you where Spark is going. Takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.
 
 ### [65] Roadmap (five topics) · DB · ~0:12
 (Gesture across the five.) Five things ahead: Project Feather, a language-agnostic UDF protocol, nanosecond timestamps, real-time mode for stateful streaming, and a faster release cadence. We will touch each one.
@@ -314,7 +314,7 @@ Earlier I mentioned real-time mode. SPARK-54699 extends it to stateful queries �
 Two parts make it work. A streaming shuffle — it sends data straight to the next task, instead of waiting for the batch. And concurrent stage scheduling — many stages run at the same time. The last part of the roadmap is how we ship all of this.
 
 ### [73] Faster, predictable releases · DB · ~0:50
-And how we ship it. SPARK-54633 — a two-layer model: quarterly minor releases, and an annual major. Minors add features and APIs but freeze dependencies and defaults, so upgrades stay safe. Majors carry the breaking changes. Long-lived branches cut maintenance work, and the final minor of each major is an 18-month LTS. The quarterly cadence begins with 4.3 — so 4.2 is the bridge release, and 4.4 will be the LTS. Monday takeaway: plan your upgrades around the new quarterly cadence.
+And how we ship it. SPARK-54633 — a two-layer model: quarterly minor releases, and an annual major. Minors add features and APIs but freeze dependencies and defaults, so upgrades stay safe. Majors carry the breaking changes. Long-lived branches cut maintenance work, and the final minor of each major is an 18-month LTS. The quarterly cadence begins with 4.3 — so 4.2 is the bridge release, and 4.4 will be the LTS. Takeaway: plan your upgrades around the new quarterly cadence.
 
 ### [74] Join the community today! · DB + XIAO · ~0:20
 (DB:) All of this is built by the Apache Spark community. And you can join. Get the release at spark.apache.org, the source on GitHub, and join the mailing lists. We welcome your contributions and your bug reports. (XIAO:) Thank you, DAIS. Enjoy the rest of the Summit.
