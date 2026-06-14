@@ -51,7 +51,7 @@ This is the whole release on one slide. Six groups. About 24 features. We will n
 ## 01 · METRICS & SEMANTIC MODELING — Slides 6–9 · XIAO
 
 ### [6] Section divider — Metrics & Semantic Modeling · **XIAO** · ~0:10
-Benefit one: define truth once. Let's start with the semantic layer inside Spark.
+Benefit one: define truth once. Let's start with the semantic layer inside Spark. And the Monday takeaway: move your top dashboard metrics into a metric view.
 
 ### [7] Why a semantic layer is critical · **XIAO** · ~1:05
 Every company already has a semantic layer. But it is scattered. Words like "revenue," "active users," and "churn" are defined again and again — in BI tools, in dbt, in notebooks, in copy-pasted SQL.
@@ -75,7 +75,7 @@ You define the view once — the dimensions and the measures. Then look at the q
 ## 02 · SPARK CONNECT — Slides 10–13 · XIAO
 
 ### [10] Section divider — Spark Connect · **XIAO** · ~0:12
-Benefit two: reach Spark from everywhere. First, Spark Connect — how more and more applications talk to Spark.
+Benefit two: reach Spark from everywhere. First, Spark Connect — how more and more applications talk to Spark. Monday takeaway: call Spark with Connect from your service's own language.
 
 ### [11] Architecture: gRPC in, Arrow out · **XIAO** · ~0:45
 The idea is simple. Your client builds a plan. It opens a gRPC stream to the server. The server resolves the plan, optimizes it, runs it on the executors, and sends Arrow batches back.
@@ -92,7 +92,7 @@ In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to 
 ## 03 · PYSPARK — Slides 14–30 · XIAO
 
 ### [14] Section divider — PySpark, Faster by Default · **XIAO** · ~0:12
-Still benefit two — reach Spark from everywhere. Now Python, the language most of you use with Spark. The headline is in the title: faster by default.
+Still benefit two — reach Spark from everywhere. Now Python, the language most of you use with Spark. The headline is in the title: faster by default. Monday takeaway: upgrade for free speedups, and use @arrow_udf on hot paths.
 
 ### [15] Roadmap (Arrow by default) · **XIAO** · ~0:08
 *(One breath.)* Four things in the Python story. First — Arrow, on by default.
@@ -155,7 +155,7 @@ New in 4.2: you can profile these Python data sources, like UDFs — for time an
 ## 04 · SPARK SQL — Slides 31–51 · XIAO
 
 ### [31] Section divider — Spark SQL · **XIAO** · ~0:12
-Benefit three: run AI-native analytics in SQL. This release added the most features here. We split it into four themes.
+Benefit three: run AI-native analytics in SQL. This release added the most features here. We split it into four themes. Monday takeaway: replace a cross-join plus ROW_NUMBER top-K with NEAREST BY.
 
 ### [32] Roadmap (Vector search) · **XIAO** · ~0:08
 *(Point at item 1.)* We start with vector search.
@@ -229,7 +229,7 @@ Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds `G
 ## 05 · PIPELINES & AUTO CDC — Slides 52–55 · DB
 
 ### [52] Section divider — Declarative Pipelines & Auto CDC · **DB** · ~0:15
-Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes.
+Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Monday takeaway: replace custom foreachBatch plus MERGE with Auto CDC where it fits.
 
 ### [53] Applying a change feed is the hard part · **DB** · ~0:50
 The common need: keep a copy of an operational table up to date. Rows are inserted, updated, deleted.
@@ -251,7 +251,7 @@ It runs inside Spark Declarative Pipelines. So checkpoints, retries, and idempot
 ## 06 · STRUCTURED STREAMING — Slides 56–60 · DB
 
 ### [56] Section divider — Structured Streaming · **DB** · ~0:12
-Still benefit four — move changing data safely. Now streaming. It is about two things: changing a running query safely, and a state store you can trust.
+Still benefit four — move changing data safely. Now streaming. It is about two things: changing a running query safely, and a state store you can trust. Monday takeaway: name your streaming sources so you can evolve them safely.
 
 ### [57] Evolve running pipelines safely · **DB** · ~0:40
 A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint.
@@ -271,7 +271,7 @@ The state store is the heart of stateful streaming. In 4.2 it is stronger. It ca
 ## 07 · DATA SOURCE V2 — Slides 61–75 · DB
 
 ### [61] Section divider — Data Source V2 · **DB** · ~0:15
-Still benefit four — move changing data safely. Now Data Source V2 — how Spark connects to data. It improved a lot this release.
+Still benefit four — move changing data safely. Now Data Source V2 — how Spark connects to data. It improved a lot this release. Monday takeaway: read changes with one CHANGES query, not per-engine functions.
 
 ### [62] One integration API for every data source · **DB** · ~0:40
 DSv2 is the standard API for data sources in Spark — Delta, Iceberg, and more. Users get the same SQL and behavior across sources. Connectors get DML, streaming, and Spark's optimizations.
@@ -337,7 +337,7 @@ For example: `WHERE udf(month(ts)) = 'JAN'` now prunes partitions in Iceberg and
 ## 08 · PERFORMANCE, UI & OPERATIONS — Slides 76–79 · DB
 
 ### [76] Section divider — Performance, UI & Operations · **DB** · ~0:12
-Benefit five: operate and evolve predictably. First, the things that make Spark faster, easier to see, and easier to run.
+Benefit five: operate and evolve predictably. First, the things that make Spark faster, easier to see, and easier to run. Monday takeaway: upgrade to 4.2 and pick up speed and stability with no code change.
 
 ### [77] A modern Spark Web UI · **DB** · ~0:30
 The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL plans — pan, zoom, search, and compare the first and final AQE plan side by side. And the environment page shows your non-default configs, with one-click export.
@@ -353,7 +353,7 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
 ## 09 · LOOKING AHEAD — Slides 80–97 · DB
 
 ### [80] Section divider — Looking Ahead · **DB** · ~0:15
-Still benefit five — operate and evolve predictably. This last part is ongoing work, already in progress for the next releases. We want to show you where Spark is going.
+Still benefit five — operate and evolve predictably. This last part is ongoing work, already in progress for the next releases. We want to show you where Spark is going. Monday takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.
 
 ### [81] Roadmap (five topics) · **DB** · ~0:12
 *(Gesture across the five.)* Five things ahead: Project Feather, a language-agnostic UDF protocol, nanosecond timestamps, real-time mode for stateful streaming, and a faster release cadence. We will touch each one.

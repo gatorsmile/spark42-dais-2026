@@ -166,6 +166,13 @@
   .slide.break .rule { width: 140px; height: 6px; background: var(--c-accent); border-radius: 3px; margin: 26px 0 0; }
   .slide.break .benefit { margin-top: 28px; font-size: 32px; font-weight: 700; color: var(--c-accent-2); letter-spacing: -.01em; }
   .slide.break .benefit span { color: var(--c-dim); font-weight: 600; }
+  .slide.break .takeaway { margin-top: 30px; display: flex; flex-direction: column; gap: 14px; max-width: 1220px; }
+  .slide.break .takeaway > div { display: flex; gap: 16px; font-size: 23px; line-height: 1.3; color: var(--c-muted); }
+  .slide.break .takeaway .tk-label { flex: none; width: 116px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; font-size: 15px; padding-top: 5px; }
+  .slide.break .takeaway .today .tk-label { color: var(--c-warn); }
+  .slide.break .takeaway .now { color: var(--c-text); }
+  .slide.break .takeaway .now .tk-label { color: var(--c-accent-2); }
+  .slide.break .takeaway .mon .tk-label { color: var(--c-good); }
   .slide.break .spark-logo { position: absolute; top: 56px; right: 96px; display: flex; align-items: center; gap: 18px; color: var(--c-accent); }
   .slide.break .spark-logo svg { width: 64px; height: 64px; }
   .slide.break .spark-logo span { font-size: 30px; font-weight: 700; color: var(--c-text); letter-spacing: .01em; }
@@ -863,11 +870,16 @@ This is the whole release on one slide. Six groups. About 24 features. We will n
   <h1>Metrics &amp; Semantic Modeling</h1>
   <div class="rule"></div>
   <div class="benefit">Define truth once</div>
+  <div class="takeaway">
+    <div class="today"><span class="tk-label">Today</span>Metrics are redefined in every tool &mdash; and they disagree.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Define each metric once in a governed metric view.</div>
+    <div class="mon"><span class="tk-label">Monday</span>Move your top dashboard metrics into a metric view.</div>
+  </div>
   <div class="slide-footer"><span>Metrics</span><span>6</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Metrics &amp; Semantic Modeling · XIAO · ~0:10
 
-Benefit one: define truth once. Let&#x27;s start with the semantic layer inside Spark.</div>
+Benefit one: define truth once. Let&#x27;s start with the semantic layer inside Spark. And the Monday takeaway: move your top dashboard metrics into a metric view.</div>
 </section>
 
 <!-- metrics why -->
@@ -948,11 +960,16 @@ You define the view once — the dimensions and the measures. Then look at the q
   <h1>Spark Connect</h1>
   <div class="rule"></div>
   <div class="benefit">Reach Spark from everywhere</div>
+  <div class="takeaway">
+    <div class="today"><span class="tk-label">Today</span>Your app needs a full Spark runtime; only JVM and Python feel first-class.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>A thin client reaches Spark from any language over gRPC.</div>
+    <div class="mon"><span class="tk-label">Monday</span>Call Spark with Connect from your service&rsquo;s own language.</div>
+  </div>
   <div class="slide-footer"><span>Spark Connect</span><span>10</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Spark Connect · XIAO · ~0:12
 
-Benefit two: reach Spark from everywhere. First, Spark Connect — how more and more applications talk to Spark.</div>
+Benefit two: reach Spark from everywhere. First, Spark Connect — how more and more applications talk to Spark. Monday takeaway: call Spark with Connect from your service&#x27;s own language.</div>
 </section>
 
 <section class="slide">
@@ -1050,11 +1067,16 @@ In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to 
   <h1>PySpark, Faster by Default</h1>
   <div class="rule"></div>
   <div class="benefit">Reach Spark from everywhere</div>
+  <div class="takeaway">
+    <div class="today"><span class="tk-label">Today</span>Python UDFs are slow, and hard to debug when they hang.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Arrow UDFs by default, native @arrow_udf, and real profiling.</div>
+    <div class="mon"><span class="tk-label">Monday</span>Upgrade for free speedups; use @arrow_udf on hot paths.</div>
+  </div>
   <div class="slide-footer"><span>PySpark</span><span>14</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — PySpark, Faster by Default · XIAO · ~0:12
 
-Still benefit two — reach Spark from everywhere. Now Python, the language most of you use with Spark. The headline is in the title: faster by default.</div>
+Still benefit two — reach Spark from everywhere. Now Python, the language most of you use with Spark. The headline is in the title: faster by default. Monday takeaway: upgrade for free speedups, and use @arrow_udf on hot paths.</div>
 </section>
 
 <!-- roadmap: PySpark 1 -->
@@ -1383,11 +1405,16 @@ New in 4.2: you can profile these Python data sources, like UDFs — for time an
   <h1>Spark SQL</h1>
   <div class="rule"></div>
   <div class="benefit">Run AI-native analytics in SQL</div>
+  <div class="takeaway">
+    <div class="today"><span class="tk-label">Today</span>Vector search and clean window logic need extra systems or verbose SQL.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Vector functions, NEAREST BY, QUALIFY, sketches, and geospatial &mdash; built in.</div>
+    <div class="mon"><span class="tk-label">Monday</span>Replace a cross-join plus ROW_NUMBER top-K with NEAREST BY.</div>
+  </div>
   <div class="slide-footer"><span>Spark SQL</span><span>31</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Spark SQL · XIAO · ~0:12
 
-Benefit three: run AI-native analytics in SQL. This release added the most features here. We split it into four themes.</div>
+Benefit three: run AI-native analytics in SQL. This release added the most features here. We split it into four themes. Monday takeaway: replace a cross-join plus ROW_NUMBER top-K with NEAREST BY.</div>
 </section>
 
 <!-- roadmap: Spark SQL 1 -->
@@ -1797,11 +1824,16 @@ Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds GE
   <h1>Spark Declarative Pipelines &amp; Auto CDC</h1>
   <div class="rule"></div>
   <div class="benefit">Move changing data safely</div>
+  <div class="takeaway">
+    <div class="today"><span class="tk-label">Today</span>CDC logic is handwritten foreachBatch plus MERGE &mdash; fragile.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Declare keys, order, and deletes; Spark reconciles it.</div>
+    <div class="mon"><span class="tk-label">Monday</span>Replace custom foreachBatch plus MERGE with Auto CDC where it fits.</div>
+  </div>
   <div class="slide-footer"><span>Auto CDC</span><span>52</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Declarative Pipelines &amp; Auto CDC · DB · ~0:15
 
-Thank you, Xiao. Benefit four: move changing data safely. Let&#x27;s start with a hard problem — keeping a table in sync with a stream of changes.</div>
+Thank you, Xiao. Benefit four: move changing data safely. Let&#x27;s start with a hard problem — keeping a table in sync with a stream of changes. Monday takeaway: replace custom foreachBatch plus MERGE with Auto CDC where it fits.</div>
 </section>
 
 <section class="slide">
@@ -1876,11 +1908,16 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
   <h1>Structured Streaming</h1>
   <div class="rule"></div>
   <div class="benefit">Move changing data safely</div>
+  <div class="takeaway">
+    <div class="today"><span class="tk-label">Today</span>Editing a running query breaks the checkpoint; state can corrupt.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Name sources with IDENTIFIED BY; a self-healing state store.</div>
+    <div class="mon"><span class="tk-label">Monday</span>Name your streaming sources so you can evolve them safely.</div>
+  </div>
   <div class="slide-footer"><span>Streaming</span><span>56</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Structured Streaming · DB · ~0:12
 
-Still benefit four — move changing data safely. Now streaming. It is about two things: changing a running query safely, and a state store you can trust.</div>
+Still benefit four — move changing data safely. Now streaming. It is about two things: changing a running query safely, and a state store you can trust. Monday takeaway: name your streaming sources so you can evolve them safely.</div>
 </section>
 
 <section class="slide">
@@ -1958,11 +1995,16 @@ The state store is the heart of stateful streaming. In 4.2 it is stronger. It ca
   <h1>Data Source V2</h1>
   <div class="rule"></div>
   <div class="benefit">Move changing data safely</div>
+  <div class="takeaway">
+    <div class="today"><span class="tk-label">Today</span>Every engine reinvents CDC; write-time change files tax all writers.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>One CHANGES API, atomic DML, and smarter pushdown &mdash; read-time CDC.</div>
+    <div class="mon"><span class="tk-label">Monday</span>Read changes with one CHANGES query, not per-engine functions.</div>
+  </div>
   <div class="slide-footer"><span>Data Source V2</span><span>61</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Data Source V2 · DB · ~0:15
 
-Still benefit four — move changing data safely. Now Data Source V2 — how Spark connects to data. It improved a lot this release.</div>
+Still benefit four — move changing data safely. Now Data Source V2 — how Spark connects to data. It improved a lot this release. Monday takeaway: read changes with one CHANGES query, not per-engine functions.</div>
 </section>
 
 <section class="slide">
@@ -2229,11 +2271,16 @@ For example: WHERE udf(month(ts)) = &#x27;JAN&#x27; now prunes partitions in Ice
   <h1>Performance, UI &amp; Operations</h1>
   <div class="rule"></div>
   <div class="benefit">Operate &amp; evolve predictably</div>
+  <div class="takeaway">
+    <div class="today"><span class="tk-label">Today</span>Slow scans, OOMs, an aging UI, and wrong metrics under retries.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Faster Parquet and codegen, leaner memory, a modern UI, Java 25.</div>
+    <div class="mon"><span class="tk-label">Monday</span>Upgrade to 4.2 and pick up speed and stability with no code change.</div>
+  </div>
   <div class="slide-footer"><span>Others</span><span>76</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Performance, UI &amp; Operations · DB · ~0:12
 
-Benefit five: operate and evolve predictably. First, the things that make Spark faster, easier to see, and easier to run.</div>
+Benefit five: operate and evolve predictably. First, the things that make Spark faster, easier to see, and easier to run. Monday takeaway: upgrade to 4.2 and pick up speed and stability with no code change.</div>
 </section>
 
 <section class="slide">
@@ -2289,11 +2336,16 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
   <h1>Looking Ahead</h1>
   <div class="rule"></div>
   <div class="benefit">Operate &amp; evolve predictably</div>
+  <div class="takeaway">
+    <div class="today"><span class="tk-label">Today</span>Laptop queries are slow; UDFs are Python-only; time stops at micros.</div>
+    <div class="now"><span class="tk-label">Coming</span>Project Feather, a UDF protocol for any language, and nanosecond time.</div>
+    <div class="mon"><span class="tk-label">Monday</span>Follow the SPIPs, try the previews, and plan around the quarterly cadence.</div>
+  </div>
   <div class="slide-footer"><span>Looking Ahead</span><span>80</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Looking Ahead · DB · ~0:15
 
-Still benefit five — operate and evolve predictably. This last part is ongoing work, already in progress for the next releases. We want to show you where Spark is going.</div>
+Still benefit five — operate and evolve predictably. This last part is ongoing work, already in progress for the next releases. We want to show you where Spark is going. Monday takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.</div>
 </section>
 
 <!-- looking-ahead roadmap 1 -->
