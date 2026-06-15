@@ -193,6 +193,21 @@
   .slide .forward { margin-top: 26px; font-size: 25px; font-weight: 600; line-height: 1.35; color: var(--c-text); border-left: 4px solid var(--c-accent); padding-left: 20px; max-width: 1180px; }
   .slide .forward b { color: var(--c-accent-2); }
   .slide .forward .later { color: var(--c-dim); font-weight: 600; }
+  /* simple box-and-arrow mental-model diagrams (reusable) */
+  .slide .fdiag { display: flex; align-items: stretch; gap: 0; margin-top: 30px; max-width: 1420px; }
+  .slide .fdiag .fbox { flex: 1; border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-card); padding: 17px 20px; display: flex; flex-direction: column; justify-content: center; }
+  .slide .fdiag .fbox.accent { border-color: var(--c-accent); background: var(--c-accent-soft); }
+  .slide .fdiag .ft { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--c-accent-2); margin-bottom: 8px; }
+  .slide .fdiag .fbox.muted .ft { color: var(--c-muted); }
+  .slide .fdiag .fd { font-size: 19px; line-height: 1.34; color: var(--c-muted); }
+  .slide .fdiag .fd b { color: var(--c-text); font-weight: 700; }
+  .slide .fdiag .fd code { background: var(--c-bg-2); border: 1px solid var(--c-line); border-radius: 6px; padding: 1px 7px; font-size: .82em; color: var(--c-warn); }
+  .slide .fdiag .farrow { flex: none; align-self: center; width: 50px; text-align: center; color: var(--c-accent); font-size: 32px; font-weight: 800; line-height: 1; }
+  .slide .fdiag .fchips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .slide .fdiag .fchips span { font-size: 16px; padding: 4px 12px; border: 1px solid var(--c-line); border-radius: 999px; color: var(--c-text); background: var(--c-bg-2); white-space: nowrap; }
+  .slide .fcap { margin-top: 18px; font-size: 20px; line-height: 1.36; color: var(--c-muted); max-width: 1360px; }
+  .slide .fcap b { color: var(--c-accent-2); font-weight: 700; }
+  .slide .fcap code { background: var(--c-bg-2); border: 1px solid var(--c-line); border-radius: 6px; padding: 1px 7px; font-size: .82em; color: var(--c-warn); }
   /* "Looking Ahead" status badge — marks roadmap slides as NOT shipping in 4.2 */
   .slide .la-badge {
     position: absolute; top: 40px; right: 56px; z-index: 6;
@@ -1124,7 +1139,14 @@ One source of truth — for SQL, for BI, and for AI. Let me show an example.</di
       <code><span class="k">SELECT</span> country, <span class="k">MEASURE</span>(revenue_per_user) <span class="k">FROM</span> sales_metrics <span class="k">GROUP BY ALL</span></code>
     </div>
   </div>
-  <p class="forward">The point isn&rsquo;t the syntax. The metric is now an <b>object Spark understands</b> &mdash; computed correctly at every grain, for everyone.</p>
+  <div class="fdiag">
+    <div class="fbox muted"><div class="ft">Business definition</div><div class="fd">&ldquo;Revenue per user&rdquo; &mdash; written <b>once</b></div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox accent"><div class="ft">Metric view</div><div class="fd">A <b>governed object</b> in the catalog &mdash; the optimizer computes it right at every grain</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox"><div class="ft">Everyone reads the same number</div><div class="fchips"><span>BI dashboards</span><span>Notebooks</span><span>SQL</span><span>AI agents</span></div></div>
+  </div>
+  <p class="fcap">The point isn&rsquo;t the syntax &mdash; the metric is now an <b>object Spark understands</b>, computed the same way for everyone.</p>
   <div class="slide-footer"><span>Metrics</span><span>11</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Metric views in action · XIAO · ~0:40
@@ -1274,6 +1296,13 @@ Still benefit two — reach Spark from everywhere. Now Python, the language most
     <li>Arrow-backed input skips ColumnarToRow conversion on the way into Python UDFs</li>
     <li>Upgrade to 4.2 and pick up the speedups with <b>zero code changes</b></li>
   </ul>
+  <div class="fdiag">
+    <div class="fbox"><div class="ft">Spark engine &middot; JVM</div><div class="fd">Columnar batches, scheduling, optimization</div></div>
+    <div class="farrow">&#8644;</div>
+    <div class="fbox accent"><div class="ft">Arrow IPC</div><div class="fd"><b>Vectorized</b> batches over a shared columnar format &mdash; no per-row pickling</div></div>
+    <div class="farrow">&#8644;</div>
+    <div class="fbox"><div class="ft">Python worker</div><div class="fd">Your UDF runs on Arrow data, returns batches</div></div>
+  </div>
   <div class="slide-footer"><span>PySpark</span><span>17</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Arrow on by default · XIAO · ~0:40
@@ -1585,6 +1614,14 @@ Benefit three: run AI-native analytics in SQL. This release added the most featu
       </ul></li>
     <li>Score similarity at Spark scale in SQL or DataFrames &mdash; the scoring building blocks for the new <b>NEAREST BY</b> top-K join</li>
   </ul>
+  <div class="fdiag">
+    <div class="fbox muted"><div class="ft">Query vector</div><div class="fd">One row&rsquo;s embedding</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox"><div class="ft">Candidate rows</div><div class="fd">Scored by <b>your expression</b> &mdash; cosine, L2, geo, BM25</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox accent"><div class="ft">Top-K per query row</div><div class="fd">The K closest, ranked &mdash; computed for <b>every</b> query row</div></div>
+  </div>
+  <p class="fcap">This is the shape <b>NEAREST BY</b> automates next &mdash; one join clause instead of a cross-join + <code>ROW_NUMBER()</code> + filter.</p>
   <div class="slide-footer"><span>Vector Search</span><span>30</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Query embeddings where your data lives · XIAO · ~0:45
@@ -2117,6 +2154,12 @@ Still benefit four — move changing data safely. Now Data Source V2 — how Spa
     <li>Evolving fast in 4.1 and 4.2: row-level DML, CDC, schema evolution, transactions, and smarter pushdown all live here</li>
     <li>Go deeper at this Summit: <b>&ldquo;Spark DSV2: Growing Up Fast&rdquo;</b> &mdash; Szehon Ho &amp; Anton Okolnychyi</li>
   </ul>
+  <div class="fdiag">
+    <div class="fbox muted"><div class="ft">One DSv2 connector</div><div class="fd">Delta &middot; Iceberg &middot; Hudi &middot; your own</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox accent"><div class="ft">One contract, four capabilities</div><div class="fchips"><span>Read</span><span>Write &middot; INSERT / MERGE</span><span>Change &middot; CHANGES</span><span>Pushdown</span></div></div>
+  </div>
+  <p class="fcap">Implement the contract once; Spark drives <b>reads, row-level writes, change feeds, and pushdown</b> through the same source.</p>
   <div class="slide-footer"><span>Data Source V2</span><span>50</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One integration API for every data source · DB · ~0:40
@@ -2135,8 +2178,15 @@ There is a full talk at this Summit: &quot;Spark DSV2: Growing Up Fast,&quot; by
     <li><b>CDC</b> = the row-level change history of a table: which rows were added, updated, or deleted</li>
     <li>A typed log in commit order: each row tagged <code>insert</code>, <code>update_preimage</code> / <code>update_postimage</code>, or <code>delete</code></li>
     <li>Every change carries the row values, the operation (<code>_change_type</code>), and the order (<code>_commit_version</code>, <code>_commit_timestamp</code>)</li>
-    <li>CDC is load-bearing infra: incremental ETL, audit, replication &mdash; and vector search, materialized views, and streaming tables refresh on commit</li>
   </ul>
+  <div class="fdiag">
+    <div class="fbox muted"><div class="ft">Table versions</div><div class="fd"><code>v10</code> &hellip; <code>v20</code> &mdash; commits over time</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox accent"><div class="ft">CHANGES</div><div class="fd">A <b>typed change log</b> in commit order &mdash; insert / update / delete</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox"><div class="ft">Downstream consumers</div><div class="fchips"><span>Incremental ETL</span><span>Audit</span><span>Replication</span><span>Streaming tables</span><span>Vector / MV refresh</span></div></div>
+  </div>
+  <p class="fcap">CDC is load-bearing infra &mdash; everything downstream stays current by reading <b>what changed</b>, not the whole table.</p>
   <div class="slide-footer"><span>Data Source V2</span><span>51</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Ask the table: &quot;what changed?&quot; · DB · ~0:45
