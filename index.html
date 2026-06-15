@@ -1640,9 +1640,10 @@ EXACT is brute force today. APPROX lets a future index help — without changing
       <div class="r now"><span class="lbl">Now</span><code>SELECT * FROM t <span class="k">QUALIFY</span> ROW_NUMBER() OVER w &lt;= 3</code></div>
     </div>
     <div class="banow">
-      <div class="tt">FILTER &mdash; conditional aggregates</div>
-      <div class="r before"><span class="lbl">Before</span><code>SUM(CASE WHEN region = 'EU' THEN amount END)</code></div>
-      <div class="r now"><span class="lbl">Now</span><code>SUM(amount) <span class="k">FILTER</span> (WHERE region = 'EU')</code></div>
+      <div class="tt">FILTER &mdash; now in window aggregates</div>
+      <div class="r before"><span class="lbl">Before</span><code>window aggregate + FILTER &rarr; &ldquo;not supported yet&rdquo;</code></div>
+      <div class="r now"><span class="lbl">Now</span><code>SUM(amount) <span class="k">FILTER</span> (WHERE region = 'EU')
+  <span class="k">OVER</span> (PARTITION BY country ORDER BY month)</code></div>
     </div>
     <div class="banow">
       <div class="tt">PIVOT aliases &mdash; readable pivots</div>
@@ -1659,7 +1660,7 @@ EXACT is brute force today. APPROX lets a future index help — without changing
   <div class="progress"><i></i></div>
   <div class="notes" hidden>SQL gets more natural &middot; XIAO &middot; ~0:45
 
-Before and now, four times — each one removes a pattern many of us have written for years. QUALIFY: top-N without a subquery. FILTER: conditional aggregates without a CASE. PIVOT with aliases: readable pivot columns. And cursors: row-by-row logic, now in pure SQL &mdash; no need to leave SQL for a loop. Less boilerplate, more intent. Takeaway: reach for QUALIFY and FILTER first &mdash; they remove the most code.</div>
+Before and now, four times — each one removes a pattern many of us have written for years. QUALIFY: top-N without a subquery. FILTER: conditional aggregates now run over a window too &mdash; SUM(...) FILTER (WHERE ...) OVER (...), which was rejected before 4.2 (SPARK-55702). PIVOT with aliases: readable pivot columns. And cursors: row-by-row logic, now in pure SQL &mdash; no need to leave SQL for a loop. Less boilerplate, more intent. Takeaway: reach for QUALIFY first, and use FILTER over windows where you used to fall back to a subquery.</div>
 </section>
 
 <section class="slide">
