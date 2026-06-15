@@ -7,6 +7,8 @@
 
 **Through-line (say it often):** *Spark 4.2 moves more of the modern data and AI stack into the engine itself.* Five benefits — (1) Define truth once · (2) Reach Spark from everywhere · (3) Run AI-native analytics in SQL · (4) Move changing data safely · (5) Operate & evolve predictably.
 
+**PySpark hierarchy:** No code change (Arrow) → Small change (Arrow UDFs) → New capability (Python Data Sources) → Dev experience (interop, logs, profiling). On-screen perf claims are qualitative; say the numbers verbally with "in our benchmarks."
+
 **Style:** Short, simple sentences; read slowly. *(parentheses)* are stage directions. Each section divider carries a **Today → Spark 4.2 → Takeaway** triad.
 
 ---
@@ -84,41 +86,41 @@ This slide is simple: upgrade, and it is faster. In 4.2, Arrow Python UDFs are t
 
 ### [18] Native Arrow UDFs: write on columns, skip the copies · XIAO · ~0:50
 Two new decorators — @arrow_udf and @arrow_udtf. PyArrow array in, PyArrow array out. The data stays columnar.
-No pandas conversion cost. So it is about 10% faster, and uses about 40% less memory, than a pandas UDF.
+No pandas conversion cost. In our benchmarks, about 10 percent faster and about 40 percent less memory than a pandas UDF.
 You get scalar, aggregate, and table functions. Iterator mode lets you set up once — for example, load a model once per batch.
-There is also mapInArrow and applyInArrow at the DataFrame level. And if you keep your pandas UDFs, the new Arrow backend makes them about 2× faster — with no code change.
+There is also mapInArrow and applyInArrow at the DataFrame level. And if you keep your pandas UDFs, the new Arrow backend makes them about 2 times faster in our benchmarks — with no code change.
 
 ### [19] Arrow UDFs in action · XIAO · ~0:25
 (Code slide.) Here is the new decorator. Arrays in, arrays out. No to_pandas. No round trip. Columnar from start to end.
 
-### [20] Better interop & developer experience · XIAO · ~0:40
-A group of small but useful wins. PyCapsule support: zero-copy sharing with Polars, DuckDB, and Arrow tools. You can profile Python data sources. builder.create() makes a new session without changing other configs. An optional strict mode catches unclear column names early. And pandas-on-Spark supports more axis=1 functions. Small things — but things you hit every day.
-
-### [21] PyCapsule interop in action · XIAO · ~0:30
-(Code slide.) Here a Spark DataFrame goes straight to Polars or DuckDB. No serialization between them. They share the same Arrow memory. Zero copy.
-
-### [22] Debug UDFs where they run · XIAO · ~0:45
-Now debugging. Your UDF runs in a Python worker on an executor — far from your notebook. When it hangs, before, you saw nothing.
-In 4.2, hangs are visible. The worker dumps its stack trace. Idle workers can be dumped and killed. There is one profiler for Python, pandas, and Arrow UDFs — CPU time, and memory by line. It works on Spark Connect too. And you can use Python logging inside the UDF, then read the logs back as a table.
-
-### [23] UDF debugging in action · XIAO · ~0:25
-(Code slide.) Here is a stuck worker — and its stack trace, shown automatically. And here are UDF logs, read back as a normal table.
-
-### [24] Python Data Sources: connectors in pure Python · XIAO · ~0:50
+### [20] Python Data Sources: connectors in pure Python · XIAO · ~0:50
 You can now build readers and writers fully in Python. Batch and streaming. No JVM. No Scala.
 Register it once. Then read and write with spark.read.format — just like a built-in source.
 The API keeps growing — pushdown, Arrow writers, streaming, partitioning.
 And there is a real ecosystem. The community package pyspark-data-sources has many ready connectors — Hugging Face, Google Sheets, Kaggle, Salesforce, and more.
-One more thing for the AI era: give an LLM an API spec, and it can write a working data source for you.
+One more thing for the AI era: an LLM can scaffold the long-tail connector — and you still test it, profile it, and harden it like normal code.
 
-### [25] A growing Python Data Source ecosystem · XIAO · ~0:30
+### [21] A growing Python Data Source ecosystem · XIAO · ~0:30
 (Gesture at the logos.) This is the ecosystem today. Connectors the community already built, in pure Python. Before, you had to learn the JVM API. Now you just write Python.
 
-### [26] Python Data Sources in action · XIAO · ~0:25
+### [22] Python Data Sources in action · XIAO · ~0:25
 (Code slide.) Here is a full custom source. A reader class. Register it. Read it like any format. That is the whole thing.
 
-### [27] Profiling Python Data Sources · XIAO · ~0:35
+### [23] Profiling Python Data Sources · XIAO · ~0:35
 New in 4.2: you can profile these Python data sources, like UDFs — for time and memory. Turn it on with one config. Then see where time and memory go in your read and write code. Your connector is no longer a black box.
+
+### [24] Better interop & developer experience · XIAO · ~0:40
+A group of small but useful wins. PyCapsule support: zero-copy sharing with Polars, DuckDB, and Arrow tools. You can profile Python data sources. builder.create() makes a new session without changing other configs. An optional strict mode catches unclear column names early. And pandas-on-Spark supports more axis=1 functions. Small things — but things you hit every day.
+
+### [25] PyCapsule interop in action · XIAO · ~0:30
+(Code slide.) Here a Spark DataFrame goes straight to Polars or DuckDB. No serialization between them. They share the same Arrow memory. Zero copy.
+
+### [26] Debug UDFs where they run · XIAO · ~0:45
+Now debugging. Your UDF runs in a Python worker on an executor — far from your notebook. When it hangs, before, you saw nothing.
+In 4.2, hangs are visible. The worker dumps its stack trace. Idle workers can be dumped and killed. There is one profiler for Python, pandas, and Arrow UDFs — CPU time, and memory by line. It works on Spark Connect too. And you can use Python logging inside the UDF, then read the logs back as a table.
+
+### [27] UDF debugging in action · XIAO · ~0:25
+(Code slide.) Here is a stuck worker — and its stack trace, shown automatically. And here are UDF logs, read back as a normal table.
 
 
 ## Section 04 · New SQL Analytics — Spark SQL
