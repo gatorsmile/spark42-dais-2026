@@ -7,9 +7,7 @@
 
 **Through-line (say it often):** *Spark 4.2 moves more of the modern data and AI stack into the engine itself.* Five benefits — (1) Define truth once · (2) Reach Spark from everywhere · (3) Run AI-native analytics in SQL · (4) Move changing data safely · (5) Operate & evolve predictably.
 
-**Style:** Short, simple sentences; read slowly; pause at each period. *(parentheses)* are stage directions. Each **section divider** carries a **Today → Spark 4.2 → Takeaway** triad — land the takeaway action.
-
-**Structure notes:** PySpark, Spark SQL, Data Source V2, and Looking Ahead use a **corner progress strip** instead of repeated roadmap slides (Looking Ahead keeps one agenda roadmap). SQL keeps QUALIFY as the live demo plus a compatibility summary; Feather is one 3-part slide; one nanosecond slide; merged release-cadence slide.
+**Style:** Short, simple sentences; read slowly. *(parentheses)* are stage directions. Each section divider carries a **Today → Spark 4.2 → Takeaway** triad.
 
 ---
 
@@ -67,7 +65,7 @@ The idea is simple. Your client builds a plan. It opens a gRPC stream to the ser
 The client is thin. It does not need a full Spark runtime. It does not need a JVM next to your app. So the client and the cluster can change on their own. The protocol connects them.
 
 ### [13] Clients in any language · XIAO · ~0:35
-Because the client only speaks the Connect protocol over gRPC, your app can use Spark from many languages. Python, Scala, Java — and also Go, Rust, Swift, TypeScript, .NET, and more. You do not rewrite your stack. You call Spark from where you already work. (Note: UDFs are still the gap — DB will talk about that later.)
+Because the client only speaks the Connect protocol over gRPC, your app can use Spark from many languages — Python, Scala, Java, and also Go, Rust, Swift, TypeScript, .NET, and more. You do not rewrite your stack. Here is the through-line: Connect makes Spark reachable from any app. The next frontier is making your custom logic — your UDFs — portable too. DB comes back to that in Looking Ahead.
 
 ### [14] Closing the gap with Spark Classic · XIAO · ~0:40
 In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to Connect — zipWithIndex, toJSON, emptyDataFrame. read.json, csv, and xml can now take a DataFrame. There is a new GetStatus API. Errors are clearer — for example, when you use a column from the wrong DataFrame. And client file names and line numbers are saved, so debugging is easier.
