@@ -1929,12 +1929,25 @@ Still benefit four — move changing data safely. Now streaming. It is about two
 <section class="slide">
   <div class="eyebrow">Streaming</div>
   <h2>Evolve running pipelines safely</h2>
-  <ul class="points">
-    <li>Name streaming sources with <b>IDENTIFIED BY</b> &mdash; identity is no longer tied to position</li>
-    <li>Add, remove, or reorder sources in a running query <b>without breaking checkpoints</b></li>
-    <li><code>DataStreamWriter.name()</code> enables the same evolution story for sinks</li>
-    <li>Available across SQL table-valued functions, Scala, and PySpark (Classic and Connect)</li>
-  </ul>
+  <div class="baf">
+    <div class="col today">
+      <div class="hd">Today &mdash; the pain</div>
+      <ul>
+        <li>Streaming sources are identified by <b>position</b></li>
+        <li>Add, remove, or reorder one and the <b>checkpoint breaks</b> &mdash; a full reprocess</li>
+        <li>Sinks have the same fragility</li>
+      </ul>
+    </div>
+    <div class="col now">
+      <div class="hd">Spark 4.2 &mdash; the mechanism</div>
+      <ul>
+        <li>Name sources with <b>IDENTIFIED BY</b> &mdash; identity is the name, not the position</li>
+        <li>Add / remove / reorder in a running query <b>without breaking the checkpoint</b></li>
+        <li><code>DataStreamWriter.name()</code> does the same for sinks; SQL TVFs, Scala, PySpark (Classic + Connect)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Name your streaming sources with <b>IDENTIFIED BY</b> so you can evolve a running query &mdash; no full reprocess.</span></div>
   <div class="slide-footer"><span>Streaming</span><span>44</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Evolve running pipelines safely · DB · ~0:40
@@ -1968,11 +1981,25 @@ df.writeStream.name(<span class="s">"main_sink"</span>).toTable(<span class="s">
 <section class="slide">
   <div class="eyebrow">Streaming</div>
   <h2>Richer joins, lower latency</h2>
-  <ul class="points">
-    <li>Stream-stream <b>Inner and LeftSemi joins</b> now run in Update output mode</li>
-    <li>LeftSemi stream-stream joins use less state-store space</li>
-    <li><b>Real-time mode trigger</b> is now accessible from PySpark</li>
-  </ul>
+  <div class="baf">
+    <div class="col today">
+      <div class="hd">Today &mdash; the pain</div>
+      <ul>
+        <li>Stream-stream <b>Inner / LeftSemi</b> joins couldn&rsquo;t emit in <b>Update</b> output mode</li>
+        <li>LeftSemi joins held <b>more state-store space</b> than needed</li>
+        <li>The real-time mode trigger was out of reach from PySpark</li>
+      </ul>
+    </div>
+    <div class="col now">
+      <div class="hd">Spark 4.2 &mdash; the mechanism</div>
+      <ul>
+        <li>Inner and LeftSemi stream-stream joins now run in <b>Update output mode</b></li>
+        <li>LeftSemi joins use <b>less state-store space</b></li>
+        <li><b>Real-time mode trigger</b> is now accessible from PySpark</li>
+      </ul>
+    </div>
+  </div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Use Inner / LeftSemi stream-stream joins in <b>Update mode</b> &mdash; and drive real-time mode from PySpark.</span></div>
   <div class="slide-footer"><span>Streaming</span><span>46</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Richer joins, lower latency · DB · ~0:35
@@ -1983,11 +2010,25 @@ Streaming joins get richer. Inner and LeftSemi stream-stream joins now run in Up
 <section class="slide">
   <div class="eyebrow">Streaming</div>
   <h2>A state store you can trust</h2>
-  <ul class="points">
-    <li><b>Automatic snapshot repair</b> recovers corrupted state snapshots without manual intervention</li>
-    <li>Row checksums and checkpoint checksum verification detect corruption early</li>
-    <li>Lagging snapshot uploads are handled automatically &mdash; now on by default</li>
-  </ul>
+  <div class="baf">
+    <div class="col today">
+      <div class="hd">Today &mdash; the pain</div>
+      <ul>
+        <li>A <b>corrupted snapshot</b> meant manual intervention &mdash; or a failed job</li>
+        <li>Corruption surfaced <b>late</b>, after it had already spread</li>
+        <li>Lagging snapshot uploads stalled progress</li>
+      </ul>
+    </div>
+    <div class="col now">
+      <div class="hd">Spark 4.2 &mdash; the mechanism</div>
+      <ul>
+        <li><b>Automatic snapshot repair</b> recovers corrupted state &mdash; no manual step</li>
+        <li>Row + checkpoint <b>checksums</b> catch corruption early</li>
+        <li>Lagging snapshot uploads handled automatically &mdash; <b>on by default</b></li>
+      </ul>
+    </div>
+  </div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Stateful streaming <b>self-heals</b> now &mdash; fewer pages at night.</span></div>
   <div class="slide-footer"><span>Streaming</span><span>47</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>A state store you can trust · DB · ~0:35
