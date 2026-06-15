@@ -7,9 +7,9 @@
 
 **Through-line (say it often):** *Spark 4.2 moves more of the modern data and AI stack into the engine itself.* Five benefits — (1) Define truth once · (2) Reach Spark from everywhere · (3) Run AI-native analytics in SQL · (4) Move changing data safely · (5) Operate & evolve predictably.
 
-**PySpark hierarchy:** No code change (Arrow) → Small change (Arrow UDFs) → New capability (Python Data Sources) → Dev experience (interop, logs, profiling). On-screen perf claims are qualitative; say numbers verbally with "in our benchmarks."
+**PySpark hierarchy:** No code change (Arrow) → Small change (Arrow UDFs) → New capability (Python Data Sources) → Dev experience. On-screen perf claims are qualitative; say numbers verbally with "in our benchmarks."
 
-**Style:** Short, simple sentences; read slowly. *(parentheses)* are stage directions. Each section divider carries a **Today → Spark 4.2 → Takeaway** triad.
+**Style:** Short, simple sentences; read slowly. *(parentheses)* are stage directions. Section dividers carry a **Today → Spark 4.2 → Takeaway** triad.
 
 ---
 
@@ -136,7 +136,7 @@ Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually y
 
 ### [31] NEAREST BY: top-K ranking join · XIAO · ~0:50
 This is a new join clause — SPIP SPARK-56395. For each query row, it returns the top-K closest rows.
-Today you write this as a cross join plus a ROW_NUMBER() window. It is slow, and the optimizer cannot understand it. NEAREST BY replaces all of that with one clause.
+Before: a cross join, a window, a rank, and a filter — slow, and the optimizer cannot understand it. Now: NEAREST 10 BY SIMILARITY — one clause the optimizer plans for you.
 It can rank by any expression — vector similarity, distance, geospatial, even BM25. INNER drops rows with no match. LEFT OUTER keeps them.
 EXACT is brute force today. APPROX lets a future index help — without changing your query. And an index never changes your results silently.
 
@@ -150,7 +150,7 @@ Four small wins, shown as before and after. QUALIFY: top-N without a subquery. F
 A quick compatibility round. SET PATH resolves names across schemas without the full path, and it is saved in views, so results stay reproducible — this helps PostgreSQL migrations. The type system is more complete: the TIME type works across more formats, and TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus IGNORE NULLS, top-K max_by and min_by, and time_bucket. Takeaway: if you are porting SQL from another database, these close common gaps.
 
 ### [35] Data sketches: approximate, mergeable analytics · XIAO · ~0:55
-Sketches are small, probabilistic summaries. One pass. Small memory. About 1 to 2% error. Approximate answers — but exact decisions.
+Sketches are small, probabilistic summaries. One pass. Small memory. About 1 to 2% error — bounded-error answers, decision-grade when the error budget fits.
 Much of this is already in Spark, as SQL aggregates. KLL for quantiles — P50, P90, P99 — since 4.1. Theta for distinct counts with set operations — since 4.1. Approx Top-K for frequent items — since 4.1. HLL for cardinality — since 3.5.
 New in 4.2: tuple sketches — distinct count plus a metric, like revenue, in one pass.
 The best part: they merge. Store sketches as Delta columns. Then combine them for any time range in milliseconds — with no rescan of raw data. And they work with the open Apache DataSketches project, so they merge across engines.
@@ -159,7 +159,7 @@ The best part: they merge. Store sketches as Delta columns. Then combine them fo
 (Code slide.) A tuple sketch — distinct users and total revenue, in one pass. Then we merge daily sketches into a month — instantly, with no rescan.
 
 ### [37] Native geospatial types · XIAO · ~0:45
-Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds GEOMETRY and GEOGRAPHY as native SQL types. On by default. No extra package. GEOMETRY is flat. GEOGRAPHY is on the globe. There is full SRID support. You read and write in Parquet, and the type and SRID are kept. It works in SQL, DataFrames, PySpark, and the Thrift server. And it follows the open Parquet and Iceberg geospatial spec, so it works across engines.
+Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds GEOMETRY and GEOGRAPHY as native SQL types. On by default. No extra package. GEOMETRY is flat. GEOGRAPHY is on the globe. There is full SRID support. You read and write in Parquet, and the type and SRID are kept. It works in SQL, DataFrames, and PySpark. And it follows the open Parquet and Iceberg geospatial spec, so it works across engines.
 
 ### [38] Geospatial in action · XIAO · ~0:30
 (Code slide. Only claim the shipped functions on screen.) Here are the functions that ship in 4.2 — ST_GeomFromWKB, ST_GeogFromWKB, ST_AsBinary, and the SRID helpers. Build a geometry, write it to Parquet, read it back — the type and SRID stay.
