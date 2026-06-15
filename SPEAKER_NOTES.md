@@ -34,24 +34,24 @@ This is the whole release on one slide. Six groups. About 24 features. We will n
 ## Section 01 · Metrics — Metrics & Semantic Modeling
 
 ### [6] Section divider — Metrics & Semantic Modeling · XIAO · ~0:10
-Benefit one: define truth once. Let's start with the semantic layer inside Spark. And the takeaway: move your top dashboard metrics into a metric view.
+Benefit one: define truth once. Let's start with one number that quietly breaks. And the takeaway: move your top dashboard metrics into a metric view.
 
-### [7] Why a semantic layer is critical · XIAO · ~1:05
+### [7] Some metrics don’t add up · XIAO · ~0:45
+Let me start with one number that quietly breaks. Two countries. Revenue and active users add up fine — 200 and 15. But revenue per user is a ratio. Average the two rows and you get 15. That is wrong. The correct answer is total revenue over total users — 200 over 15 — which is 13.33. So the real question is: where should this metric be defined, so it comes out right every time? That is a semantic-layer problem.
+
+### [8] Why this is a semantic-layer problem · XIAO · ~1:05
 Every company already has a semantic layer. But it is scattered. Words like "revenue," "active users," and "churn" are defined again and again — in BI tools, in dbt, in notebooks, in copy-pasted SQL.
 The cost is real. Dashboards do not agree. Teams waste time checking numbers. No one owns the real definition.
 This is not about style. It is about correctness. Ratios and COUNT(DISTINCT) break when you group or roll up the data. The number looks fine, but it is wrong.
 Client-side tools sit outside the engine. So they cannot enforce correctness, and permissions are not consistent.
 And now AI needs this too. An agent must answer "revenue per customer in the EU last quarter" the same way every time. A governed metric view gives both BI and AI one source of truth.
 
-### [8] Metric views: define metrics once · XIAO · ~1:05
+### [9] Metric views: define metrics once · XIAO · ~1:05
 So 4.2 adds metric views — SPIP SPARK-54119. You define a business metric once. Then you query it by any breakdown.
 There are two parts. Dimensions — the ways to slice. And measures — a new column type that aggregates without a fixed GROUP BY.
 This stops metric drift. Ratios and distinct counts are correct for every grouping. And measures can build on other measures.
 It lives in the engine and the catalog. So the optimizer enforces correctness, and permissions stay the same everywhere.
 One source of truth — for SQL, for BI, and for AI. Let me show an example.
-
-### [9] Some metrics don’t add up · XIAO · ~0:45
-Here is the problem, in one table. Two countries. Revenue and active users add up fine — 200 and 15. But revenue per user is a ratio. If you average the two rows, you get 15. That is wrong. The correct answer is total revenue over total users — 200 over 15 — which is 13.33. The point is not the YAML. The point is that these metrics are not additive, and Spark knows that — a metric view computes them correctly at every grain.
 
 ### [10] Metric views in action · XIAO · ~0:40
 You define the view once — the dimensions and the measures. Then look at the queries. The same metric, by region, by month, and the total. The numbers are correct at every level, because the engine knows how to aggregate each measure. You write it once. Everyone else just asks questions. Now — how do you connect to Spark?
@@ -64,10 +64,10 @@ Benefit two: reach Spark from everywhere. First, Spark Connect — how more and 
 
 ### [12] Architecture: gRPC in, Arrow out · XIAO · ~0:45
 The idea is simple. Your client builds a plan. It opens a gRPC stream to the server. The server resolves the plan, optimizes it, runs it on the executors, and sends Arrow batches back.
-The client is thin. It does not need a full Spark runtime. It does not need a JVM next to your app. So the client and the cluster can change on their own. The protocol connects them.
+The client is thin. It does not need a full Spark runtime. It does not need a JVM next to your app. So the client and the cluster can change on their own. The protocol connects them. The point: your app does not need to be a Spark app.
 
 ### [13] Clients in any language · XIAO · ~0:35
-Because the client only speaks the Connect protocol over gRPC, your app can use Spark from many languages — Python, Scala, Java, and also Go, Rust, Swift, TypeScript, .NET, and more. You do not rewrite your stack. Here is the through-line: Connect makes Spark reachable from any app. The next frontier is making your custom logic — your UDFs — portable too. DB comes back to that in Looking Ahead.
+Because the client only speaks the Connect protocol over gRPC, your app can use Spark from many languages — Python, Scala, Java, and also Go, Rust, Swift, TypeScript, .NET, and more. For example, a Go service can call Spark without embedding a JVM. You do not rewrite your stack. Here is the through-line: Connect makes Spark reachable from any app. The next frontier is making your custom logic — your UDFs — portable too. DB comes back to that in Looking Ahead.
 
 ### [14] Closing the gap with Spark Classic · XIAO · ~0:40
 In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to Connect — zipWithIndex, toJSON, emptyDataFrame. read.json, csv, and xml can now take a DataFrame. There is a new GetStatus API. Errors are clearer — for example, when you use a column from the wrong DataFrame. And client file names and line numbers are saved, so debugging is easier.
@@ -79,7 +79,7 @@ In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to 
 Still benefit two — reach Spark from everywhere. Now Python, the language most of you use with Spark. The headline is in the title: faster by default. Takeaway: upgrade for free speedups, and use @arrow_udf on hot paths.
 
 ### [16] Arrow on by default · XIAO · ~0:40
-This slide is simple: upgrade, and it is faster. In 4.2, Arrow Python UDFs are the default. Your old UDFs just run faster. Arrow IPC between the JVM and Python is on by default. And Arrow input skips an extra conversion step. Upgrade to 4.2 and get this speed — with no code change.
+The important part is the default. In 4.2, Arrow Python UDFs are the default — your old UDFs just run faster. Arrow IPC between the JVM and Python is on, too. And Arrow input skips an extra conversion step. This is the upgrade story: get this speed with no code change.
 
 ### [17] Python UDFs: same code, now faster · XIAO · ~0:25
 (Code slide.) Same UDF you always write. No new decorator. No rewrite. But the engine now moves the data as Arrow. Same code — faster.
@@ -110,7 +110,7 @@ One more thing for the AI era: an LLM can scaffold the long-tail connector — a
 New in 4.2: you can profile these Python data sources, like UDFs — for time and memory. Turn it on with one config. Then see where time and memory go in your read and write code. Your connector is no longer a black box.
 
 ### [24] Better interop & developer experience · XIAO · ~0:40
-A group of small but useful wins. PyCapsule support: zero-copy sharing with Polars, DuckDB, and Arrow tools. You can profile Python data sources. builder.create() makes a new session without changing other configs. An optional strict mode catches unclear column names early. And pandas-on-Spark supports more axis=1 functions. Small things — but things you hit every day.
+This is small individually, but big in daily debugging. PyCapsule support: zero-copy sharing with Polars, DuckDB, and Arrow tools. You can profile Python data sources. builder.create() makes a new session without changing other configs. An optional strict mode catches unclear column names early. And pandas-on-Spark supports more axis=1 functions. Each one is minor alone — together, they save you time every day.
 
 ### [25] PyCapsule interop in action · XIAO · ~0:30
 (Code slide.) Here a Spark DataFrame goes straight to Polars or DuckDB. No serialization between them. They share the same Arrow memory. Zero copy.
@@ -144,7 +144,7 @@ EXACT is brute force today. APPROX lets a future index help — without changing
 (Code slide.) One query: for each row, give me the five nearest. That is it. No window. No cross join.
 
 ### [33] SQL gets more natural · XIAO · ~0:45
-Four small wins, shown as before and after. QUALIFY: top-N without a subquery. FILTER: conditional aggregates without a CASE. PIVOT with aliases: readable pivot columns. And cursors: row-by-row logic, now in pure SQL — no need to leave SQL for a loop. The theme is simple: less boilerplate, more intent. Takeaway: reach for QUALIFY and FILTER first — they remove the most code.
+Before and now, four times — each one removes a pattern many of us have written for years. QUALIFY: top-N without a subquery. FILTER: conditional aggregates without a CASE. PIVOT with aliases: readable pivot columns. And cursors: row-by-row logic, now in pure SQL — no need to leave SQL for a loop. Less boilerplate, more intent. Takeaway: reach for QUALIFY and FILTER first — they remove the most code.
 
 ### [34] SQL compatibility improvements · XIAO · ~0:40
 A quick compatibility round. SET PATH resolves names across schemas without the full path, and it is saved in views, so results stay reproducible — this helps PostgreSQL migrations. The type system is more complete: the TIME type works across more formats, and TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus IGNORE NULLS, top-K max_by and min_by, and time_bucket. Takeaway: if you are porting SQL from another database, these close common gaps.
@@ -163,7 +163,7 @@ Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds GE
 
 ### [38] Geospatial in action · XIAO · ~0:30
 (Code slide. Only claim the shipped functions on screen.) Here are the functions that ship in 4.2 — ST_GeomFromWKB, ST_GeogFromWKB, ST_AsBinary, and the SRID helpers. Build a geometry, write it to Parquet, read it back — the type and SRID stay.
-▶ HANDOFF — XIAO → DB. (XIAO:) That is my half — SQL and Python. Now DB will show how data moves, and where Spark is going. DB.
+▶ HANDOFF — XIAO → DB. (XIAO:) So far, we saw how Spark 4.2 brings more logic into the engine — metrics, Python, and SQL. But analytics is not only about querying data. The data is changing underneath you. DB will now show how 4.2 makes change itself safer — CDC, streaming, Data Source V2, and operations. DB.
 
 
 ## Section 05 · Pipelines & Auto CDC — Spark Declarative Pipelines & Auto CDC
@@ -257,7 +257,7 @@ This is for single-statement DML today. Multi-statement and cross-catalog transa
 DML is observable now. MERGE, UPDATE, and DELETE report metrics — rows inserted, updated, deleted, copied. You see them where you already look — Delta DESCRIBE HISTORY, Iceberg snapshots. MERGE and INSERT support schema evolution, and the connector decides what is valid. And table refresh is consistent — so views over external tables stay correct.
 
 ### [59] Smarter pushdown: PartitionPredicate · DB · ~0:35
-A small but real gap. Before, partition filters with UDFs or unusual expressions were lost between Catalyst and the DSv2 connectors. File sources could use them. Connectors could not.
+This is a real gap, and connectors hit it every day. Before, partition filters with UDFs or unusual expressions were lost between Catalyst and the DSv2 connectors. File sources could use them. Connectors could not.
 The new PartitionPredicate API fixes this. Any Catalyst partition filter can be checked against partition values. It works for scans, DELETE WHERE, and runtime filters.
 For example: WHERE udf(month(ts)) = 'JAN' now prunes partitions in Iceberg and Delta. Less data read. Faster queries.
 
