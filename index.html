@@ -1481,21 +1481,20 @@ In 4.2, hangs are visible. The worker dumps its stack trace. Idle workers can be
   <div class="progstrip"><span>1 &middot; No code change</span><span>2 &middot; Small change</span><span>3 &middot; New capability</span><span class="on">4 &middot; Dev experience</span></div>
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>UDF debugging in action</h2>
-  <pre class="code sm focus"><span class="c"># stuck worker? dump stacks on a timer, reap silent workers</span>
-spark.python.worker.tracebackDumpIntervalSeconds = 30
-spark.python.worker.killOnIdleTimeout            = <span class="k">true</span>
-spark.python.worker.idleTimeoutSeconds           = 60
+  <pre class="code sm focus"><span class="c"># stuck worker? dump stacks on a timer, reap silent workers (4.2)</span>
+spark.conf.set(<span class="s">"spark.sql.execution.pyspark.udf.tracebackDumpIntervalSeconds"</span>, <span class="s">"30"</span>)
+spark.conf.set(<span class="s">"spark.sql.execution.pyspark.udf.idleTimeoutSeconds"</span>, <span class="s">"60"</span>)
+spark.conf.set(<span class="s">"spark.sql.execution.pyspark.udf.killOnIdleTimeout"</span>, <span class="s">"true"</span>)
 
 <span class="c"># profile any UDF: where time and memory actually go</span>
 spark.conf.set(<span class="s">"spark.sql.pyspark.udf.profiler"</span>, <span class="s">"perf"</span>)  <span class="c"># or "memory"</span>
 df.select(add1(<span class="s">"id"</span>)).show()
 <span class="hl">spark.profile.show(type=<span class="s">"perf"</span>)</span>     <span class="c"># cProfile per UDF</span>
-spark.profile.show(type=<span class="s">"memory"</span>)   <span class="c"># line-by-line memory</span>
 
 <span class="c"># structured logging from inside a UDF (4.2)</span>
 spark.conf.set(<span class="s">"spark.sql.pyspark.worker.logging.enabled"</span>, <span class="s">"true"</span>)
 <span class="c">#   ... logging.info("null input skipped") inside the UDF ...</span>
-<span class="k">SELECT</span> * <span class="k">FROM</span> <span class="hl">python_worker_logs()</span>;  <span class="c">-- query logs as a table</span></pre>
+<span class="hl">spark.sql(<span class="s">"SELECT * FROM python_worker_logs()"</span>).show(truncate=<span class="k">False</span>)</span></pre>
   <div class="slide-footer"><span>PySpark</span><span>27</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>UDF debugging in action · XIAO · ~0:25
@@ -1786,20 +1785,20 @@ Location data is everywhere — delivery, IoT, maps, risk. In 4.2, Spark adds GE
   <div class="progstrip"><span>1 &middot; Vector</span><span>2 &middot; SQL</span><span>3 &middot; Sketches</span><span class="on">4 &middot; Geospatial</span></div>
   <div class="eyebrow">Geospatial <span class="tag">In action</span></div>
   <h2>Geospatial in action</h2>
-  <pre class="code focus"><span class="c">-- Define geospatial columns</span>
-<span class="k">CREATE TABLE</span> city_zones (
-  zone_id INT, name STRING, boundary <span class="hl">GEOMETRY(4326)</span>
+  <pre class="code sm focus"><span class="c">-- Define a geospatial column</span>
+<span class="k">CREATE TABLE</span> city_points (
+  id INT, name STRING, location <span class="hl">GEOMETRY(4326)</span>
 );
 
-<span class="c">-- Build values from WKB, with an explicit SRID</span>
-<span class="k">INSERT INTO</span> city_zones <span class="k">SELECT</span>
-  1, <span class="s">'Downtown'</span>, <span class="hl">ST_GeomFromWKB(x'0103...', 4326)</span>;
+<span class="c">-- Build a value from WKB, with an explicit SRID</span>
+<span class="k">INSERT INTO</span> city_points <span class="k">VALUES</span>
+  (1, <span class="s">'Downtown'</span>, <span class="hl">ST_GeomFromWKB(X'0101000000000000000000F03F0000000000000040', 4326)</span>);
 
-<span class="c">-- Inspect the SRID and export geometries back to WKB</span>
-<span class="k">SELECT</span> zone_id, name,
-       <span class="hl">ST_Srid(boundary)</span>     <span class="k">AS</span> srid,
-       <span class="hl">ST_AsBinary(boundary)</span> <span class="k">AS</span> wkb
-<span class="k">FROM</span> city_zones;</pre>
+<span class="c">-- Inspect the SRID and export the geometry back to WKB</span>
+<span class="k">SELECT</span> id, name,
+       <span class="hl">ST_Srid(location)</span>     <span class="k">AS</span> srid,
+       <span class="hl">ST_AsBinary(location)</span> <span class="k">AS</span> wkb
+<span class="k">FROM</span> city_points;</pre>
   <p class="sub">Shipped functions: <code>ST_GeomFromWKB</code>, <code>ST_GeogFromWKB</code>, <code>ST_AsBinary</code>, <code>ST_Srid</code>, <code>ST_SetSrid</code></p>
   <div class="slide-footer"><span>Geospatial</span><span>38</span></div>
   <div class="progress"><i></i></div>
