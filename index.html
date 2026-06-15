@@ -97,12 +97,21 @@
   .slide .demotable tr.good td { color: var(--c-good); font-weight: 700; }
   .slide .baq { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 48px; margin-top: 30px; }
   .slide .baq .t { font-weight: 800; color: var(--c-accent-2); font-size: 20px; margin: 0 0 10px; }
-  .slide .baq code { display: block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 16px; line-height: 1.45; white-space: pre-wrap; }
+  .slide .baq code { display: block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 18px; line-height: 1.5; white-space: pre-wrap; }
   .slide .baq .b { color: #5d7186; }
   .slide .baq .b::before { content: "\2717  "; color: var(--c-warn); }
   .slide .baq .a { color: #e8eef4; margin-top: 5px; }
   .slide .baq .a::before { content: "\2713  "; color: var(--c-good); }
   .slide .baq .a .k { color: var(--c-accent-2); font-weight: 700; }
+  .slide .banow { margin-top: 26px; border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-card); padding: 22px 30px; max-width: 1140px; }
+  .slide .banow .r { display: flex; align-items: baseline; gap: 20px; }
+  .slide .banow .r + .r { margin-top: 16px; }
+  .slide .banow .lbl { flex: none; width: 78px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; }
+  .slide .banow .before .lbl { color: var(--c-warn); }
+  .slide .banow .now .lbl { color: var(--c-good); }
+  .slide .banow code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 22px; color: #e8eef4; }
+  .slide .banow .before code { color: #74879a; }
+  .slide .banow .now code .k { color: var(--c-accent-2); font-weight: 700; }
   .slide .forward { margin-top: 26px; font-size: 25px; font-weight: 600; line-height: 1.35; color: var(--c-text); border-left: 4px solid var(--c-accent); padding-left: 20px; max-width: 1180px; }
   .slide .forward b { color: var(--c-accent-2); }
   .slide .forward .later { color: var(--c-dim); font-weight: 600; }
@@ -1461,11 +1470,9 @@ Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually y
     <li><code>INNER</code> (default) drops unmatched query rows; <code>LEFT OUTER</code> keeps them with NULL base columns</li>
     <li><code>EXACT</code> is brute-force KNN today; <code>APPROX</code> lets future ANN indexes kick in <b>without changing the query</b> &mdash; index presence never silently changes results</li>
   </ul>
-  <div class="baq" style="grid-template-columns:1fr; margin-top:22px;">
-    <div class="item">
-      <code class="b">cross join &nbsp;+&nbsp; ROW_NUMBER() window &nbsp;+&nbsp; rank &nbsp;+&nbsp; filter</code>
-      <code class="a"><span class="k">NEAREST</span> 10 <span class="k">BY SIMILARITY</span> &hellip;</code>
-    </div>
+  <div class="banow">
+    <div class="r before"><span class="lbl">Before</span><code>cross join + ROW_NUMBER() window + rank + filter</code></div>
+    <div class="r now"><span class="lbl">Now</span><code><span class="k">NEAREST 10 BY SIMILARITY</span> &hellip;</code></div>
   </div>
   <div class="slide-footer"><span>Vector Search</span><span>31</span></div>
   <div class="progress"><i></i></div>
