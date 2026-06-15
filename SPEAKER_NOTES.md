@@ -232,9 +232,10 @@ Still benefit five. This last part is ongoing work, already in progress for the 
 
 ### [67] Project Feather: fast local queries · DB · ~0:32
 First, Project Feather. The goal: make small queries fast on a laptop. Spark uses one API for big and small jobs. But for small jobs, the fixed costs are too high. A query over less than 100 MB can still take seconds — because planning, scheduling, serialization, and shuffle were built for big clusters. Feather works on three areas: planning and scheduling, the cache format, and shuffle.
+Here is the key difference. Unlike DuckDB or Polars, the value of Feather is this: many users want to start small on a laptop and scale to big data later — without switching APIs, engines, or mental models. If Spark can feel lightweight for local experimentation while still scaling to production workloads, that is a much smoother path from prototype to production.
 
 ### [68] Project Feather: a three-part plan · DB · ~0:32
-Feather has three parts. One: faster planning and scheduling. A single-pass analyzer, and a one-file query that runs as a single task, with no shuffle. Two: an Arrow columnar cache, to replace the row-based df.cache, for faster re-reads. Three: shuffle-free local execution. Threads pass data through channels, instead of shuffle files. Together, Spark works on a laptop, and still scales to the cluster.
+Feather has three parts. One: faster planning and scheduling. A single-pass analyzer, and a one-file query that runs as a single task, with no shuffle. Two: an Arrow columnar cache, to replace the row-based df.cache, for faster re-reads. And UDFs now take Arrow as input too — so the data stays Arrow end to end, with no format change across the pipeline. Three: shuffle-free local execution. Threads pass data through channels, instead of shuffle files. Together, Spark works on a laptop, and still scales to the cluster.
 
 ### [69] Language-agnostic UDF protocol · DB · ~0:35
 Remember the Connect clients — Go, Rust, Swift, and more. UDFs are the one thing Connect cannot give most of them. SPIP SPARK-55278 fixes that. Today, each language rebuilds the whole UDF stack. The planning rules are tied to Python. Serialized UDFs are tied to a runtime — a server upgrade can break them. And UDF execution is locked in the cluster. So a heavy or GPU UDF forces an over-sized cluster.

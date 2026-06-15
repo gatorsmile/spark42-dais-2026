@@ -2537,11 +2537,14 @@ Still benefit five. This last part is ongoing work, already in progress for the 
     <li>Queries over &lt;100 MB of data can still take seconds: planning, scheduling, serialization, and shuffle machinery built for distributed execution</li>
     <li>Three focus areas: query compilation &amp; task scheduling, cache format efficiency, shuffle overhead</li>
   </ul>
+  <p class="sub" style="margin-top:30px"><b>Unlike DuckDB or Polars:</b> start small on a laptop and scale to big data later &mdash; no switching APIs, engines, or mental models. A smoother path from prototype to production.</p>
   <div class="slide-footer"><span>Looking Ahead</span><span>67</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Project Feather: fast local queries · DB · ~0:32
 
-First, Project Feather. The goal: make small queries fast on a laptop. Spark uses one API for big and small jobs. But for small jobs, the fixed costs are too high. A query over less than 100 MB can still take seconds — because planning, scheduling, serialization, and shuffle were built for big clusters. Feather works on three areas: planning and scheduling, the cache format, and shuffle.</div>
+First, Project Feather. The goal: make small queries fast on a laptop. Spark uses one API for big and small jobs. But for small jobs, the fixed costs are too high. A query over less than 100 MB can still take seconds — because planning, scheduling, serialization, and shuffle were built for big clusters. Feather works on three areas: planning and scheduling, the cache format, and shuffle.
+
+Here is the key difference. Unlike DuckDB or Polars, the value of Feather is this: many users want to start small on a laptop and scale to big data later — without switching APIs, engines, or mental models. If Spark can feel lightweight for local experimentation while still scaling to production workloads, that is a much smoother path from prototype to production.</div>
 </section>
 
 <!-- 59 -->
@@ -2551,7 +2554,7 @@ First, Project Feather. The goal: make small queries fast on a laptop. Spark use
   <h2>A three-part plan</h2>
   <ul class="points">
     <li><b>Faster planning &amp; scheduling</b> &mdash; a single-pass analyzer; run a one-file query as a single task, with no shuffle</li>
-    <li><b>Arrow columnar cache</b> &mdash; replace the row-oriented <code>df.cache</code> with a compressed Arrow cache: smaller, with faster re-reads</li>
+    <li><b>Arrow columnar cache</b> &mdash; replace the row-oriented <code>df.cache</code> with a compressed Arrow cache: smaller, with faster re-reads. UDFs now take Arrow as input too &mdash; so no data-format change across the pipeline</li>
     <li><b>Shuffle-free local execution</b> &mdash; a multithreaded local mode where threads pass data through channels instead of shuffle files</li>
   </ul>
   <p class="sub" style="margin-top:30px">Together: Spark that works at laptop scale, with a clear path back to the cluster.</p>
@@ -2559,7 +2562,7 @@ First, Project Feather. The goal: make small queries fast on a laptop. Spark use
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Project Feather: a three-part plan · DB · ~0:32
 
-Feather has three parts. One: faster planning and scheduling. A single-pass analyzer, and a one-file query that runs as a single task, with no shuffle. Two: an Arrow columnar cache, to replace the row-based df.cache, for faster re-reads. Three: shuffle-free local execution. Threads pass data through channels, instead of shuffle files. Together, Spark works on a laptop, and still scales to the cluster.</div>
+Feather has three parts. One: faster planning and scheduling. A single-pass analyzer, and a one-file query that runs as a single task, with no shuffle. Two: an Arrow columnar cache, to replace the row-based df.cache, for faster re-reads. And UDFs now take Arrow as input too — so the data stays Arrow end to end, with no format change across the pipeline. Three: shuffle-free local execution. Threads pass data through channels, instead of shuffle files. Together, Spark works on a laptop, and still scales to the cluster.</div>
 </section>
 
 <!-- 60 -->
