@@ -195,6 +195,8 @@
   .slide .forward .later { color: var(--c-dim); font-weight: 600; }
   /* simple box-and-arrow mental-model diagrams (reusable) */
   .slide .fdiag { display: flex; align-items: stretch; gap: 0; margin-top: 30px; max-width: 1420px; }
+  .slide .fdiag.parts { gap: 16px; }
+  .slide .fdiag .flead { flex: none; align-self: center; padding-right: 4px; font-size: 17px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--c-accent-2); }
   .slide .fdiag .fbox { flex: 1; border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-card); padding: 17px 20px; display: flex; flex-direction: column; justify-content: center; }
   .slide .fdiag .fbox.accent { border-color: var(--c-accent); background: var(--c-accent-soft); }
   .slide .fdiag .ft { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--c-accent-2); margin-bottom: 8px; }
@@ -1918,10 +1920,17 @@ Thank you, Xiao. Benefit four: move changing data safely. Let&#x27;s start with 
   <h2>Applying a change feed is the hard part</h2>
   <ul class="points">
     <li>The classic need: keep a lakehouse replica of an operational table in sync &mdash; rows are inserted, updated, and deleted</li>
-    <li>A CDC event has four parts: <b>key</b> (row identity), <b>operation</b>, <b>sequence</b> (when it happened), and <b>payload</b></li>
     <li>The hard parts: events arrive out of order and across micro-batch boundaries, change events can be partial, and retries must stay idempotent</li>
     <li>Hand-rolled <code>foreachBatch</code> + MERGE with tombstone tracking easily runs to dozens or hundreds of lines of code</li>
   </ul>
+  <div class="fdiag parts">
+    <span class="flead">One CDC event</span>
+    <div class="fbox"><div class="ft">Key</div><div class="fd">row identity</div></div>
+    <div class="fbox"><div class="ft">Operation</div><div class="fd">insert / update / delete</div></div>
+    <div class="fbox"><div class="ft">Sequence</div><div class="fd">when it happened</div></div>
+    <div class="fbox accent"><div class="ft">Payload</div><div class="fd">the changed column values</div></div>
+  </div>
+  <p class="fcap">These four fields are all you <b>declare</b> &mdash; the next slide hands the reconciliation to Spark.</p>
   <div class="slide-footer"><span>Auto CDC</span><span>41</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Applying a change feed is the hard part · DB · ~0:50
@@ -2368,10 +2377,17 @@ There is new INSERT ... REPLACE syntax, and BY NAME with REPLACE WHERE. MERGE ge
   <div class="progstrip"><span>1 &middot; Read changes</span><span class="on">2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
   <h2>Transactions: atomic, isolated DML</h2>
-  <ul class="points">
-    <li>DML is read &rarr; transform &rarr; write back: without isolation, a writer can overwrite concurrent changes it never saw</li>
+  <div class="fdiag">
+    <div class="fbox muted"><div class="ft">Read</div><div class="fd">the rows the DML touches</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox muted"><div class="ft">Transform</div><div class="fd">compute the new values</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox muted"><div class="ft">Write back</div><div class="fd">stage the result</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox accent"><div class="ft">Commit-time check</div><div class="fd">concurrent change to a row I read? &mdash; <b>fail cleanly</b>, never silently corrupt</div></div>
+  </div>
+  <ul class="points" style="margin-top:22px">
     <li>Spark 4.2 begins a <b>transaction for every DML operation</b> and tracks all table reads and writes inside it</li>
-    <li>Connectors validate concurrent commits at commit time &mdash; stale reads fail cleanly instead of corrupting data</li>
     <li>Engine-level today: single-statement DML; multi-statement and cross-catalog transactions are future work</li>
   </ul>
   <div class="slide-footer"><span>Data Source V2</span><span>58</span></div>
@@ -2599,12 +2615,16 @@ Today, each language must rebuild the whole UDF stack. The planning rules are ti
   <div class="progstrip"><span>1 &middot; Feather</span><span class="on">2 &middot; UDF protocol</span><span>3 &middot; Nanosecond</span><span>4 &middot; Real-time</span><span>5 &middot; Releases</span></div>
   <div class="eyebrow">Looking Ahead &middot; UDF Protocol</div>
   <h2>Three pillars</h2>
-  <ul class="points">
-    <li><b>Language-agnostic planning</b>: plan UDFs by execution shape &mdash; scalar, mapPartitions, grouped map, table function, aggregator &mdash; not by language</li>
-    <li><b>One standardized execution protocol</b>: init &rarr; data &rarr; finish over gRPC + Protobuf with Arrow batches &mdash; versioned, streaming, with back-pressure</li>
-    <li><b>Declarative worker spec</b>: the client declares how to start, connect, and clean up &mdash; local process, container, or remote / GPU worker</li>
-    <li>Each pillar makes one thing replaceable without touching the others</li>
-  </ul>
+  <div class="fdiag">
+    <div class="fbox muted"><div class="ft">Client &middot; any language</div><div class="fd">Go &middot; Rust &middot; Swift &middot; Python &hellip;</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox"><div class="ft">1 &middot; Plan by shape</div><div class="fd">scalar &middot; map &middot; grouped map &middot; table &middot; aggregate &mdash; <b>not by language</b></div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox accent"><div class="ft">2 &middot; Execution protocol</div><div class="fd"><b>init &rarr; data &rarr; finish</b> over gRPC + Arrow &mdash; versioned, streaming, back-pressure</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox"><div class="ft">3 &middot; Worker spec</div><div class="fd">client declares start / connect / clean up</div><div class="fchips" style="margin-top:8px"><span>local</span><span>container</span><span>remote / GPU</span></div></div>
+  </div>
+  <p class="fcap">Each pillar is <b>replaceable without touching the others</b> &mdash; that&rsquo;s what makes UDFs portable across languages, runtimes, and hardware.</p>
   <div class="slide-footer"><span>Looking Ahead</span><span>70</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Three pillars · DB · ~0:40
