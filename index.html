@@ -1205,7 +1205,7 @@ In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to 
   <div class="benefit">Reach Spark from everywhere</div>
   <div class="takeaway">
     <div class="today"><span class="tk-label">Today</span>Python UDFs are slow, and hard to debug when they hang.</div>
-    <div class="now"><span class="tk-label">Spark 4.2</span>Arrow UDFs by default, native @arrow_udf, and real profiling.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Arrow UDFs by default, @arrow_udf on hot paths, and real profiling.</div>
     <div class="mon"><span class="tk-label">Takeaway</span>Upgrade for free speedups; use @arrow_udf on hot paths.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep on"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
@@ -1273,7 +1273,7 @@ df.select(shipping_cost(<span class="s">"weight"</span>, <span class="s">"zone"<
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li><code>@arrow_udf</code> / <code>@arrow_udtf</code>: <code>pa.Array</code> in, <code>pa.Array</code> out &mdash; <b>faster, lower memory</b>, data stays columnar</li>
+        <li><code>@arrow_udf</code> / <code>@arrow_udtf</code> <span class="dim">(since 4.1)</span>: <code>pa.Array</code> in/out &mdash; <b>faster, lower memory</b>, data stays columnar</li>
         <li>Scalar, aggregate (groupBy / Window), and table functions; <b>iterator mode</b> amortizes setup like model loading</li>
         <li><code>mapInArrow</code> / <code>applyInArrow</code> at the DataFrame level</li>
       </ul>
@@ -1284,10 +1284,10 @@ df.select(shipping_cost(<span class="s">"weight"</span>, <span class="s">"zone"<
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Native Arrow UDFs: write on columns, skip the copies · XIAO · ~0:50
 
-Two new decorators — @arrow_udf and @arrow_udtf. PyArrow array in, PyArrow array out. The data stays columnar.
+Spark 4.2 continues the Arrow-first direction. The decorators to reach for — @arrow_udf and @arrow_udtf — arrived in 4.1, and they are the APIs to use on hot paths. PyArrow array in, PyArrow array out. The data stays columnar.
 No pandas conversion cost. In our benchmarks, about 10 percent faster and about 40 percent less memory than a pandas UDF.
 You get scalar, aggregate, and table functions. Iterator mode lets you set up once — for example, load a model once per batch.
-There is also mapInArrow and applyInArrow at the DataFrame level. And if you keep your pandas UDFs, the new Arrow backend makes them about 2 times faster in our benchmarks — with no code change.</div>
+There is also mapInArrow and applyInArrow at the DataFrame level. And if you keep your pandas UDFs, the Arrow backend makes them about 2 times faster in our benchmarks — with no code change.</div>
 </section>
 
 <section class="slide">
@@ -1315,7 +1315,7 @@ There is also mapInArrow and applyInArrow at the DataFrame level. And if you kee
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Arrow UDFs in action · XIAO · ~0:25
 
-(Code slide.) Here is the new decorator. Arrays in, arrays out. No to_pandas. No round trip. Columnar from start to end.</div>
+(Code slide.) Here is the @arrow_udf decorator. Arrays in, arrays out. No to_pandas. No round trip. Columnar from start to end.</div>
 </section>
 
 <!-- roadmap: PySpark 3 -->
@@ -1425,7 +1425,7 @@ New in 4.2: you can profile these Python data sources, like UDFs — for time an
   <div class="eyebrow">PySpark</div>
   <h2>Better interop &amp; developer experience</h2>
   <ul class="points">
-    <li><b>PyCapsule protocol</b> support: zero-copy interchange with Polars, DuckDB, and the Arrow ecosystem</li>
+    <li><b>PyCapsule protocol</b> (Arrow C Data Interface) &mdash; zero-copy exchange with Polars, DuckDB, and the Arrow ecosystem <b>when both sides support it</b></li>
     <li>Profile Python data sources with the built-in profilers</li>
     <li><code>SparkSession.builder.create()</code>: spin up a new session without mutating existing configs</li>
     <li>Optional strict column-resolution mode catches ambiguous DataFrame references early</li>
@@ -1435,7 +1435,7 @@ New in 4.2: you can profile these Python data sources, like UDFs — for time an
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Better interop &amp; developer experience · XIAO · ~0:40
 
-This is small individually, but big in daily debugging. PyCapsule support: zero-copy sharing with Polars, DuckDB, and Arrow tools. You can profile Python data sources. builder.create() makes a new session without changing other configs. An optional strict mode catches unclear column names early. And pandas-on-Spark supports more axis=1 functions. Each one is minor alone — together, they save you time every day.</div>
+This is small individually, but big in daily debugging. PyCapsule support: when both sides speak the Arrow C Data Interface, you exchange data zero-copy with Polars, DuckDB, and Arrow tools. You can profile Python data sources. builder.create() makes a new session without changing other configs. An optional strict mode catches unclear column names early. And pandas-on-Spark supports more axis=1 functions. Each one is minor alone — together, they save you time every day.</div>
 </section>
 
 <section class="slide">
@@ -1457,7 +1457,7 @@ duckdb.sql(<span class="s">"SELECT count(*) FROM df"</span>) <span class="c"># q
   <div class="progress"><i></i></div>
   <div class="notes" hidden>PyCapsule interop in action · XIAO · ~0:30
 
-(Code slide.) Here a Spark DataFrame goes straight to Polars or DuckDB. No serialization between them. They share the same Arrow memory. Zero copy.</div>
+(Code slide.) Here a Spark DataFrame goes straight to Polars or DuckDB through the Arrow C Data Interface. When both sides support it, they share the same Arrow memory — zero copy, no serialization.</div>
 </section>
 
 <section class="slide">
@@ -1598,7 +1598,7 @@ Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually y
 This is a new join clause — SPIP SPARK-56395. For each query row, it returns the top-K closest rows.
 Before: a cross join, a window, a rank, and a filter — slow, and the optimizer cannot understand it. Now: NEAREST 10 BY SIMILARITY — one clause the optimizer plans for you.
 It can rank by any expression — vector similarity, distance, geospatial, even BM25. INNER drops rows with no match. LEFT OUTER keeps them.
-EXACT is brute force today. APPROX lets a future index help — without changing your query. And an index never changes your results silently.</div>
+In 4.2, think exact semantics first. EXACT is brute-force KNN — and that is what 4.2 delivers: the native SQL shape and exact top-K ranking. ANN / index-backed execution is explicitly out of scope for now — a future optimization path. APPROX is the door for it: a future index can help without changing your query, and an index never changes your results silently.</div>
 </section>
 
 <section class="slide">
@@ -2119,7 +2119,7 @@ So 4.2 makes read-time CDC first-class. Only the reader pays. And any engine can
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Read changes</span><span>2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>One CHANGES API for any DSv2 source</h2>
+  <h2>One CHANGES API for changelog-capable DSv2 sources</h2>
   <div class="baf">
     <div class="col today">
       <div class="hd">Today &mdash; the pain</div>
@@ -2133,7 +2133,7 @@ So 4.2 makes read-time CDC first-class. Only the reader pays. And any engine can
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
         <li>One SQL <code>CHANGES</code> clause &mdash; version/timestamp ranges, or streaming <code>STREAM t CHANGES</code></li>
-        <li>Same in DataFrames (<code>.changes()</code>, <code>.readStream.changes()</code>); <b>same syntax</b> for Delta, Iceberg, Hudi</li>
+        <li>Same in DataFrames (<code>.changes()</code>, <code>.readStream.changes()</code>); <b>same syntax</b> for any connector that implements changelog support &mdash; Delta, Iceberg, Hudi</li>
         <li>Spark owns carry-over removal, update detection, net-change collapse &mdash; connectors ship a <b>tiny contract</b></li>
       </ul>
     </div>
@@ -2141,9 +2141,9 @@ So 4.2 makes read-time CDC first-class. Only the reader pays. And any engine can
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Read changes with <b>one <code>CHANGES</code> query</b> instead of per-engine functions.</span></div>
   <div class="slide-footer"><span>Data Source V2</span><span>52</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>One CHANGES API for any DSv2 source · DB · ~0:45
+  <div class="notes" hidden>One CHANGES API for changelog-capable DSv2 sources · DB · ~0:45
 
-The answer is one API. One SQL CHANGES clause — batch by version or time, or streaming with STREAM ... CHANGES. The same shape in DataFrames — read.changes() and readStream.changes(). The same syntax for Delta, Iceberg, and Hudi.
+The answer is one API. One SQL CHANGES clause — batch by version or time, or streaming with STREAM ... CHANGES. The same shape in DataFrames — read.changes() and readStream.changes(). The same syntax for any DSv2 connector that implements changelog support — Delta, Iceberg, and Hudi today. (Not every DSv2 source has it — the connector must ship the Changelog interface.)
 Spark does the hard part — removing carry-overs, detecting updates, collapsing changes. Connectors only ship a small contract — one interface, three flags, and a row id and row version.</div>
 </section>
 

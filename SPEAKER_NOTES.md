@@ -85,13 +85,13 @@ The important part is the default. In 4.2, Arrow Python UDFs are the default —
 (Code slide.) Same UDF you always write. No new decorator. No rewrite. But the engine now moves the data as Arrow. Same code — faster.
 
 ### [18] Native Arrow UDFs: write on columns, skip the copies · XIAO · ~0:50
-Two new decorators — @arrow_udf and @arrow_udtf. PyArrow array in, PyArrow array out. The data stays columnar.
+Spark 4.2 continues the Arrow-first direction. The decorators to reach for — @arrow_udf and @arrow_udtf — arrived in 4.1, and they are the APIs to use on hot paths. PyArrow array in, PyArrow array out. The data stays columnar.
 No pandas conversion cost. In our benchmarks, about 10 percent faster and about 40 percent less memory than a pandas UDF.
 You get scalar, aggregate, and table functions. Iterator mode lets you set up once — for example, load a model once per batch.
-There is also mapInArrow and applyInArrow at the DataFrame level. And if you keep your pandas UDFs, the new Arrow backend makes them about 2 times faster in our benchmarks — with no code change.
+There is also mapInArrow and applyInArrow at the DataFrame level. And if you keep your pandas UDFs, the Arrow backend makes them about 2 times faster in our benchmarks — with no code change.
 
 ### [19] Arrow UDFs in action · XIAO · ~0:25
-(Code slide.) Here is the new decorator. Arrays in, arrays out. No to_pandas. No round trip. Columnar from start to end.
+(Code slide.) Here is the @arrow_udf decorator. Arrays in, arrays out. No to_pandas. No round trip. Columnar from start to end.
 
 ### [20] Python Data Sources: connectors in pure Python · XIAO · ~0:50
 You can now build readers and writers fully in Python. Batch and streaming. No JVM. No Scala.
@@ -110,10 +110,10 @@ One more thing for the AI era: an LLM can scaffold the long-tail connector — a
 New in 4.2: you can profile these Python data sources, like UDFs — for time and memory. Turn it on with one config. Then see where time and memory go in your read and write code. Your connector is no longer a black box.
 
 ### [24] Better interop & developer experience · XIAO · ~0:40
-This is small individually, but big in daily debugging. PyCapsule support: zero-copy sharing with Polars, DuckDB, and Arrow tools. You can profile Python data sources. builder.create() makes a new session without changing other configs. An optional strict mode catches unclear column names early. And pandas-on-Spark supports more axis=1 functions. Each one is minor alone — together, they save you time every day.
+This is small individually, but big in daily debugging. PyCapsule support: when both sides speak the Arrow C Data Interface, you exchange data zero-copy with Polars, DuckDB, and Arrow tools. You can profile Python data sources. builder.create() makes a new session without changing other configs. An optional strict mode catches unclear column names early. And pandas-on-Spark supports more axis=1 functions. Each one is minor alone — together, they save you time every day.
 
 ### [25] PyCapsule interop in action · XIAO · ~0:30
-(Code slide.) Here a Spark DataFrame goes straight to Polars or DuckDB. No serialization between them. They share the same Arrow memory. Zero copy.
+(Code slide.) Here a Spark DataFrame goes straight to Polars or DuckDB through the Arrow C Data Interface. When both sides support it, they share the same Arrow memory — zero copy, no serialization.
 
 ### [26] Debug UDFs where they run · XIAO · ~0:45
 Now debugging. Your UDF runs in a Python worker on an executor — far from your notebook. When it hangs, before, you saw nothing.
@@ -138,7 +138,7 @@ Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually y
 This is a new join clause — SPIP SPARK-56395. For each query row, it returns the top-K closest rows.
 Before: a cross join, a window, a rank, and a filter — slow, and the optimizer cannot understand it. Now: NEAREST 10 BY SIMILARITY — one clause the optimizer plans for you.
 It can rank by any expression — vector similarity, distance, geospatial, even BM25. INNER drops rows with no match. LEFT OUTER keeps them.
-EXACT is brute force today. APPROX lets a future index help — without changing your query. And an index never changes your results silently.
+In 4.2, think exact semantics first. EXACT is brute-force KNN — and that is what 4.2 delivers: the native SQL shape and exact top-K ranking. ANN / index-backed execution is explicitly out of scope for now — a future optimization path. APPROX is the door for it: a future index can help without changing your query, and an index never changes your results silently.
 
 ### [32] NEAREST BY in action · XIAO · ~0:25
 (Code slide.) One query: for each row, give me the five nearest. That is it. No window. No cross join.
@@ -228,8 +228,8 @@ Two: write-time CDC costs every writer. Change files are written on every update
 Some numbers: in 60 days, 206 million CDC queries. And 68% of them needed no stored change files at all.
 So 4.2 makes read-time CDC first-class. Only the reader pays. And any engine can write the table.
 
-### [52] One CHANGES API for any DSv2 source · DB · ~0:45
-The answer is one API. One SQL CHANGES clause — batch by version or time, or streaming with STREAM ... CHANGES. The same shape in DataFrames — read.changes() and readStream.changes(). The same syntax for Delta, Iceberg, and Hudi.
+### [52] One CHANGES API for changelog-capable DSv2 sources · DB · ~0:45
+The answer is one API. One SQL CHANGES clause — batch by version or time, or streaming with STREAM ... CHANGES. The same shape in DataFrames — read.changes() and readStream.changes(). The same syntax for any DSv2 connector that implements changelog support — Delta, Iceberg, and Hudi today. (Not every DSv2 source has it — the connector must ship the Changelog interface.)
 Spark does the hard part — removing carry-overs, detecting updates, collapsing changes. Connectors only ship a small contract — one interface, three flags, and a row id and row version.
 
 ### [53] Reading changes in action · DB · ~0:25
