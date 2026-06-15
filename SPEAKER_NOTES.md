@@ -236,7 +236,7 @@ Spark does the hard part — removing carry-overs, detecting updates, collapsing
 (Code slide.) SELECT ... FROM t CHANGES. A version range in, typed change rows out. Same query for Delta or Iceberg.
 
 ### [54] Delta goes read-time — by default · DB · ~0:50
-For Delta, the result is great: CDC on every table, with nothing to enable. No table property. No ALTER TABLE. No ticket to the table owner.
+For a Delta table with row tracking, the result is great: read-time CDC with no Change Data Feed property to enable. No CDF table property. No ALTER TABLE. No ticket to the table owner.
 And nothing to pay at write time. No change files. Changes are computed only when a reader asks.
 It uses two columns Delta already has — a stable row id, and a row commit version. In one commit, removed and added rows with the same row id become an update. A lone add is an insert. A lone remove is a delete.
 It needs Row Tracking — on by default in Databricks, opt-in in Delta OSS. Write-time CDC still works for special cases.

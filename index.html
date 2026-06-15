@@ -2190,18 +2190,18 @@ spark.readStream.changes(<span class="s">"my_table"</span>)
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li>CDC on <b>every Delta table, nothing to enable</b>; <b>nothing paid at write time</b> &mdash; computed only when a reader asks</li>
+        <li><b>No Change Data Feed property</b> to set, and <b>nothing paid at write time</b> &mdash; changes are computed only when a reader asks</li>
         <li>Built on columns Delta already tracks: <code>_metadata.row_id</code> + <code>_metadata.row_commit_version</code></li>
         <li>Matched row_id &rarr; update; lone add &rarr; insert; lone remove &rarr; delete &middot; needs Row Tracking <span class="dim">(default in Databricks, opt-in in Delta OSS)</span></li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Read changes from <b>any Delta table</b> on 4.2 &mdash; no setup, no write-time cost. Write-time CDC stays for special workloads.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Read changes from Delta tables with <b>row tracking</b> on 4.2 &mdash; no write-time CDF setup. Write-time CDC stays for special workloads.</span></div>
   <div class="slide-footer"><span>Data Source V2</span><span>54</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Delta goes read-time — by default · DB · ~0:50
 
-For Delta, the result is great: CDC on every table, with nothing to enable. No table property. No ALTER TABLE. No ticket to the table owner.
+For a Delta table with row tracking, the result is great: read-time CDC with no Change Data Feed property to enable. No CDF table property. No ALTER TABLE. No ticket to the table owner.
 And nothing to pay at write time. No change files. Changes are computed only when a reader asks.
 It uses two columns Delta already has — a stable row id, and a row commit version. In one commit, removed and added rows with the same row id become an update. A lone add is an insert. A lone remove is a delete.
 It needs Row Tracking — on by default in Databricks, opt-in in Delta OSS. Write-time CDC still works for special cases.</div>
