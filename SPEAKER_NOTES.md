@@ -67,10 +67,10 @@ Benefit two: reach Spark from everywhere. First, Spark Connect — how more and 
 
 ### [13] Architecture: gRPC in, Arrow out · XIAO · ~0:45
 The idea is simple. Your client builds a plan. It opens a gRPC stream to the server. The server resolves the plan, optimizes it, runs it on the executors, and sends Arrow batches back.
-The client is thin. It does not need a full Spark runtime. It does not need a JVM next to your app. So the client and the cluster can change on their own. The protocol connects them. The point: your app does not need to be a Spark app.
+The client is thin. It does not need a full Spark runtime. It does not need a JVM next to your app. So the client and the cluster can change on their own. The protocol connects them. Here is the framing: before Connect, using Spark from another runtime often meant wrapping it, embedding it, or living inside a JVM-centric model. With Connect, Spark becomes something more like a service API — your app does not need to be a Spark app.
 
-### [14] Clients in any language · XIAO · ~0:35
-Because the client only speaks the Connect protocol over gRPC, your app can use Spark from many languages — Python, Scala, Java, and also Go, Rust, Swift, TypeScript, .NET, and more. For example, a Go service can call Spark without embedding a JVM. You do not rewrite your stack. Here is the through-line: Connect makes Spark reachable from any app. The next frontier is making your custom logic — your UDFs — portable too. DB comes back to that in Looking Ahead.
+### [14] Spark becomes a service API · XIAO · ~0:35
+The point is the use case, not the language list. Before Connect, using Spark from another runtime meant wrapping it, embedding it, or living inside a JVM-centric model. With Connect, Spark becomes something more like a service API. Three examples: a Go service submits Spark work; a Python notebook connects to a remote cluster; a lightweight app uses Spark without packaging Spark. Python and Scala ship with Spark; a growing ecosystem — Go, Swift, Rust, R, TypeScript, .NET — speaks the same protocol, at different maturity levels, so do not present them all as equal. The through-line: Connect makes Spark reachable from any app. The next frontier is making your custom logic — your UDFs — portable too. DB comes back to that in Looking Ahead.
 
 ### [15] Closing the gap with Spark Classic · XIAO · ~0:40
 In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to Connect — zipWithIndex, toJSON, emptyDataFrame. read.json, csv, and xml can now take a DataFrame. There is a new GetStatus API. Errors are clearer — for example, when you use a column from the wrong DataFrame. And client file names and line numbers are saved, so debugging is easier.
