@@ -251,8 +251,8 @@ SPIP SPARK-56822. Today Spark timestamps stop at microseconds, so nanosecond Par
 ### [73] Real-time mode for stateful streaming · DB · ~0:35
 Earlier I mentioned real-time mode. SPARK-54699 extends it to stateful queries — about 100 milliseconds latency. It builds on stateless real-time mode from 4.1, now with the same low latency for transformWithState and aggregations. Two parts make it work: a streaming shuffle that sends data straight to the next task instead of waiting for the batch, and concurrent stage scheduling, so many stages run at once. Last, how we ship all this.
 
-### [74] Faster, predictable releases · DB · ~0:38
-And how we ship it. SPARK-54633 — a two-layer model: quarterly minors and an annual major. Minors add features and APIs but freeze dependencies and defaults, so upgrades stay safe; majors carry the breaking changes. Long-lived branches cut maintenance, and the final minor of each major is an 18-month LTS. The cadence begins with 4.3 — so 4.2 is the bridge release, and 4.4 is the LTS. Takeaway: plan upgrades around the quarterly cadence.
+### [74] Faster, predictable releases · DB · ~0:40
+And how we ship it. SPARK-54633 — a two-layer model: quarterly minors and an annual major. Minors freeze dependencies and defaults so upgrades stay safe; majors carry the breaking changes. The final minor of each major is an 18-month LTS. 4.2 is the bridge, and the quarterly train starts at 4.3. As a transition exception, the 4.x LTS is 4.5.0 — the last planned 4.x, around March 2027 — not 4.3. Then Spark 5.0 follows around June 2027. Takeaway: plan upgrades around the quarterly cadence, and target the 4.5 LTS.
 
 ### [75] Join the community today! · DB + XIAO · ~0:20
 (DB:) All of this is built by the Apache Spark community — and you can join. Get the release at spark.apache.org, the source on GitHub, and join the mailing lists. We welcome your contributions and bug reports. (XIAO:) Thank you, DAIS. Enjoy the rest of the Summit.

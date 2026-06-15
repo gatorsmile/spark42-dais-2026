@@ -210,6 +210,13 @@
   .slide .fcap { margin-top: 18px; font-size: 20px; line-height: 1.36; color: var(--c-muted); max-width: 1360px; }
   .slide .fcap b { color: var(--c-accent-2); font-weight: 700; }
   .slide .fcap code { background: var(--c-bg-2); border: 1px solid var(--c-line); border-radius: 6px; padding: 1px 7px; font-size: .82em; color: var(--c-warn); }
+  /* release-train timeline (slide 74) */
+  .slide .fdiag.train { gap: 0; margin-top: 26px; }
+  .slide .fdiag.train .fbox { padding: 14px 14px; text-align: center; }
+  .slide .fdiag.train .ver { font-size: 28px; font-weight: 800; color: var(--c-text); line-height: 1; }
+  .slide .fdiag.train .fbox.accent .ver { color: var(--c-accent-2); }
+  .slide .fdiag.train .role { font-size: 15px; color: var(--c-muted); margin-top: 7px; line-height: 1.25; }
+  .slide .fdiag.train .farrow { width: 36px; font-size: 24px; }
   /* "Looking Ahead" status badge — marks roadmap slides as NOT shipping in 4.2 */
   .slide .la-badge {
     position: absolute; top: 40px; right: 56px; z-index: 6;
@@ -2658,13 +2665,24 @@ Earlier I mentioned real-time mode. SPARK-54699 extends it to stateful queries �
     <li><b>SPIP SPARK-54633</b>: a two-layer model &mdash; <b>quarterly</b> minor releases and an <b>annual</b> major release</li>
     <li>Minors add features and APIs but <b>freeze dependencies, behavior, and config defaults</b>, so upgrades stay safe; majors carry the breaking changes</li>
     <li>Long-lived branches cut active maintenance, and the <b>final minor of each major is an 18-month LTS</b></li>
-    <li>The quarterly cadence <b>begins with 4.3</b> &mdash; 4.2 is the bridge release, and <b>4.4 is the LTS</b>; monthly preview releases retire now that minors ship every quarter</li>
+    <li>4.2 is the <b>bridge</b> release; the quarterly train <b>starts at 4.3</b>. As a transition exception, the <b>4.x LTS is 4.5.0</b> &mdash; the last planned 4.x, not 4.3</li>
   </ul>
+  <div class="fdiag train">
+    <div class="fbox"><div class="ver">4.2</div><div class="role">now &middot; bridge</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox"><div class="ver">4.3</div><div class="role">first quarterly</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox"><div class="ver">4.4</div><div class="role">quarterly</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox accent"><div class="ver">4.5</div><div class="role">4.x LTS &middot; ~Mar 2027</div></div>
+    <div class="farrow">&#8594;</div>
+    <div class="fbox"><div class="ver">5.0</div><div class="role">next major &middot; ~Jun 2027</div></div>
+  </div>
   <div class="slide-footer"><span>Looking Ahead</span><span>74</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Faster, predictable releases · DB · ~0:38
+  <div class="notes" hidden>Faster, predictable releases · DB · ~0:40
 
-And how we ship it. SPARK-54633 — a two-layer model: quarterly minors and an annual major. Minors add features and APIs but freeze dependencies and defaults, so upgrades stay safe; majors carry the breaking changes. Long-lived branches cut maintenance, and the final minor of each major is an 18-month LTS. The cadence begins with 4.3 — so 4.2 is the bridge release, and 4.4 is the LTS. Takeaway: plan upgrades around the quarterly cadence.</div>
+And how we ship it. SPARK-54633 — a two-layer model: quarterly minors and an annual major. Minors freeze dependencies and defaults so upgrades stay safe; majors carry the breaking changes. The final minor of each major is an 18-month LTS. 4.2 is the bridge, and the quarterly train starts at 4.3. As a transition exception, the 4.x LTS is 4.5.0 — the last planned 4.x, around March 2027 — not 4.3. Then Spark 5.0 follows around June 2027. Takeaway: plan upgrades around the quarterly cadence, and target the 4.5 LTS.</div>
 </section>
 
 <!-- 66 -->
