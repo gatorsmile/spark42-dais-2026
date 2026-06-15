@@ -1934,8 +1934,8 @@ Still benefit four — move changing data safely. Now streaming. It is about two
       <div class="hd">Today &mdash; the pain</div>
       <ul>
         <li>Streaming sources are identified by <b>position</b></li>
-        <li>Add, remove, or reorder one and the <b>checkpoint breaks</b> &mdash; a full reprocess</li>
-        <li>Sinks have the same fragility</li>
+        <li>Add, remove, or reorder one and the <b>checkpoint breaks</b></li>
+        <li>The only safe fix is a <b>full reprocess</b> from scratch</li>
       </ul>
     </div>
     <div class="col now">
@@ -1943,17 +1943,17 @@ Still benefit four — move changing data safely. Now streaming. It is about two
       <ul>
         <li>Name sources with <b>IDENTIFIED BY</b> &mdash; identity is the name, not the position</li>
         <li>Add / remove / reorder in a running query <b>without breaking the checkpoint</b></li>
-        <li><code>DataStreamWriter.name()</code> does the same for sinks; SQL TVFs, Scala, PySpark (Classic + Connect)</li>
+        <li>In PySpark, the same via <code>DataStreamReader.name(&hellip;)</code> &mdash; Classic + Connect (Scala too)</li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Name your streaming sources with <b>IDENTIFIED BY</b> so you can evolve a running query &mdash; no full reprocess.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Name your streaming sources &mdash; <b>IDENTIFIED BY</b> in SQL, <code>DataStreamReader.name()</code> in PySpark &mdash; so you can evolve a running query with no full reprocess.</span></div>
   <div class="slide-footer"><span>Streaming</span><span>44</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Evolve running pipelines safely · DB · ~0:40
 
 A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint.
-Now you name them, with IDENTIFIED BY. Identity is no longer the position. So you can change the sources in a running query, and keep the checkpoint. name() does the same for sinks. It works in SQL functions, Scala, and PySpark — classic and Connect.</div>
+Now you name them &mdash; IDENTIFIED BY in SQL, DataStreamReader.name(...) in PySpark (Classic and Connect; Scala too). Identity is no longer the position. So you can change the sources in a running query, and keep the checkpoint. (Sink naming exists internally in Scala, but it is not a public PySpark API &mdash; so do not demo df.writeStream.name().)</div>
 </section>
 
 <section class="slide">
@@ -1965,9 +1965,9 @@ Now you name them, with IDENTIFIED BY. Identity is no longer the position. So yo
 <span class="k">UNION ALL</span>
 <span class="k">SELECT</span> * <span class="k">FROM</span> STREAM backfill <span class="hl">IDENTIFIED BY backfill_src</span>;
 
-<span class="c"># PySpark: same thing on DataStreamReader / DataStreamWriter</span>
+<span class="c"># PySpark: name the source on DataStreamReader</span>
 spark.readStream.name(<span class="s">"orders_src"</span>).table(<span class="s">"orders"</span>)
-df.writeStream.name(<span class="s">"main_sink"</span>).toTable(<span class="s">"unified"</span>)
+df.writeStream.toTable(<span class="s">"unified"</span>)
 
 <span class="c">-- Later: add, remove, or reorder sources
 -- without breaking the checkpoint</span></pre>

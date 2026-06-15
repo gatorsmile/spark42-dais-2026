@@ -194,7 +194,7 @@ Still benefit four — move changing data safely. Now streaming. It is about two
 
 ### [44] Evolve running pipelines safely · DB · ~0:40
 A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint.
-Now you name them, with IDENTIFIED BY. Identity is no longer the position. So you can change the sources in a running query, and keep the checkpoint. name() does the same for sinks. It works in SQL functions, Scala, and PySpark — classic and Connect.
+Now you name them — IDENTIFIED BY in SQL, DataStreamReader.name(...) in PySpark (Classic and Connect; Scala too). Identity is no longer the position. So you can change the sources in a running query, and keep the checkpoint. (Sink naming exists internally in Scala, but it is not a public PySpark API — so do not demo df.writeStream.name().)
 
 ### [45] IDENTIFIED BY in action · DB · ~0:20
 (Code slide.) Named sources. Then a query adds a new one, restarts, and keeps its checkpoint. No full reprocess.
