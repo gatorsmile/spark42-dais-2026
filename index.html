@@ -1678,7 +1678,7 @@ Before and now, four times — each one removes a pattern many of us have writte
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li><b>Search path</b> &mdash; <code>SET PATH</code> resolves names across schemas; persisted in views, shown in <code>DESCRIBE</code></li>
+        <li><b>Search path</b> &mdash; <code>SET PATH</code> resolves names across schemas; persisted in views, shown in <code>DESCRIBE</code> &middot; opt-in via <code>spark.sql.path.enabled</code></li>
         <li><b>Richer types</b> &mdash; <code>TIME</code> across JSON/CSV/XML/ORC/Avro; <code>TIMESTAMP WITH LOCAL TIME ZONE</code> in SQL</li>
         <li><b>More built-ins</b> &mdash; <code>IGNORE/RESPECT NULLS</code>, top-K <code>max_by</code>/<code>min_by</code>, <code>time_bucket</code></li>
       </ul>
@@ -1689,7 +1689,7 @@ Before and now, four times — each one removes a pattern many of us have writte
   <div class="progress"><i></i></div>
   <div class="notes" hidden>SQL compatibility improvements &middot; XIAO &middot; ~0:40
 
-A quick compatibility round. SET PATH resolves names across schemas without the full path, and it is saved in views, so results stay reproducible &mdash; this helps PostgreSQL migrations. The type system is more complete: the TIME type works across more formats, and TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus IGNORE NULLS, top-K max_by and min_by, and time_bucket. Takeaway: if you are porting SQL from another database, these close common gaps.</div>
+A quick compatibility round. SET PATH resolves names across schemas without the full path, and it is saved in views, so results stay reproducible &mdash; this helps PostgreSQL migrations. (If you demo it: it is off by default &mdash; first SET spark.sql.path.enabled=true, then SET PATH sales, shared, system.builtin, and check with SELECT current_path().) The type system is more complete: the TIME type works across more formats, and TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus IGNORE NULLS, top-K max_by and min_by, and time_bucket. Takeaway: if you are porting SQL from another database, these close common gaps.</div>
 </section>
 
 <section class="slide">
