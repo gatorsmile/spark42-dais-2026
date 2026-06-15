@@ -1179,7 +1179,7 @@ The client is thin. It does not need a full Spark runtime. It does not need a JV
   <h2>Spark becomes a service API</h2>
   <p class="sub">Before Connect, reaching Spark from another runtime meant wrapping it, embedding it, or living inside a JVM-centric model. Now a thin client speaks the Connect protocol &mdash; and <b>Spark is a service you call</b>.</p>
   <div class="usecases">
-    <div class="uc"><div class="uct">Go service</div><p>submits Spark work over gRPC &mdash; no JVM embedded</p></div>
+    <div class="uc"><div class="uct">Rust service</div><p>submits Spark work over gRPC &mdash; no JVM embedded</p></div>
     <div class="uc"><div class="uct">Python notebook</div><p>connects to a remote cluster, not a local runtime</p></div>
     <div class="uc"><div class="uct">Lightweight app</div><p>uses Spark without packaging or shipping Spark</p></div>
   </div>
@@ -1189,7 +1189,7 @@ The client is thin. It does not need a full Spark runtime. It does not need a JV
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Spark becomes a service API · XIAO · ~0:35
 
-The point is the use case, not the language list. Before Connect, using Spark from another runtime meant wrapping it, embedding it, or living inside a JVM-centric model. With Connect, Spark becomes something more like a service API. Three examples: a Go service submits Spark work; a Python notebook connects to a remote cluster; a lightweight app uses Spark without packaging Spark. Python and Scala ship with Spark; a growing ecosystem — Go, Swift, Rust, R, TypeScript, .NET — speaks the same protocol, at different maturity levels, so do not present them all as equal. The through-line: Connect makes Spark reachable from any app. The next frontier is making your custom logic — your UDFs — portable too. DB comes back to that in Looking Ahead.</div>
+The point is the use case, not the language list. Before Connect, using Spark from another runtime meant wrapping it, embedding it, or living inside a JVM-centric model. With Connect, Spark becomes something more like a service API. Three examples: a Rust service submits Spark work; a Python notebook connects to a remote cluster; a lightweight app uses Spark without packaging Spark. Python and Scala ship with Spark; a growing ecosystem — Go, Swift, Rust, R, TypeScript, .NET — speaks the same protocol, at different maturity levels, so do not present them all as equal. The through-line: Connect makes Spark reachable from any app. The next frontier is making your custom logic — your UDFs — portable too. DB comes back to that in Looking Ahead.</div>
 </section>
 
 <section class="slide">
