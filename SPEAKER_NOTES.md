@@ -184,7 +184,7 @@ In 4.2 you get a Python API — create_auto_cdc_flow() — and Spark Connect sup
 It runs inside Spark Declarative Pipelines. So checkpoints, retries, and idempotency are handled for you.
 
 ### [42] Auto CDC in action · DB · ~0:30
-(Code slide.) Here is the whole thing. Declare the flow. Point it at the feed. Name the keys and the order column. These few lines replace the hundreds we just saw. Now — streaming.
+(Code slide.) Here is the whole thing — inside a Declarative Pipelines file. create_auto_cdc_flow registers a flow; it is not a standalone notebook call. Declare the flow. Point it at the feed. Name the keys and the order column. These few lines replace the hundreds we just saw. Now — streaming.
 
 
 ## Section 06 · Streaming — Structured Streaming

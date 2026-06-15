@@ -1886,25 +1886,25 @@ It runs inside Spark Declarative Pipelines. So checkpoints, retries, and idempot
 <span class="k">CREATE STREAMING TABLE</span> user_changes <span class="k">AS</span>
   <span class="k">SELECT</span> * <span class="k">FROM</span> STREAM users CHANGES <span class="k">FROM</span> VERSION 10;
 
-<span class="c"># 2. apply it in Python (SPARK-56249)</span>
-dp.create_streaming_table(<span class="s">"user_replica"</span>)
+<span class="c"># 2. apply it &mdash; inside a Spark Declarative Pipelines file (SPARK-56249)</span>
+<span class="k">from</span> pyspark <span class="k">import</span> pipelines <span class="k">as</span> dp
+<span class="k">from</span> pyspark.sql.functions <span class="k">import</span> col, expr
 
+dp.create_streaming_table(<span class="s">"user_replica"</span>)
 dp.<span class="hl">create_auto_cdc_flow</span>(
     target=<span class="s">"user_replica"</span>,
     source=<span class="s">"user_changes"</span>,
     keys=[<span class="s">"id"</span>],
     sequence_by=col(<span class="s">"_commit_timestamp"</span>),
     apply_as_deletes=expr(<span class="s">"_change_type = 'delete'"</span>),
-    except_column_list=[<span class="s">"_change_type"</span>, <span class="s">"_commit_version"</span>,
-                        <span class="s">"_commit_timestamp"</span>],
-    stored_as_scd_type=<span class="s">"1"</span>,
-)
-<span class="c">-- SQL apply syntax (CREATE FLOW … AUTO CDC INTO …) is on the way</span></pre>
+    except_column_list=[<span class="s">"_change_type"</span>, <span class="s">"_commit_version"</span>, <span class="s">"_commit_timestamp"</span>],
+    stored_as_scd_type=1,
+)</pre>
   <div class="slide-footer"><span>Auto CDC</span><span>42</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Auto CDC in action · DB · ~0:30
 
-(Code slide.) Here is the whole thing. Declare the flow. Point it at the feed. Name the keys and the order column. These few lines replace the hundreds we just saw. Now — streaming.</div>
+(Code slide.) Here is the whole thing &mdash; inside a Declarative Pipelines file. create_auto_cdc_flow registers a flow; it is not a standalone notebook call. Declare the flow. Point it at the feed. Name the keys and the order column. These few lines replace the hundreds we just saw. Now — streaming.</div>
 </section>
 
 <!-- ============ Section 06 ============ -->
