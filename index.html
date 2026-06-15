@@ -1680,7 +1680,7 @@ Before and now, four times — each one removes a pattern many of us have writte
       <ul>
         <li><b>Search path</b> &mdash; <code>SET PATH</code> resolves names across schemas; persisted in views, shown in <code>DESCRIBE</code> &middot; opt-in via <code>spark.sql.path.enabled</code></li>
         <li><b>Richer types</b> &mdash; <code>TIME</code> <span class="pvtag">Preview</span> across JSON/CSV/XML/ORC/Avro <span class="dim">(opt-in: <code>spark.sql.timeType.enabled</code>)</span>; <code>TIMESTAMP WITH LOCAL TIME ZONE</code> in SQL</li>
-        <li><b>More built-ins</b> &mdash; <code>IGNORE/RESPECT NULLS</code>, top-K <code>max_by</code>/<code>min_by</code>, <code>time_bucket</code></li>
+        <li><b>More built-ins</b> &mdash; top-K <code>max_by</code>/<code>min_by</code>, <code>time_bucket</code>, <code>reverse</code> on binary &middot; <code>IGNORE</code>/<code>RESPECT NULLS</code> now honored by <code>array_agg</code>/<code>collect_list</code>/<code>collect_set</code></li>
       </ul>
     </div>
   </div>
@@ -1689,7 +1689,7 @@ Before and now, four times — each one removes a pattern many of us have writte
   <div class="progress"><i></i></div>
   <div class="notes" hidden>SQL compatibility improvements &middot; XIAO &middot; ~0:40
 
-A quick compatibility round. SET PATH resolves names across schemas without the full path, and it is saved in views, so results stay reproducible &mdash; this helps PostgreSQL migrations. (If you demo it: it is off by default &mdash; first SET spark.sql.path.enabled=true, then SET PATH sales, shared, system.builtin, and check with SELECT current_path().) The type system is more complete: the TIME type works across more formats &mdash; but call it a preview: it is off by default in production builds (spark.sql.timeType.enabled), so do not live-demo TIME on a vanilla 4.2 build without enabling the flag. TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus IGNORE NULLS, top-K max_by and min_by, and time_bucket. Takeaway: if you are porting SQL from another database, these close common gaps.</div>
+A quick compatibility round. SET PATH resolves names across schemas without the full path, and it is saved in views, so results stay reproducible &mdash; this helps PostgreSQL migrations. (If you demo it: it is off by default &mdash; first SET spark.sql.path.enabled=true, then SET PATH sales, shared, system.builtin, and check with SELECT current_path().) The type system is more complete: the TIME type works across more formats &mdash; but call it a preview: it is off by default in production builds (spark.sql.timeType.enabled), so do not live-demo TIME on a vanilla 4.2 build without enabling the flag. TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus top-K max_by/min_by, time_bucket, and reverse on binary. And IGNORE/RESPECT NULLS is now honored by array_agg, collect_list, and collect_set &mdash; the clause itself is not new in 4.2; these aggregates just gained support. Takeaway: if you are porting SQL from another database, these close common gaps.</div>
 </section>
 
 <section class="slide">
