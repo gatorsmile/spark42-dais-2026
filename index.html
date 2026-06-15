@@ -1376,20 +1376,23 @@ One more thing for the AI era: an LLM can scaffold the long-tail connector — a
   <div class="progstrip"><span>1 &middot; No code change</span><span>2 &middot; Small change</span><span class="on">3 &middot; New capability</span><span>4 &middot; Dev experience</span></div>
   <div class="eyebrow">PySpark <span class="tag">In action</span></div>
   <h2>Python Data Sources in action</h2>
-  <pre class="code sm focus"><span class="k">from</span> pyspark.sql.datasource <span class="k">import</span> DataSource, DataSourceReader
+  <pre class="code sm focus"><span class="k">from</span> datetime <span class="k">import</span> datetime
+<span class="k">from</span> pyspark.sql.datasource <span class="k">import</span> DataSource, DataSourceReader
 
 <span class="k">class</span> WeatherSource(DataSource):
+    <span class="hl">@classmethod</span>                      <span class="c"># name() is a classmethod in 4.2</span>
     <span class="k">def</span> name(cls): <span class="k">return</span> <span class="s">"weather"</span>
-    <span class="k">def</span> schema(self): <span class="k">return</span> <span class="s">"city string, temp double"</span>
+    <span class="k">def</span> schema(self): <span class="k">return</span> <span class="s">"city STRING, temp_c DOUBLE, ts TIMESTAMP"</span>
     <span class="k">def</span> reader(self, schema): <span class="k">return</span> WeatherReader(self.options)
 
 <span class="k">class</span> WeatherReader(DataSourceReader):
+    <span class="k">def</span> __init__(self, options): self.options = options
     <span class="k">def</span> read(self, partition):
-        <span class="k">for</span> city <span class="k">in</span> fetch_cities(self.options):   <span class="c"># any Python lib / API</span>
-            <span class="k">yield</span> (city.name, city.temp)
+        <span class="c"># call any Python lib or API here</span>
+        <span class="k">yield</span> (<span class="s">"Paris"</span>, 18.0, datetime(2026, 1, 1))
 
 spark.dataSource.<span class="hl">register</span>(WeatherSource)
-spark.read.<span class="hl">format(<span class="s">"weather"</span>)</span>.option(<span class="s">"region"</span>, <span class="s">"EU"</span>).load().show()</pre>
+spark.read.<span class="hl">format(<span class="s">"weather"</span>)</span>.load().show()</pre>
   <div class="slide-footer"><span>PySpark</span><span>22</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Python Data Sources in action · XIAO · ~0:25
