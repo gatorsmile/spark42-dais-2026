@@ -164,6 +164,26 @@
   .slide .usecases .uc p { margin: 0; font-size: 19px; line-height: 1.4; color: var(--c-muted); }
   .slide .langline { margin-top: 26px; font-size: 19px; line-height: 1.45; color: var(--c-muted); max-width: 1320px; }
   .slide .langline b { color: var(--c-text); }
+  /* ~100 lines -> ~8 lines visual before/after */
+  .slide .linescmp { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 26px; align-items: stretch; }
+  .slide .linescmp .col { border: 1px solid var(--c-line); border-radius: 14px; background: var(--c-card); padding: 18px 24px 20px; }
+  .slide .linescmp .col.now { border-color: var(--c-accent); background: var(--c-accent-soft); }
+  .slide .linescmp .hd { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  .slide .linescmp .hd .t { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; }
+  .slide .linescmp .col.today .hd .t { color: var(--c-warn); }
+  .slide .linescmp .col.now .hd .t { color: var(--c-accent-2); }
+  .slide .linescmp .lc { font-size: 34px; font-weight: 800; line-height: 1; }
+  .slide .linescmp .col.today .lc { color: var(--c-warn); }
+  .slide .linescmp .col.now .lc { color: var(--c-good); }
+  .slide .linescmp ul { list-style: none; margin: 0; padding: 0; }
+  .slide .linescmp li { position: relative; padding-left: 22px; font-size: 19px; line-height: 1.4; color: var(--c-muted); }
+  .slide .linescmp li + li { margin-top: 10px; }
+  .slide .linescmp .col.today li::before { content: "\2717"; position: absolute; left: 0; color: var(--c-warn); font-weight: 800; }
+  .slide .linescmp pre { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 17px; line-height: 1.5; color: #e8eef4; white-space: pre-wrap; }
+  .slide .linescmp pre .s { color: var(--c-good); }
+  .slide .linescmp pre .k { color: var(--c-accent-2); font-weight: 700; }
+  .slide .linescmp .owns { margin: 16px 0 0; font-size: 18px; line-height: 1.4; color: var(--c-text); }
+  .slide .linescmp .owns b { color: var(--c-accent-2); }
   .slide .baf code { background: var(--c-bg-2); border: 1px solid var(--c-line); border-radius: 6px; padding: 1px 7px; font-size: .82em; color: var(--c-warn); }
   .slide .baf-try { margin-top: 20px; display: flex; align-items: baseline; gap: 18px; border-left: 4px solid var(--c-good); background: var(--c-card); border-radius: 0 12px 12px 0; padding: 14px 22px; max-width: 1340px; }
   .slide .baf-try .lbl { flex: none; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .09em; color: var(--c-good); }
@@ -1878,30 +1898,34 @@ The hand-written version — foreachBatch plus MERGE plus tombstones — is ofte
 <section class="slide">
   <div class="eyebrow">Pipelines &amp; Auto CDC</div>
   <h2>Auto CDC: declare it, Spark reconciles it</h2>
-  <div class="baf">
+  <div class="linescmp">
     <div class="col today">
-      <div class="hd">Today &mdash; the pain</div>
+      <div class="hd"><span class="t">By hand</span><span class="lc">~100 lines</span></div>
       <ul>
-        <li>Applying a change feed by hand = <code>foreachBatch</code> + <code>MERGE</code> + tombstones &mdash; hundreds of lines</li>
-        <li><b>Out-of-order events corrupt state</b> if you get the sequencing wrong</li>
-        <li>Everyone re-writes it, and everyone makes small mistakes</li>
+        <li>A <code>foreachBatch</code> loop over every micro-batch</li>
+        <li><code>MERGE</code> &mdash; matched rows update, missing rows insert</li>
+        <li>Order by sequence &middot; dedupe within the batch</li>
+        <li>Handle late / out-of-order events</li>
+        <li>Tombstone deletes &middot; keep retries idempotent</li>
       </ul>
     </div>
     <div class="col now">
-      <div class="hd">Spark 4.2 &mdash; the mechanism</div>
-      <ul>
-        <li>Declare keys, sequencing, and delete condition &mdash; Spark reconciles each batch <b>in order</b> and merges it</li>
-        <li><b>Out-of-order safe</b>: inserts and updates both reduce to upserts; deletes come from the feed</li>
-        <li>Python <code>create_auto_cdc_flow()</code> + Connect, SCD Type 1 <span class="dim">(SQL syntax &amp; SCD 2 coming)</span>; runs in Declarative Pipelines</li>
-      </ul>
+      <div class="hd"><span class="t">Auto CDC</span><span class="lc">~8 lines</span></div>
+      <pre><span class="k">from</span> pyspark <span class="k">import</span> pipelines <span class="k">as</span> dp
+dp.create_streaming_table(<span class="s">"replica"</span>)
+dp.create_auto_cdc_flow(
+  target=&hellip;, source=&hellip;, keys=[<span class="s">"id"</span>],
+  sequence_by=&hellip;, apply_as_deletes=&hellip;,
+  stored_as_scd_type=1)</pre>
+      <p class="owns">You declare keys, sequence, and the delete rule. The <b>pipeline owns</b> ordering, dedupe, late data, and deletes.</p>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Replace hand-written <code>foreachBatch</code> + <code>MERGE</code> with a <b>declared Auto CDC flow</b> &mdash; checkpoints and retries handled for you.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Replace hand-written <code>foreachBatch</code> + <code>MERGE</code> with a <b>declared Auto CDC flow</b> &mdash; out-of-order safe; checkpoints and retries handled for you.</span></div>
   <div class="slide-footer"><span>Auto CDC</span><span>42</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Auto CDC: declare it, Spark reconciles it · DB · ~0:55
 
-So 4.2 lets you declare it instead. You give the keys, the order, and the delete rule. Spark reconciles each batch against the target, in order, and merges it for you.
+Here is the contrast, in line count. By hand, this is about a hundred lines — a foreachBatch loop, a MERGE, sequence ordering, dedupe within the batch, late-data handling, tombstone deletes, and idempotent retries. With Auto CDC it is about eight: you declare the keys, the order, and the delete rule, and Spark reconciles each batch in order and merges it for you.
 It is safe with out-of-order data. Inserts and updates both become upserts. Deletes come from the feed.
 In 4.2 you get a Python API — create_auto_cdc_flow() — and Spark Connect support. It stores SCD Type 1. SQL syntax and SCD Type 2 are coming.
 It runs inside Spark Declarative Pipelines. So checkpoints, retries, and idempotency are handled for you.</div>

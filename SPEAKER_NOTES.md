@@ -181,7 +181,7 @@ This sounds easy, but it is not. Events arrive out of order, and across batches.
 The hand-written version — foreachBatch plus MERGE plus tombstones — is often hundreds of lines. Everyone writes it again, and everyone makes small mistakes.
 
 ### [42] Auto CDC: declare it, Spark reconciles it · DB · ~0:55
-So 4.2 lets you declare it instead. You give the keys, the order, and the delete rule. Spark reconciles each batch against the target, in order, and merges it for you.
+Here is the contrast, in line count. By hand, this is about a hundred lines — a foreachBatch loop, a MERGE, sequence ordering, dedupe within the batch, late-data handling, tombstone deletes, and idempotent retries. With Auto CDC it is about eight: you declare the keys, the order, and the delete rule, and Spark reconciles each batch in order and merges it for you.
 It is safe with out-of-order data. Inserts and updates both become upserts. Deletes come from the feed.
 In 4.2 you get a Python API — create_auto_cdc_flow() — and Spark Connect support. It stores SCD Type 1. SQL syntax and SCD Type 2 are coming.
 It runs inside Spark Declarative Pipelines. So checkpoints, retries, and idempotency are handled for you.
