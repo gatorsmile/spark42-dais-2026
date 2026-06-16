@@ -159,19 +159,19 @@ This is the mental model. Spark Declarative Pipelines is the pipeline manager: i
 ## Section 06 · Streaming — Structured Streaming
 
 ### [45] Section divider — Structured Streaming · DB · ~0:12
-Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's talk, "Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!," happening Thursday, June 18 from 1:50 PM to 2:30 PM PDT at Marriott Level 2 Foothill G. The arc is: lower latency with real-time mode, safer query evolution with named sources, faster stream-stream joins, and stronger state management. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.
+Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's talk, "Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!," happening Thursday, June 18 from 1:50 PM to 2:30 PM PDT at Marriott Level 2 Foothill G. The Spark 4.2 order is: stream-stream joins with fast watermark eviction, state-store integrity with row-level checksum and automatic snapshot repair, and source naming for query evolution. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.
 
-### [46] Evolve running pipelines safely · DB · ~0:32
-A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint. Now you name them — IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark, both Classic and Connect. Identity is the name, not the position. The name is tracked in checkpoint metadata, so this becomes the foundation for query evolution. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)
+### [46] Stream-stream joins: fast watermark eviction · DB · ~0:30
+First, stream-stream joins. In Spark 4.1, virtual column families moved join state into one RocksDB store instead of four, and the State Data Source can read join state directly. In Spark 4.2, state format v4 adds a secondary index for watermark eviction. The talk's callout is the useful number: eviction scanning goes from about two seconds for a full scan to about thirty milliseconds bounded per million rows, even when there is nothing to evict.
 
-### [47] IDENTIFIED BY in action · DB · ~0:18
+### [47] State-store integrity: repair automatically · DB · ~0:30
+Second, state-store integrity. Spark 4.1 added state-machine locking, so RocksDB has a single owner, plus file-level integrity checksums. Spark 4.2 goes finer grained with row-level checksum using CRC32C sampling, and it can automatically repair corrupted snapshots. The talk also calls out storage improvements: RocksDB memory usage on the unified memory manager and robust checkpoint format v2. The practical point is fewer manual recovery paths for stateful streaming.
+
+### [48] Source naming and query evolution · DB · ~0:30
+Third, source naming and query evolution. A long-time problem: streaming checkpoints identified sources and sinks by position. Add, remove, or reorder a source, and the checkpoint could break. Spark 4.2 lets you name sources with IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark. Those names are tracked in checkpoint metadata, so identity is the name, not the position. This is the foundation for safer query evolution. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)
+
+### [49] IDENTIFIED BY in action · DB · ~0:18
 (Code slide.) Named sources. A query adds a new one, restarts, and keeps its checkpoint. No full reprocess.
-
-### [48] Lower latency, faster stream-stream joins · DB · ~0:35
-From Anish and Jerry's streaming talk, there are two performance stories. Real-time mode changes the execution model: micro-batches are time-based, stages run concurrently, and streaming shuffle moves data directly from mappers to reducers instead of waiting for the whole batch. Stream-stream joins also got faster. In 4.1, virtual column families moved join state into one RocksDB store instead of four. In 4.2, state format v4 adds a secondary index for watermark eviction. Their benchmark callout is the nice number: about two seconds for a full scan down to about thirty milliseconds bounded per million rows, even when there is nothing to evict.
-
-### [49] Stateful streaming is easier to trust · DB · ~0:35
-The other big theme is state. TransformWithState is the next-generation arbitrary stateful processing API. It was introduced in 4.0, and the 4.1 work adds the PySpark API plus Spark Connect support. The streaming talk also calls out 4.2 tooling: TwsTester can unit-test a StatefulProcessor without running a live streaming query. On reliability, 4.1 added state-machine locking and file-level integrity checksums. Spark 4.2 adds row-level checksum and automatic snapshot repair. And the State Data Source can read checkpointed state for debugging and observability. The short version: stateful streaming is becoming more testable, observable, and self-repairing.
 
 ## Section 07 · Data Source V2 — Data Source V2
 

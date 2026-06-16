@@ -2074,7 +2074,7 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
   <div class="benefit">Move changing data safely</div>
   <div class="takeaway">
     <div class="today"><span class="tk-label">Today</span>Streaming workloads need lower latency, safer evolution, and stronger state.</div>
-    <div class="now"><span class="tk-label">Spark 4.2</span>Source naming, faster joins, and stronger state-store integrity.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Fast watermark eviction, stronger state-store integrity, and source naming.</div>
     <div class="mon"><span class="tk-label">Takeaway</span>Structured Streaming keeps moving toward always-on production pipelines.</div>
   </div>
   <p class="fcap" style="margin-top:18px; max-width:1280px"><b>Full talk:</b> “Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!” — Anish Shrigondekar &amp; Jerry Peng, Thursday, June 18, 1:50 PM-2:30 PM PDT, Marriott Level 2 Foothill G</p>
@@ -2083,37 +2083,94 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Structured Streaming · DB · ~0:12
 
-Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's talk, "Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!," happening Thursday, June 18 from 1:50 PM to 2:30 PM PDT at Marriott Level 2 Foothill G. The arc is: lower latency with real-time mode, safer query evolution with named sources, faster stream-stream joins, and stronger state management. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.</div>
+Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's talk, "Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!," happening Thursday, June 18 from 1:50 PM to 2:30 PM PDT at Marriott Level 2 Foothill G. The Spark 4.2 order is: stream-stream joins with fast watermark eviction, state-store integrity with row-level checksum and automatic snapshot repair, and source naming for query evolution. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.</div>
 </section>
 
 <section class="slide">
   <div class="eyebrow">Streaming</div>
-  <h2>Evolve running pipelines safely</h2>
+  <h2>Stream-stream joins: fast watermark eviction</h2>
   <div class="baf">
     <div class="col today">
-      <div class="hd">Today &mdash; the pain</div>
+      <div class="hd">Spark 4.1</div>
       <ul>
-        <li>Streaming sources are identified by <b>position</b></li>
-        <li>Add, remove, or reorder one and the <b>checkpoint breaks</b></li>
-        <li>The only safe fix is a <b>full reprocess</b> from scratch</li>
+        <li>Virtual column families &mdash; one RocksDB store instead of four</li>
+        <li>State Data Source can read join state for deeper debugging</li>
+        <li>LeftSemi and non-outer joins get internal improvements</li>
       </ul>
     </div>
     <div class="col now">
-      <div class="hd">Spark 4.2 &mdash; the mechanism</div>
+      <div class="hd">Spark 4.2</div>
       <ul>
-        <li>Name sources with <b>IDENTIFIED BY</b> &mdash; identity is the name, not the position</li>
-        <li>Add / remove / reorder sources <b>without breaking the checkpoint</b></li>
-        <li>Names are tracked in checkpoint metadata &mdash; the foundation for query evolution</li>
-        <li>In PySpark, the same via <code>DataStreamReader.name(&hellip;)</code> &mdash; Classic + Connect (Scala too)</li>
+        <li><b>State format v4</b> adds a secondary index for watermark eviction</li>
+        <li>Optimized scanning cuts eviction latency significantly</li>
+        <li>About <b>2s</b> full scan to about <b>30ms</b> bounded per 1M rows</li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Name your streaming sources &mdash; <b>IDENTIFIED BY</b> in SQL, <code>DataStreamReader.name()</code> in PySpark &mdash; so you can evolve a running query with no full reprocess.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Watermark eviction becomes bounded instead of scanning the full join state.</span></div>
   <div class="slide-footer"><span>Streaming</span><span>46</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Evolve running pipelines safely · DB · ~0:32
+  <div class="notes" hidden>Stream-stream joins: fast watermark eviction · DB · ~0:30
 
-A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint. Now you name them — IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark, both Classic and Connect. Identity is the name, not the position. The name is tracked in checkpoint metadata, so this becomes the foundation for query evolution. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)</div>
+First, stream-stream joins. In Spark 4.1, virtual column families moved join state into one RocksDB store instead of four, and the State Data Source can read join state directly. In Spark 4.2, state format v4 adds a secondary index for watermark eviction. The talk's callout is the useful number: eviction scanning goes from about two seconds for a full scan to about thirty milliseconds bounded per million rows, even when there is nothing to evict.</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Streaming</div>
+  <h2>State-store integrity: repair automatically</h2>
+  <div class="baf">
+    <div class="col today">
+      <div class="hd">Spark 4.1</div>
+      <ul>
+        <li>State-machine locking gives RocksDB a single owner</li>
+        <li>File-level integrity checksums catch checkpoint corruption</li>
+        <li>Robust checkpoint format v2 strengthens state storage</li>
+      </ul>
+    </div>
+    <div class="col now">
+      <div class="hd">Spark 4.2</div>
+      <ul>
+        <li><b>Row-level checksum</b> with CRC32C sampling</li>
+        <li><b>Automatic snapshot repair</b> recovers corrupted state</li>
+        <li>RocksDB memory usage moves onto the unified memory manager</li>
+      </ul>
+    </div>
+  </div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">The state store catches finer-grained corruption and repairs snapshots automatically.</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>47</span></div>
+  <div class="progress"><i></i></div>
+  <div class="notes" hidden>State-store integrity: repair automatically · DB · ~0:30
+
+Second, state-store integrity. Spark 4.1 added state-machine locking, so RocksDB has a single owner, plus file-level integrity checksums. Spark 4.2 goes finer grained with row-level checksum using CRC32C sampling, and it can automatically repair corrupted snapshots. The talk also calls out storage improvements: RocksDB memory usage on the unified memory manager and robust checkpoint format v2. The practical point is fewer manual recovery paths for stateful streaming.</div>
+</section>
+
+<section class="slide">
+  <div class="eyebrow">Streaming</div>
+  <h2>Source naming and query evolution</h2>
+  <div class="baf">
+    <div class="col today">
+      <div class="hd">The problem</div>
+      <ul>
+        <li>Checkpoints pin sources and sinks by <b>position</b></li>
+        <li>Add, remove, or reorder one and the checkpoint can break</li>
+        <li>Position-based identity blocks safer query evolution</li>
+      </ul>
+    </div>
+    <div class="col now">
+      <div class="hd">Spark 4.2</div>
+      <ul>
+        <li>Name sources with <b>IDENTIFIED BY</b></li>
+        <li>PySpark: <code>DataStreamReader.name(&hellip;)</code></li>
+        <li>Names are tracked in checkpoint metadata as the foundation for query evolution</li>
+      </ul>
+    </div>
+  </div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Identity becomes the name, not the source position.</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>48</span></div>
+  <div class="progress"><i></i></div>
+  <div class="notes" hidden>Source naming and query evolution · DB · ~0:30
+
+Third, source naming and query evolution. A long-time problem: streaming checkpoints identified sources and sinks by position. Add, remove, or reorder a source, and the checkpoint could break. Spark 4.2 lets you name sources with IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark. Those names are tracked in checkpoint metadata, so identity is the name, not the position. This is the foundation for safer query evolution. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)</div>
 </section>
 
 <section class="slide">
@@ -2131,69 +2188,11 @@ df.writeStream.toTable(<span class="s">"unified"</span>)
 
 <span class="c">-- Later: add, remove, or reorder sources
 -- without breaking the checkpoint</span></pre>
-  <div class="slide-footer"><span>Streaming</span><span>47</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>49</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>IDENTIFIED BY in action · DB · ~0:18
 
 (Code slide.) Named sources. A query adds a new one, restarts, and keeps its checkpoint. No full reprocess.</div>
-</section>
-
-<section class="slide">
-  <div class="eyebrow">Streaming</div>
-  <h2>Lower latency, faster stream-stream joins</h2>
-  <div class="baf">
-    <div class="col today">
-      <div class="hd">Real-time mode</div>
-      <ul>
-        <li>Time-based micro-batches keep processing new data during execution</li>
-        <li>Stages run concurrently instead of waiting at shuffle barriers</li>
-        <li>Streaming shuffle sends mapper output directly to reducers</li>
-      </ul>
-    </div>
-    <div class="col now">
-      <div class="hd">Join improvements</div>
-      <ul>
-        <li>4.1: virtual column families &mdash; one RocksDB store instead of four</li>
-        <li>4.2: state format v4 adds a secondary index for watermark eviction</li>
-        <li>Eviction scan improves from about <b>2s</b> full scan to about <b>30ms</b> bounded per 1M rows</li>
-      </ul>
-    </div>
-  </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Streaming performance improves at both layers: execution mode and state-backed joins.</span></div>
-  <div class="slide-footer"><span>Streaming</span><span>48</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Lower latency, faster stream-stream joins · DB · ~0:35
-
-From Anish and Jerry's streaming talk, there are two performance stories. Real-time mode changes the execution model: micro-batches are time-based, stages run concurrently, and streaming shuffle moves data directly from mappers to reducers instead of waiting for the whole batch. Stream-stream joins also got faster. In 4.1, virtual column families moved join state into one RocksDB store instead of four. In 4.2, state format v4 adds a secondary index for watermark eviction. Their benchmark callout is the nice number: about two seconds for a full scan down to about thirty milliseconds bounded per million rows, even when there is nothing to evict.</div>
-</section>
-
-<section class="slide">
-  <div class="eyebrow">Streaming</div>
-  <h2>Stateful streaming is easier to trust</h2>
-  <div class="baf">
-    <div class="col today">
-      <div class="hd">Arbitrary stateful processing</div>
-      <ul>
-        <li><b>TransformWithState</b> is the next-generation stateful API</li>
-        <li>4.1: PySpark API and Spark Connect support</li>
-        <li>4.2: TwsTester unit-tests a StatefulProcessor without a live query</li>
-      </ul>
-    </div>
-    <div class="col now">
-      <div class="hd">State management</div>
-      <ul>
-        <li>4.1: state-machine locking and file-level integrity checksums</li>
-        <li>4.2: row-level checksum with automatic snapshot repair</li>
-        <li>State Data Source reads checkpointed state for debugging and observability</li>
-      </ul>
-    </div>
-  </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">The state store is becoming more testable, observable, and self-repairing.</span></div>
-  <div class="slide-footer"><span>Streaming</span><span>49</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Stateful streaming is easier to trust · DB · ~0:35
-
-The other big theme is state. TransformWithState is the next-generation arbitrary stateful processing API. It was introduced in 4.0, and the 4.1 work adds the PySpark API plus Spark Connect support. The streaming talk also calls out 4.2 tooling: TwsTester can unit-test a StatefulProcessor without running a live streaming query. On reliability, 4.1 added state-machine locking and file-level integrity checksums. Spark 4.2 adds row-level checksum and automatic snapshot repair. And the State Data Source can read checkpointed state for debugging and observability. The short version: stateful streaming is becoming more testable, observable, and self-repairing.</div>
 </section>
 
 <!-- ============ Section 07 ============ -->
