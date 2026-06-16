@@ -220,7 +220,7 @@ Benefit five: operate and evolve predictably. First, what makes Spark faster, ea
 The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL plans — you can pan, zoom, search, and compare the first and final AQE plans, side by side. And the environment page shows your non-default configs, with one-click export.
 
 ### [64] Faster & leaner · DB · ~0:28
-Four performance points. Faster scans — better vectorized Parquet. Smarter plans — pre-aggregation for many COUNT(DISTINCT), and more codegen. Leaner memory — bounded merge and early release cut OOMs. And faster I/O — zero-copy transfers, and less JVM-to-Python overhead. All with no code change.
+Four performance points. Faster scans — better vectorized Parquet. Smarter plans — pre-aggregation for many COUNT(DISTINCT), and more codegen. Leaner memory — bounded merge and early release cut OOMs. And faster I/O — Arrow transfers data between the JVM and Python, resulting in lower memory overhead. All with no code change.
 
 ### [65] Runtime & operations · DB · ~0:28
 On operations: we now run on Java 25. Kubernetes — in-place executor and PVC resizing, smaller images, NetworkPolicy isolation. The History Server scales — multiple log folders, and on-demand loading. And consistent results — query-level retry for indeterminate shuffles, with correct SQL metrics under AQE. That is 4.2. Now — what is next.

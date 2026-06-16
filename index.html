@@ -2532,13 +2532,13 @@ The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL pl
     <li><b>Faster scans</b> &mdash; optimized vectorized Parquet reading for bytes, booleans, binary &amp; null runs</li>
     <li><b>Smarter plans</b> &mdash; pre-aggregation for multiple <code>COUNT(DISTINCT)</code> and more whole-stage codegen</li>
     <li><b>Leaner memory</b> &mdash; bounded external merge and eager memory release cut OOMs</li>
-    <li><b>Faster I/O</b> &mdash; zero-copy transfers and lower JVM&harr;Python overhead</li>
+    <li><b>Faster I/O</b> &mdash; Arrow transfer between JVM and Python lowers memory overhead</li>
   </ul>
   <div class="slide-footer"><span>Others</span><span>64</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Faster &amp; leaner · DB · ~0:28
 
-Four performance points. Faster scans — better vectorized Parquet. Smarter plans — pre-aggregation for many COUNT(DISTINCT), and more codegen. Leaner memory — bounded merge and early release cut OOMs. And faster I/O — zero-copy transfers, and less JVM-to-Python overhead. All with no code change.</div>
+Four performance points. Faster scans — better vectorized Parquet. Smarter plans — pre-aggregation for many COUNT(DISTINCT), and more codegen. Leaner memory — bounded merge and early release cut OOMs. And faster I/O — Arrow transfers data between the JVM and Python, resulting in lower memory overhead. All with no code change.</div>
 </section>
 
 <section class="slide">
