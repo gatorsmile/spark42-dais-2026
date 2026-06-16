@@ -115,7 +115,7 @@ Embeddings are now ordinary table data. The first need is simple: compare two ve
 The simplest vector search: one query vector against a table. Score, sort, take the top 10 — and it is just SQL. But real workloads have many query rows, like top products for every user. By hand that means a cross join, a window, and a filter. NEAREST BY replaces that.
 
 ### [32] NEAREST BY: top-K per query row · XIAO · ~0:30
-Now we generalize: from one query vector to many query rows. For each left row, find the K best right rows. The score is usually similarity, but it can be any expression. The old way — cross join, ROW_NUMBER, filter — hides the intent; NEAREST BY makes it explicit. In 4.2, think EXACT first. APPROX is for future indexes, not today's demo.
+Now we generalize: from one query vector to many query rows. For each left row, find the K best right rows. The score is usually similarity, but it can be any expression. The old way — cross join, ROW_NUMBER, filter — hides the intent; NEAREST BY makes it explicit. In 4.2, EXACT is brute-force top-K, just with clearer SQL. APPROX keeps the same shape ready for future index-backed plans.
 
 ### [33] NEAREST BY in action: batch vector search · XIAO · ~0:26
 The same search, now batched: for every user, the top 10 products by similarity. The point is the shape, not the function — no cross join, no window, no filter. Vector search is the common case, but NEAREST BY fits any top-K join. Demo EXACT; APPROX keeps the query stable for smarter execution later.
