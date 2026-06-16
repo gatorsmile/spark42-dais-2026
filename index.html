@@ -2094,13 +2094,14 @@ Still benefit four. Now streaming. This is the short version of Anish Shrigondek
       <div class="hd">Spark 4.1</div>
       <ul>
         <li>Virtual column families &mdash; one RocksDB store instead of four</li>
-        <li>State Data Source can read join state for deeper debugging</li>
         <li>LeftSemi and non-outer joins get internal improvements</li>
+        <li>Watermark eviction still scans too much join state</li>
       </ul>
     </div>
     <div class="col now">
       <div class="hd">Spark 4.2</div>
       <ul>
+        <li><b>State Data Source</b> can read join state for deeper debugging</li>
         <li><b>State format v4</b> adds a secondary index for watermark eviction</li>
         <li>Optimized scanning cuts eviction latency significantly</li>
         <li>About <b>2s</b> full scan to about <b>30ms</b> bounded per 1M rows</li>
@@ -2112,7 +2113,7 @@ Still benefit four. Now streaming. This is the short version of Anish Shrigondek
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Stream-stream joins: fast watermark eviction · DB · ~0:30
 
-First, stream-stream joins. In Spark 4.1, virtual column families moved join state into one RocksDB store instead of four, and the State Data Source can read join state directly. In Spark 4.2, state format v4 adds a secondary index for watermark eviction. The talk's callout is the useful number: eviction scanning goes from about two seconds for a full scan to about thirty milliseconds bounded per million rows, even when there is nothing to evict.</div>
+First, stream-stream joins. In Spark 4.1, virtual column families moved join state into one RocksDB store instead of four, with internal improvements for LeftSemi and non-outer joins. In Spark 4.2, the State Data Source can read join state directly for debugging, and state format v4 adds a secondary index for watermark eviction. The talk's callout is the useful number: eviction scanning goes from about two seconds for a full scan to about thirty milliseconds bounded per million rows, even when there is nothing to evict.</div>
 </section>
 
 <section class="slide">
