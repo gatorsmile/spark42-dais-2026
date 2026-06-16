@@ -145,7 +145,7 @@ Location data is everywhere — delivery, IoT, maps, risk. 4.2 adds GEOMETRY and
 ## Section 05 · Pipelines & Auto CDC — Spark Declarative Pipelines & Auto CDC
 
 ### [41] Section divider — Declarative Pipelines & Auto CDC · DB · ~0:12
-Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: move the reconciliation logic into a declared Auto CDC flow.
+Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: move the reconciliation logic into a declared Auto CDC flow. For the full CDC deep dive, see Gengliang Wang and Johan Lasperas's talk, "First-Class CDC Support in Spark 4.2," on June 18 from 10:20 to 11:00 at Marriott Level 2 Foothill G.
 
 ### [42] Applying a change feed is the hard part · DB · ~0:40
 The common need: keep a lakehouse table in sync with an operational change feed. Here is one customer. Version 1 says SF. Version 3 says Seattle. Then version 2 arrives late and says LA. If you process by arrival order, LA can overwrite Seattle, even though LA is older. Then version 4 deletes the row. A CDC event has four parts: key, operation, sequence, and payload. The key is the row identity. The sequence is the business order. Hand-written foreachBatch plus MERGE turns that simple intent into ordering, dedupe, tombstone, and retry code. That is where small mistakes happen.
@@ -176,40 +176,40 @@ The state store is the heart of stateful streaming. In 4.2 it is stronger. It re
 ## Section 07 · Data Source V2 — Data Source V2
 
 ### [50] Section divider — Data Source V2 · DB · ~0:12
-Still benefit four. Now Data Source V2 — how Spark connects to data. It improved a lot this release. Takeaway: read changes with one CHANGES query, not per-engine functions.
+Still benefit four. Now Data Source V2 — how Spark connects to data. This is the short version of Szehon and Anton's DSv2 talk. The takeaway: use Spark syntax, and let DSv2 connectors expose the table-format features underneath.
 
 ### [51] One integration API for every data source · DB · ~0:33
-DSv2 is the standard API for data sources — Delta, Iceberg, and more. Users get the same SQL and behavior across sources. Connectors get DML, streaming, and Spark's optimizations. It is growing fast. In 4.1 and 4.2: row-level DML, CDC, schema evolution, transactions, and better pushdown. There is a full talk at this Summit: 'Spark DSV2: Growing Up Fast', by Szehon Ho and Anton Okolnychyi.
+DSv2 is the standard API for data sources — Delta, Iceberg, and more. Connectors provide metadata and small contracts. Spark does the heavy lifting — analysis, planning, optimization, execution. That gives users consistent syntax and behavior across sources. This is only the short version. For the full deep dive, go to Szehon Ho and Anton Okolnychyi's talk, 'Spark DSV2: Growing Up Fast,' on June 18 from 11:30 to 12:10 at Marriott Level 2 Foothill C.
 
-### [52] Ask the table: "what changed?" · DB · ~0:32
-CDC is the row-level history of a table — which rows were added, updated, or deleted. It is a typed log, in commit order. Each row is tagged: insert, update before, update after, or delete. Each row has the values, the operation, and the order. CDC is used everywhere — incremental ETL, audit, replication. And it refreshes vector indexes, materialized views, and streaming tables on commit.
+### [52] What grew up in 4.1 and 4.2 · DB · ~0:32
+DSv2 has a long history, but the recent momentum is the point. In 4.1 and 4.2, it grew into DML hardening, schema evolution, write summaries, transactions, ChangeLog, and PartitionPredicate. The theme is consistent: Spark takes on more of the feature complexity, while connectors expose small contracts.
 
-### [53] Two problems with CDC today · DB · ~0:40
-CDC today has two problems. One: every engine built its own. Delta has table_changes(). Iceberg has create_changelog_view. Hudi has incremental reads. Same idea, three syntaxes. Two: write-time CDC costs every writer. Change files are written on every update — about 1.2x the write time. You pay this even if no one reads them. Some numbers: 206 million CDC queries in 60 days. And 68% of them needed no stored change files at all. So 4.2 makes read-time CDC built in. Only the reader pays. And any engine can write the table.
+### [53] CDC: move the changelog logic into Spark · DB · ~0:35
+CDC is one example of DSv2 growing up. Before, table formats used Spark extensions for their own changelog syntax and execution. The result was duplicated complexity and inconsistent behavior. In 4.2, ChangeLog is a DSv2 contract. The connector exposes row identity, row version, and a scan. Spark owns the hard parts — removing carry-over rows, reconstructing updates, and computing net changes.
 
 ### [54] One CHANGES API for changelog-capable DSv2 sources · DB · ~0:35
-The answer is one API. One SQL CHANGES clause — by version or by time, or streaming with STREAM ... CHANGES. The same shape in DataFrames — read.changes() and readStream.changes(). The same syntax for any DSv2 connector that supports a changelog — Delta, Iceberg, and Hudi today. Not every source has it; the connector must ship the interface. Spark does the hard part — removing carry-overs, finding updates, collapsing changes. Connectors ship only a small contract.
+The user-facing API is one SQL CHANGES clause — by version or by time, or streaming with STREAM ... CHANGES. The same shape exists in DataFrames: read.changes() and readStream.changes(). Underneath, the connector implements ChangeLog. Spark does the hard part — carry-over removal, update reconstruction, and net-change collapse.
 
 ### [55] Reading changes in action · DB · ~0:20
-(Code slide.) SELECT ... FROM t CHANGES. A version range in, typed change rows out. The same query for Delta or Iceberg.
+(Code slide.) SELECT ... FROM t CHANGES. A version range in, typed change rows out. The same idea works in streaming and in the DataFrame API. The connector exposes the changelog; Spark normalizes it.
 
-### [56] Delta goes read-time — by default · DB · ~0:40
-For a Delta table with row tracking, the result is great: read-time CDC, with no Change Data Feed property. No CDF setting. No ALTER TABLE. No ticket to the owner. And you pay nothing at write time. Changes are computed only when a reader asks. It uses two columns Delta already has — a stable row id and a row commit version. A matched id is an update. A lone add is an insert. A lone remove is a delete. It needs Row Tracking — default in Databricks, opt-in in Delta OSS. Write-time CDC still works for special cases.
+### [56] Read-time CDC: only pay when you read · DB · ~0:32
+The second CDC point is cost. Write-time change files tax every update, even if nobody reads them. In 4.2, Spark makes read-time CDC first-class through DSv2 ChangeLog. For Delta tables with row tracking, changes can be computed when a reader asks, with no Change Data Feed property. Write-time CDC still matters for special workloads that need stored change files.
 
-### [57] Smarter writes: INSERT & MERGE · DB · ~0:30
-Writes are smarter and safer. INSERT INTO ... WITH SCHEMA EVOLUTION lets the target grow with the data. A source with fewer columns is fine — missing fields are filled. There is new INSERT ... REPLACE syntax, and BY NAME with REPLACE WHERE. MERGE gets fixes — schema evolution with DELETE, and nested fields kept. And TABLESAMPLE SYSTEM, pushed down to DSv2 and JDBC.
+### [57] DML schema evolution: Spark calculates, connector validates · DB · ~0:35
+Schema evolution is another place where DSv2 grew up. Spark compares the source and target, including nested struct fields. It computes what needs to change — add a column, widen a type, fill missing target fields with null or defaults — then the connector decides what is valid for that table format. Delta and Iceberg do not allow exactly the same widening rules, and DSv2 gives each connector a place to say yes or no.
 
 ### [58] Schema evolution in action · DB · ~0:18
-(Code slide.) A new column appears in the source. With SCHEMA EVOLUTION, the target takes it. No manual ALTER.
+(Code slide.) A new column appears in the source. With SCHEMA EVOLUTION, Spark computes the schema change and asks the connector to apply what is valid. The DataFrame APIs mirror the SQL shape.
 
 ### [59] Transactions: atomic, isolated DML · DB · ~0:30
-DML is read, transform, write back. Without isolation, a writer can overwrite changes it never saw. So 4.2 starts a transaction for every DML. It tracks all reads and writes in it. Connectors check concurrent commits at commit time. So a stale read fails cleanly, instead of corrupting data. This is single-statement DML today. Multi-statement and cross-catalog are future work.
+DML is read, transform, write back. Without isolation, a writer can overwrite changes it never saw. So Spark 4.2 adds a transaction API. Spark begins a transaction for DML. The connector can stage writes, track reads, validate at commit time, and abort cleanly. The scope today is single DML statements. Multi-statement and cross-catalog transactions are future work.
 
-### [60] Observable, evolvable DML · DB · ~0:28
-DML is observable now. MERGE, UPDATE, and DELETE report metrics — rows inserted, updated, deleted, copied. You see them where you already look — Delta DESCRIBE HISTORY, Iceberg snapshots. MERGE and INSERT support schema evolution, and the connector decides what is valid. And table refresh is consistent, so views over external tables stay correct.
+### [60] DML is observable now · DB · ~0:28
+DML is observable now. Spark 4.1 added MERGE operation metrics. Spark 4.2 adds UPDATE and DELETE metrics. Spark collects row counts while the operation runs, then passes summary objects into the DSv2 commit API. Connectors surface the results where users already look — Delta DESCRIBE HISTORY and Iceberg snapshot summaries.
 
 ### [61] Smarter pushdown: PartitionPredicate · DB · ~0:30
-This is a real gap, and connectors hit it every day. Before, partition filters with UDFs or unusual expressions were lost between Catalyst and the connectors. File sources could use them. Connectors could not. The new PartitionPredicate API fixes this. Any Catalyst partition filter is checked against the partition values — for scans, DELETE WHERE, and runtime filters. So WHERE udf(month(ts)) = 'JAN' now prunes partitions in Iceberg and Delta. Less data read. Faster queries.
+This is a real gap, and connectors hit it every day. Built-in file sources use Catalyst directly, so they can evaluate the full power of Spark partition filters. DSv2 connectors used a smaller expression vocabulary, so UDFs and non-standard expressions got lost in translation. PartitionPredicate fixes that. Spark preserves the Catalyst predicate, the connector provides partition values, and Spark evaluates it. Less data read. Faster queries.
 
 ## Section 08 · Others — Performance, UI & Operations
 

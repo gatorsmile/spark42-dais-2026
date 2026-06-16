@@ -1932,12 +1932,13 @@ Location data is everywhere — delivery, IoT, maps, risk. 4.2 adds GEOMETRY and
     <div class="now"><span class="tk-label">Spark 4.2</span>Declare the flow; Spark orders, dedupes, and applies changes.</div>
     <div class="mon"><span class="tk-label">Takeaway</span>Move reconciliation into a declared Auto CDC flow.</div>
   </div>
+  <p class="fcap" style="margin-top:18px; max-width:1280px"><b>Full talk:</b> “First-Class CDC Support in Spark 4.2” — Gengliang Wang &amp; Johan Lasperas, June 18, 10:20-11:00, Marriott Level 2 Foothill G</p>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep on"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
   <div class="slide-footer"><span>Auto CDC</span><span>41</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Declarative Pipelines &amp; Auto CDC · DB · ~0:12
 
-Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: move the reconciliation logic into a declared Auto CDC flow.</div>
+Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: move the reconciliation logic into a declared Auto CDC flow. For the full CDC deep dive, see Gengliang Wang and Johan Lasperas's talk, "First-Class CDC Support in Spark 4.2," on June 18 from 10:20 to 11:00 at Marriott Level 2 Foothill G.</div>
 </section>
 
 <section class="slide">
@@ -2197,16 +2198,16 @@ The state store is the heart of stateful streaming. In 4.2 it is stronger. It re
   <div class="rule"></div>
   <div class="benefit">Move changing data safely</div>
   <div class="takeaway">
-    <div class="today"><span class="tk-label">Today</span>Every engine reinvents CDC; write-time change files tax all writers.</div>
-    <div class="now"><span class="tk-label">Spark 4.2</span>One CHANGES API, atomic DML, and smarter pushdown &mdash; read-time CDC.</div>
-    <div class="mon"><span class="tk-label">Takeaway</span>Read changes with one CHANGES query, not per-engine functions.</div>
+    <div class="today"><span class="tk-label">Today</span>Modern table formats expose rich features through different paths.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>DSv2 grows into the common contract for DML, CDC, transactions, and pushdown.</div>
+    <div class="mon"><span class="tk-label">Takeaway</span>Use Spark syntax; let DSv2 connectors expose table-format power.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep on"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
   <div class="slide-footer"><span>Data Source V2</span><span>50</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Data Source V2 · DB · ~0:12
 
-Still benefit four. Now Data Source V2 — how Spark connects to data. It improved a lot this release. Takeaway: read changes with one CHANGES query, not per-engine functions.</div>
+Still benefit four. Now Data Source V2 — how Spark connects to data. This is the short version of Szehon and Anton's DSv2 talk. The takeaway: use Spark syntax, and let DSv2 connectors expose the table-format features underneath.</div>
 </section>
 
 <section class="slide">
@@ -2215,63 +2216,62 @@ Still benefit four. Now Data Source V2 — how Spark connects to data. It improv
   <h2>One integration API for every data source</h2>
   <ul class="points">
     <li><b>DSv2</b> is the de-facto API for plugging data sources into Spark &mdash; Delta, Iceberg, and beyond</li>
-    <li>Users get consistent SQL syntax and behavior across sources; connectors get DML, streaming, and Spark's optimizations</li>
-    <li>Evolving fast in 4.1 and 4.2: row-level DML, CDC, schema evolution, transactions, and smarter pushdown all live here</li>
-    <li>Go deeper at this Summit: <b>&ldquo;Spark DSV2: Growing Up Fast&rdquo;</b> &mdash; Szehon Ho &amp; Anton Okolnychyi</li>
+    <li>Connectors provide metadata and small contracts; Spark owns analysis, planning, optimization, and execution</li>
+    <li>Users get consistent SQL/DataFrame behavior; connectors get DML, streaming, CDC, transactions, and pushdown</li>
+    <li>Full talk: <b>&ldquo;Spark DSV2: Growing Up Fast&rdquo;</b> &mdash; Szehon Ho &amp; Anton Okolnychyi, June 18, 11:30-12:10, Marriott Level 2 Foothill C</li>
   </ul>
   <div class="fdiag">
     <div class="fbox muted"><div class="ft">One DSv2 connector</div><div class="fd">Delta &middot; Iceberg &middot; Hudi &middot; your own</div></div>
     <div class="farrow">&#8594;</div>
-    <div class="fbox accent"><div class="ft">One contract, four capabilities</div><div class="fchips"><span>Read</span><span>Write &middot; INSERT / MERGE</span><span>Change &middot; CHANGES</span><span>Pushdown</span></div></div>
+    <div class="fbox accent"><div class="ft">One contract, many capabilities</div><div class="fchips"><span>Read</span><span>DML</span><span>ChangeLog</span><span>Transactions</span><span>Pushdown</span></div></div>
   </div>
-  <p class="fcap">Implement the contract once; Spark drives <b>reads, row-level writes, change feeds, and pushdown</b> through the same source.</p>
+  <p class="fcap">Implement the contract once; Spark drives <b>reads, row-level writes, change feeds, transactions, and partition pruning</b> through the same source.</p>
   <div class="slide-footer"><span>Data Source V2</span><span>51</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One integration API for every data source · DB · ~0:33
 
-DSv2 is the standard API for data sources — Delta, Iceberg, and more. Users get the same SQL and behavior across sources. Connectors get DML, streaming, and Spark's optimizations. It is growing fast. In 4.1 and 4.2: row-level DML, CDC, schema evolution, transactions, and better pushdown. There is a full talk at this Summit: 'Spark DSV2: Growing Up Fast', by Szehon Ho and Anton Okolnychyi.</div>
+DSv2 is the standard API for data sources — Delta, Iceberg, and more. Connectors provide metadata and small contracts. Spark does the heavy lifting — analysis, planning, optimization, execution. That gives users consistent syntax and behavior across sources. This is only the short version. For the full deep dive, go to Szehon Ho and Anton Okolnychyi's talk, 'Spark DSV2: Growing Up Fast,' on June 18 from 11:30 to 12:10 at Marriott Level 2 Foothill C.</div>
 </section>
 
 <!-- roadmap: Data Source V2 1 -->
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Read changes</span><span>2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>Ask the table: &ldquo;what changed?&rdquo;</h2>
+  <h2>What grew up in 4.1 and 4.2</h2>
   <ul class="points">
-    <li><b>CDC</b> = the row-level change history of a table: which rows were added, updated, or deleted</li>
-    <li>A typed log in commit order: each row tagged <code>insert</code>, <code>update_preimage</code> / <code>update_postimage</code>, or <code>delete</code></li>
-    <li>Every change carries the row values, the operation (<code>_change_type</code>), and the order (<code>_commit_version</code>, <code>_commit_timestamp</code>)</li>
+    <li><b>DML hardening</b>: row-level writes, schema evolution, write summaries, and operation metrics</li>
+    <li><b>Transactions</b>: Spark begins a transaction for DML; connectors stage writes, track reads, and validate on commit</li>
+    <li><b>ChangeLog / CHANGES</b>: one Spark API for table changes, instead of per-engine changelog syntax</li>
+    <li><b>PartitionPredicate</b>: preserve Catalyst partition filters, including UDFs and non-standard expressions</li>
   </ul>
   <div class="fdiag">
-    <div class="fbox muted"><div class="ft">Table versions</div><div class="fd"><code>v10</code> &hellip; <code>v20</code> &mdash; commits over time</div></div>
+    <div class="fbox muted"><div class="ft">Spark 4.1</div><div class="fd">Constraints &middot; defaults &middot; MERGE metrics</div></div>
     <div class="farrow">&#8594;</div>
-    <div class="fbox accent"><div class="ft">CHANGES</div><div class="fd">A <b>typed change log</b> in commit order &mdash; insert / update / delete</div></div>
-    <div class="farrow">&#8594;</div>
-    <div class="fbox"><div class="ft">Downstream consumers</div><div class="fchips"><span>Incremental ETL</span><span>Audit</span><span>Replication</span><span>Streaming tables</span><span>Vector / MV refresh</span></div></div>
+    <div class="fbox accent"><div class="ft">Spark 4.2</div><div class="fchips"><span>Transactions</span><span>Schema evolution</span><span>ChangeLog</span><span>PartitionPredicate</span><span>Write summaries</span></div></div>
   </div>
-  <p class="fcap">CDC is load-bearing infra &mdash; everything downstream stays current by reading <b>what changed</b>, not the whole table.</p>
+  <p class="fcap">The pattern is the same each time: <b>move feature-specific complexity into Spark</b>, and keep connector APIs small.</p>
   <div class="slide-footer"><span>Data Source V2</span><span>52</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Ask the table: "what changed?" · DB · ~0:32
 
-CDC is the row-level history of a table — which rows were added, updated, or deleted. It is a typed log, in commit order. Each row is tagged: insert, update before, update after, or delete. Each row has the values, the operation, and the order. CDC is used everywhere — incremental ETL, audit, replication. And it refreshes vector indexes, materialized views, and streaming tables on commit.</div>
+DSv2 has a long history, but the recent momentum is the point. In 4.1 and 4.2, it grew into DML hardening, schema evolution, write summaries, transactions, ChangeLog, and PartitionPredicate. The theme is consistent: Spark takes on more of the feature complexity, while connectors expose small contracts.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Read changes</span><span>2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>Two problems with CDC today</h2>
+  <h2>CDC: move the changelog logic into Spark</h2>
   <ul class="points">
-    <li>Each engine reinvented CDC: Delta <code>table_changes()</code>, Iceberg <code>create_changelog_view</code>, Hudi incremental reads &mdash; same idea, three syntaxes, three sets of defaults</li>
-    <li><b>Write-time CDC taxes every writer</b>: change files are written on every update commit (~1.2&times; write time), paid up front whether anyone reads them or not</li>
-    <li>By the numbers: 206M batch CDC queries in 60 days &mdash; and 68% of them need no stored change files at all</li>
-    <li>Spark 4.2 makes <b>read-time CDC first-class</b>: only the reader pays, and any engine can write the table</li>
+    <li>Prior art: Iceberg and Delta used Spark extensions for custom changelog grammar and execution</li>
+    <li>That meant inconsistent syntax, duplicated logic, and connector-specific behavior</li>
+    <li>In Spark 4.2, CDC support moves into Spark through the DSv2 <b>ChangeLog</b> contract</li>
+    <li>Spark handles carry-over removal, update reconstruction, and net-change computation</li>
   </ul>
   <div class="slide-footer"><span>Data Source V2</span><span>53</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Two problems with CDC today · DB · ~0:40
 
-CDC today has two problems. One: every engine built its own. Delta has table_changes(). Iceberg has create_changelog_view. Hudi has incremental reads. Same idea, three syntaxes. Two: write-time CDC costs every writer. Change files are written on every update — about 1.2x the write time. You pay this even if no one reads them. Some numbers: 206 million CDC queries in 60 days. And 68% of them needed no stored change files at all. So 4.2 makes read-time CDC built in. Only the reader pays. And any engine can write the table.</div>
+CDC is one example of DSv2 growing up. Before, table formats used Spark extensions for their own changelog syntax and execution. The result was duplicated complexity and inconsistent behavior. In 4.2, ChangeLog is a DSv2 contract. The connector exposes row identity, row version, and a scan. Spark owns the hard parts — removing carry-over rows, reconstructing updates, and computing net changes.</div>
 </section>
 
 <section class="slide">
@@ -2283,16 +2283,16 @@ CDC today has two problems. One: every engine built its own. Delta has table_cha
       <div class="hd">Today &mdash; the pain</div>
       <ul>
         <li>Each engine ships its <b>own CDC API</b> &mdash; Delta &ne; Iceberg &ne; Hudi</li>
-        <li>You maintain a read path per source, and <b>hand-roll the post-processing</b></li>
-        <li>Switching engines means rewriting the change-reading code</li>
+        <li>Spark extensions duplicate parsing, planning, and execution logic</li>
+        <li>Users learn source-specific syntax for the same concept</li>
       </ul>
     </div>
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
         <li>One SQL <code>CHANGES</code> clause &mdash; version/timestamp ranges, or streaming <code>STREAM t CHANGES</code></li>
-        <li>Same in DataFrames (<code>.changes()</code>, <code>.readStream.changes()</code>); <b>same syntax</b> for any connector that implements changelog support &mdash; Delta, Iceberg, Hudi</li>
-        <li>Spark owns carry-over removal, update detection, net-change collapse &mdash; connectors ship a <b>tiny contract</b></li>
+        <li>Same in DataFrames: <code>.changes()</code> and <code>.readStream.changes()</code></li>
+        <li>Connectors implement <b>ChangeLog</b>; Spark owns carry-over removal, update reconstruction, and net-change collapse</li>
       </ul>
     </div>
   </div>
@@ -2301,7 +2301,7 @@ CDC today has two problems. One: every engine built its own. Delta has table_cha
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One CHANGES API for changelog-capable DSv2 sources · DB · ~0:35
 
-The answer is one API. One SQL CHANGES clause — by version or by time, or streaming with STREAM ... CHANGES. The same shape in DataFrames — read.changes() and readStream.changes(). The same syntax for any DSv2 connector that supports a changelog — Delta, Iceberg, and Hudi today. Not every source has it; the connector must ship the interface. Spark does the hard part — removing carry-overs, finding updates, collapsing changes. Connectors ship only a small contract.</div>
+The user-facing API is one SQL CHANGES clause — by version or by time, or streaming with STREAM ... CHANGES. The same shape exists in DataFrames: read.changes() and readStream.changes(). Underneath, the connector implements ChangeLog. Spark does the hard part — carry-over removal, update reconstruction, and net-change collapse.</div>
 </section>
 
 <section class="slide">
@@ -2324,73 +2324,74 @@ spark.read.option(<span class="s">"startingVersion"</span>, 10)
           .option(<span class="s">"endingVersion"</span>,  20).changes(<span class="s">"my_table"</span>)
 spark.readStream.changes(<span class="s">"my_table"</span>)
 
-<span class="c">-- output: data columns + _change_type, _commit_version, _commit_timestamp</span></pre>
+<span class="c">-- output: data columns + _change_type, _commit_version, _commit_timestamp
+-- Spark performs carry-over removal, update reconstruction, net-change collapse</span></pre>
   <div class="slide-footer"><span>Data Source V2</span><span>55</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Reading changes in action · DB · ~0:20
 
-(Code slide.) SELECT ... FROM t CHANGES. A version range in, typed change rows out. The same query for Delta or Iceberg.</div>
+(Code slide.) SELECT ... FROM t CHANGES. A version range in, typed change rows out. The same idea works in streaming and in the DataFrame API. The connector exposes the changelog; Spark normalizes it.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Read changes</span><span>2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>Delta goes read-time &mdash; by default</h2>
+  <h2>Read-time CDC: only pay when you read</h2>
   <div class="baf">
     <div class="col today">
       <div class="hd">Today &mdash; the pain</div>
       <ul>
-        <li>CDC must be <b>enabled per table</b> &mdash; a table property, an <code>ALTER TABLE</code>, a ticket to the owner</li>
-        <li>Write-time <b>change files tax every writer</b>, whether or not anyone reads the changes</li>
-        <li>Turn it on too late and the early history is gone</li>
+        <li>Write-time change files tax every update, whether or not anyone reads the changes</li>
+        <li>CDC often must be enabled ahead of time, table by table</li>
+        <li>Each source exposes different CDC setup and syntax</li>
       </ul>
     </div>
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li><b>No Change Data Feed property</b> to set, and <b>nothing paid at write time</b> &mdash; changes are computed only when a reader asks</li>
-        <li>Built on columns Delta already tracks: <code>_metadata.row_id</code> + <code>_metadata.row_commit_version</code></li>
-        <li>Matched row_id &rarr; update; lone add &rarr; insert; lone remove &rarr; delete &middot; needs Row Tracking <span class="dim">(default in Databricks, opt-in in Delta OSS)</span></li>
+        <li>Spark 4.2 makes read-time CDC first-class through DSv2 ChangeLog</li>
+        <li>For Delta with row tracking, changes can be computed when a reader asks &mdash; no write-time CDF setup</li>
+        <li>Write-time CDC remains useful for special workloads that need stored change files</li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Read changes from Delta tables with <b>row tracking</b> on 4.2 &mdash; no write-time CDF setup. Write-time CDC stays for special workloads.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Use <b>read-time CDC</b> where row tracking supports it; reserve write-time change files for special workloads.</span></div>
   <div class="slide-footer"><span>Data Source V2</span><span>56</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Delta goes read-time — by default · DB · ~0:40
 
-For a Delta table with row tracking, the result is great: read-time CDC, with no Change Data Feed property. No CDF setting. No ALTER TABLE. No ticket to the owner. And you pay nothing at write time. Changes are computed only when a reader asks. It uses two columns Delta already has — a stable row id and a row commit version. A matched id is an update. A lone add is an insert. A lone remove is a delete. It needs Row Tracking — default in Databricks, opt-in in Delta OSS. Write-time CDC still works for special cases.</div>
+The second CDC point is cost. Write-time change files tax every update, even if nobody reads them. In 4.2, Spark makes read-time CDC first-class through DSv2 ChangeLog. For Delta tables with row tracking, changes can be computed when a reader asks, with no Change Data Feed property. Write-time CDC still matters for special workloads that need stored change files.</div>
 </section>
 
 <!-- roadmap: Data Source V2 2 -->
 <section class="slide">
   <div class="progstrip"><span>1 &middot; Read changes</span><span class="on">2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>Smarter writes: INSERT &amp; MERGE</h2>
+  <h2>DML schema evolution: Spark calculates, connector validates</h2>
   <div class="baf">
     <div class="col today">
       <div class="hd">Today &mdash; the pain</div>
       <ul>
-        <li>A new source column <b>breaks the INSERT</b> until you alter the target by hand</li>
-        <li>Narrow sources are rejected; <code>MERGE</code> can&rsquo;t evolve schema or preserve nested fields</li>
-        <li>Sampling isn&rsquo;t pushed down, so it scans anyway</li>
+        <li>A new source column can break <code>INSERT</code> or <code>MERGE</code> until the target is altered by hand</li>
+        <li>Type widening and nested struct changes are source-specific and easy to get wrong</li>
+        <li>By-position writes and by-name writes need different matching rules</li>
       </ul>
     </div>
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li><code>INSERT INTO &hellip; WITH SCHEMA EVOLUTION</code> &mdash; target grows with the data; narrow sources fill missing fields</li>
-        <li>New <code>INSERT &hellip; REPLACE ON/USING</code> and <code>BY NAME</code> with <code>REPLACE WHERE</code></li>
-        <li><code>MERGE</code> evolves schema with <code>DELETE</code> and keeps nested fields; <code>TABLESAMPLE SYSTEM</code> pushes to DSv2 &amp; JDBC</li>
+        <li><code>MERGE WITH SCHEMA EVOLUTION</code> and <code>INSERT WITH SCHEMA EVOLUTION</code></li>
+        <li>Spark compares columns and nested fields, then calls catalog/schema APIs for the target</li>
+        <li>The data source decides which changes are valid, via <code>SupportsSchemaEvolution</code></li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Drop the manual schema-sync around <code>INSERT</code>/<code>MERGE</code> &mdash; let the target <b>evolve with the data</b>.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Let Spark compute the schema change; let the connector enforce what its table format allows.</span></div>
   <div class="slide-footer"><span>Data Source V2</span><span>57</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Smarter writes: INSERT &amp; MERGE · DB · ~0:30
 
-Writes are smarter and safer. INSERT INTO ... WITH SCHEMA EVOLUTION lets the target grow with the data. A source with fewer columns is fine — missing fields are filled. There is new INSERT ... REPLACE syntax, and BY NAME with REPLACE WHERE. MERGE gets fixes — schema evolution with DELETE, and nested fields kept. And TABLESAMPLE SYSTEM, pushed down to DSv2 and JDBC.</div>
+Schema evolution is another place where DSv2 grew up. Spark compares the source and target, including nested struct fields. It computes what needs to change — add a column, widen a type, fill missing target fields with null or defaults — then the connector decides what is valid for that table format. Delta and Iceberg do not allow exactly the same widening rules, and DSv2 gives each connector a place to say yes or no.</div>
 </section>
 
 <section class="slide">
@@ -2401,19 +2402,20 @@ Writes are smarter and safer. INSERT INTO ... WITH SCHEMA EVOLUTION lets the tar
 <span class="k">INSERT INTO</span> sales_target <span class="hl">WITH SCHEMA EVOLUTION</span>
 <span class="k">SELECT</span> * <span class="k">FROM</span> sales_source;
 
-<span class="c">-- Sources with fewer columns are fine too:
--- missing fields are filled automatically</span>
-<span class="k">INSERT INTO</span> sales_target <span class="k">WITH SCHEMA EVOLUTION</span>
-<span class="k">SELECT</span> id, amount <span class="k">FROM</span> partial_source;
+<span class="c">-- MERGE can evolve too; Spark compares source and target by name</span>
+<span class="k">MERGE WITH SCHEMA EVOLUTION INTO</span> sales_target t
+<span class="k">USING</span> sales_source s <span class="k">ON</span> t.id = s.id
+<span class="k">WHEN MATCHED THEN UPDATE SET</span> *
+<span class="k">WHEN NOT MATCHED THEN INSERT</span> *;
 
-<span class="c">-- 4.2 also adds:
---   INSERT INTO ... REPLACE ON / USING
---   BY NAME combined with REPLACE WHERE</span></pre>
+<span class="c">-- DataFrame APIs mirror the SQL shape:
+--   df.writeTo("target").withSchemaEvolution().append()
+--   df.mergeInto("target", cond).withSchemaEvolution().merge()</span></pre>
   <div class="slide-footer"><span>Data Source V2</span><span>58</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Schema evolution in action · DB · ~0:18
 
-(Code slide.) A new column appears in the source. With SCHEMA EVOLUTION, the target takes it. No manual ALTER.</div>
+(Code slide.) A new column appears in the source. With SCHEMA EVOLUTION, Spark computes the schema change and asks the connector to apply what is valid. The DataFrame APIs mirror the SQL shape.</div>
 </section>
 
 <section class="slide">
@@ -2430,31 +2432,32 @@ Writes are smarter and safer. INSERT INTO ... WITH SCHEMA EVOLUTION lets the tar
     <div class="fbox accent"><div class="ft">Commit-time check</div><div class="fd">concurrent change to a row I read? &mdash; <b>fail cleanly</b>, never silently corrupt</div></div>
   </div>
   <ul class="points" style="margin-top:22px">
-    <li>Spark 4.2 begins a <b>transaction for every DML operation</b> and tracks all table reads and writes inside it</li>
-    <li>Engine-level today: single-statement DML; multi-statement and cross-catalog transactions are future work</li>
+    <li>New <code>TransactionalCatalogPlugin</code>: Spark begins a transaction for every DML operation</li>
+    <li>Connectors can stage writes, track reads, validate on commit, and abort cleanly</li>
+    <li>Current scope: single DML statement; no multi-statement or cross-catalog transactions yet</li>
   </ul>
   <div class="slide-footer"><span>Data Source V2</span><span>59</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Transactions: atomic, isolated DML · DB · ~0:30
 
-DML is read, transform, write back. Without isolation, a writer can overwrite changes it never saw. So 4.2 starts a transaction for every DML. It tracks all reads and writes in it. Connectors check concurrent commits at commit time. So a stale read fails cleanly, instead of corrupting data. This is single-statement DML today. Multi-statement and cross-catalog are future work.</div>
+DML is read, transform, write back. Without isolation, a writer can overwrite changes it never saw. So Spark 4.2 adds a transaction API. Spark begins a transaction for DML. The connector can stage writes, track reads, validate at commit time, and abort cleanly. The scope today is single DML statements. Multi-statement and cross-catalog transactions are future work.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span>1 &middot; Read changes</span><span class="on">2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>Observable, evolvable DML</h2>
+  <h2>DML is observable now</h2>
   <ul class="points">
-    <li>MERGE / UPDATE / DELETE now report <b>operation metrics</b>: rows inserted, updated, deleted, and copied</li>
-    <li>Surfaced where you already look &mdash; Delta <code>DESCRIBE HISTORY</code> and Iceberg snapshot summaries</li>
-    <li>MERGE and INSERT support <code>WITH SCHEMA EVOLUTION</code>: add or widen columns as data arrives, with the connector deciding which changes are valid (e.g., Delta type widening)</li>
-    <li>Consistent table refresh in 4.2: Spark refreshes before writes and non-pinned reads, so views over external tables stay correct</li>
+    <li><b>MERGE metrics</b> landed in Spark 4.1: rows inserted, updated, deleted, copied, and matched by source</li>
+    <li><b>UPDATE / DELETE metrics</b> land in Spark 4.2: updated/deleted rows plus copied rows</li>
+    <li>Spark collects the row counts and passes summary objects into DSv2 <code>commit()</code></li>
+    <li>Surfaced where users already look: Delta <code>DESCRIBE HISTORY</code> and Iceberg snapshot summaries</li>
   </ul>
   <div class="slide-footer"><span>Data Source V2</span><span>60</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Observable, evolvable DML · DB · ~0:28
 
-DML is observable now. MERGE, UPDATE, and DELETE report metrics — rows inserted, updated, deleted, copied. You see them where you already look — Delta DESCRIBE HISTORY, Iceberg snapshots. MERGE and INSERT support schema evolution, and the connector decides what is valid. And table refresh is consistent, so views over external tables stay correct.</div>
+DML is observable now. Spark 4.1 added MERGE operation metrics. Spark 4.2 adds UPDATE and DELETE metrics. Spark collects row counts while the operation runs, then passes summary objects into the DSv2 commit API. Connectors surface the results where users already look — Delta DESCRIBE HISTORY and Iceberg snapshot summaries.</div>
 </section>
 
 <!-- roadmap: Data Source V2 3 -->
@@ -2474,9 +2477,9 @@ DML is observable now. MERGE, UPDATE, and DELETE report metrics — rows inserte
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li>New <b>PartitionPredicate</b> API &mdash; any Catalyst partition filter is evaluated against partition values</li>
-        <li>Preserves the DSv2 abstraction; works across scans, metadata-only <code>DELETE WHERE</code>, and runtime filters</li>
-        <li>Closes the gap with built-in file sources</li>
+        <li>New <b>PartitionPredicate</b> API preserves arbitrary Catalyst partition filters</li>
+        <li>Connector provides only partition values; Spark evaluates the predicate</li>
+        <li>Works for scans, metadata-only <code>DELETE WHERE</code>, and runtime filters</li>
       </ul>
     </div>
   </div>
@@ -2485,7 +2488,7 @@ DML is observable now. MERGE, UPDATE, and DELETE report metrics — rows inserte
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Smarter pushdown: PartitionPredicate · DB · ~0:30
 
-This is a real gap, and connectors hit it every day. Before, partition filters with UDFs or unusual expressions were lost between Catalyst and the connectors. File sources could use them. Connectors could not. The new PartitionPredicate API fixes this. Any Catalyst partition filter is checked against the partition values — for scans, DELETE WHERE, and runtime filters. So WHERE udf(month(ts)) = 'JAN' now prunes partitions in Iceberg and Delta. Less data read. Faster queries.</div>
+This is a real gap, and connectors hit it every day. Built-in file sources use Catalyst directly, so they can evaluate the full power of Spark partition filters. DSv2 connectors used a smaller expression vocabulary, so UDFs and non-standard expressions got lost in translation. PartitionPredicate fixes that. Spark preserves the Catalyst predicate, the connector provides partition values, and Spark evaluates it. Less data read. Faster queries.</div>
 </section>
 
 <!-- ============ Section 08 ============ -->
