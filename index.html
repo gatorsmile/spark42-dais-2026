@@ -573,13 +573,14 @@ Spark 4.2 in one line: more semantic, AI, Python, CDC, and operations power, all
     <li><b>Reach Spark from everywhere</b> &mdash; Spark Connect, PySpark, Arrow, Python Data Sources</li>
     <li><b>Run AI-native analytics in SQL</b> &mdash; vector search, sketches, geospatial, SQL improvements</li>
     <li><b>Move changing data safely</b> &mdash; Auto CDC, CHANGES, Data Source V2, Streaming</li>
-    <li><b>Operate &amp; evolve predictably</b> &mdash; Web UI, Project Feather, release cadence</li>
+    <li><b>Operate &amp; evolve predictably</b> &mdash; Web UI, reliability, release cadence</li>
+    <li><b>Looking ahead</b> &mdash; Project Feather and other ongoing SPIPs</li>
   </ul>
   <div class="slide-footer"><span>Agenda</span><span>4</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>What we'll cover today · XIAO · ~0:40
 
-We built the talk around five benefits. One: define truth once — metric views. Two: reach Spark from everywhere — Connect, PySpark, Arrow, Python Data Sources. Three: AI-native analytics in SQL — vectors, sketches, geospatial. Four: move changing data safely — Auto CDC, CHANGES, DSv2, streaming. Five: operate and evolve predictably — the UI, Feather, faster releases. I cover the first ones. DB covers the rest.</div>
+We built the talk around five benefits. One: define truth once — metric views. Two: reach Spark from everywhere — Connect, PySpark, Arrow, Python Data Sources. Three: AI-native analytics in SQL — vectors, sketches, geospatial. Four: move changing data safely — Auto CDC, CHANGES, DSv2, streaming. Five: operate and evolve predictably — the UI, reliability, faster releases. And looking ahead — Project Feather and other ongoing SPIPs. I cover the first ones. DB covers the rest.</div>
 </section>
 
 <!-- major features overview -->
@@ -1062,14 +1063,14 @@ Benefit one: define truth once. Let's start with the problem. Takeaway: move you
   <h2>The same metric should not change when the query changes</h2>
   <div class="bigstack">
     <p>Revenue per user is a <b>ratio</b>.</p>
-    <p>Ratios are <b class="warn">not additive</b>.</p>
+    <p>Ratios <b class="warn">cannot be summed directly</b>.</p>
     <p class="punch">If every team writes the formula by hand, <b>dashboards drift</b>.</p>
   </div>
   <div class="slide-footer"><span>Metrics</span><span>7</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>The same metric should not change when the query changes · XIAO · ~0:30
 
-The problem, in plain words. Revenue per user is a ratio. Ratios are not additive. You cannot average them across groups and get the right answer. So when every team writes the formula by hand, the dashboards drift apart. Same metric, different numbers. Let me show how it breaks.</div>
+The problem, in plain words. Revenue per user is a ratio. Ratios cannot be summed directly. You cannot average them across groups and get the right answer. So when every team writes the formula by hand, the dashboards drift apart. Same metric, different numbers. Let me show how it breaks.</div>
 </section>
 
 <!-- metrics: concrete failure first -->

@@ -23,7 +23,7 @@ One quick note. Spark 4.2 is built by the whole Apache Spark community — hundr
 Spark 4.2 in one line: more semantic, AI, Python, CDC, and operations power, all in the engine. The numbers: over 1,600 JIRAs, from over 260 contributors. One goal ties it together. Make analytics and AI more native to Spark.
 
 ### [4] What we'll cover today · XIAO · ~0:40
-We built the talk around five benefits. One: define truth once — metric views. Two: reach Spark from everywhere — Connect, PySpark, Arrow, Python Data Sources. Three: AI-native analytics in SQL — vectors, sketches, geospatial. Four: move changing data safely — Auto CDC, CHANGES, DSv2, streaming. Five: operate and evolve predictably — the UI, Feather, faster releases. I cover the first ones. DB covers the rest.
+We built the talk around five benefits. One: define truth once — metric views. Two: reach Spark from everywhere — Connect, PySpark, Arrow, Python Data Sources. Three: AI-native analytics in SQL — vectors, sketches, geospatial. Four: move changing data safely — Auto CDC, CHANGES, DSv2, streaming. Five: operate and evolve predictably — the UI, reliability, faster releases. And looking ahead — Project Feather and other ongoing SPIPs. I cover the first ones. DB covers the rest.
 
 ### [5] The features at a glance · XIAO · ~0:25
 This is the whole release on one slide. Six groups. About 24 features. We will not cover them all. Just see how much is here. Keep it as a map. Let's start.
@@ -34,7 +34,7 @@ This is the whole release on one slide. Six groups. About 24 features. We will n
 Benefit one: define truth once. Let's start with the problem. Takeaway: move your top dashboard metrics into a metric view.
 
 ### [7] The same metric should not change when the query changes · XIAO · ~0:30
-The problem, in plain words. Revenue per user is a ratio. Ratios are not additive. You cannot average them across groups and get the right answer. So when every team writes the formula by hand, the dashboards drift apart. Same metric, different numbers. Let me show how it breaks.
+The problem, in plain words. Revenue per user is a ratio. Ratios cannot be summed directly. You cannot average them across groups and get the right answer. So when every team writes the formula by hand, the dashboards drift apart. Same metric, different numbers. Let me show how it breaks.
 
 ### [8] Some metrics don't add up · XIAO · ~0:35
 Here it is, in one table. Two countries. Revenue and active users add up fine. But revenue per user is a ratio. If you average the two rows, you get 15. That is wrong. The right answer is total revenue over total users. That is 13.33. So where should this metric live, so it is right every time? That is a semantic-layer problem.
