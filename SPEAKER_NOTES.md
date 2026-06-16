@@ -92,7 +92,7 @@ Build Spark readers and writers fully in Python: batch or streaming, no JVM or S
 New in 4.2: you can profile these Python data sources, like UDFs — for time and memory. One config turns it on. Then you see where time and memory go, in your read and write code. Your connector is no longer a black box.
 
 ### [25] Better interop & developer experience · XIAO · ~0:35
-Small on their own, but they help every day. PyCapsule: when both sides speak the Arrow C Data Interface, you pass data to Polars, DuckDB, and Arrow tools with no copy. You can profile Python data sources. builder.create() makes a new session without changing other configs. A strict mode catches unclear column names early. And pandas-on-Spark adds more axis=1 functions. Each one is small. Together they save you time.
+Small on their own, but they help every day. PyCapsule: when both sides speak the Arrow C Data Interface, you pass data to Polars, DuckDB, and Arrow tools with no copy. builder.create() makes a new session without changing other configs. A strict mode catches unclear column names early. And pandas-on-Spark adds more axis=1 functions. Each one is small. Together they save you time.
 
 ### [26] PyCapsule interop in action · XIAO · ~0:25
 (Code slide.) A Spark DataFrame goes straight to Polars or DuckDB, through the Arrow C Data Interface. When both sides support it, they share the same Arrow memory. No copy. No serialization.
