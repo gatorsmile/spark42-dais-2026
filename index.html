@@ -1619,7 +1619,7 @@ spark.conf.set(<span class="s">"spark.sql.pyspark.worker.logging.enabled"</span>
   <div class="takeaway">
     <div class="today"><span class="tk-label">Today</span>AI, ranking, approximate analytics, and geospatial workflows are split across extra systems, libraries, and verbose SQL patterns.</div>
     <div class="now"><span class="tk-label">Spark 4.2</span>Spark SQL brings them into the engine: vector functions, NEAREST BY, QUALIFY, tuple sketches, and native GEOMETRY / GEOGRAPHY.</div>
-    <div class="mon"><span class="tk-label">Takeaway</span>Keep AI-native analytics where your tables live. Start by replacing cross-join + ROW_NUMBER top-K patterns with NEAREST BY.</div>
+    <div class="mon"><span class="tk-label">Takeaway</span>Keep AI-native analytics where your tables live. Use vector functions to score embeddings in SQL; use NEAREST BY when that top-K pattern must run for every query row.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep on"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
   <div class="slide-footer"><span>Spark SQL</span><span>29</span></div>
@@ -1629,71 +1629,61 @@ spark.conf.set(<span class="s">"spark.sql.pyspark.worker.logging.enabled"</span>
 Benefit three: run AI-native analytics in SQL.
 The problem today is not just one missing function. These workflows are scattered. Embeddings often go to a vector system. Top-K ranking becomes a cross join and a window. Approximate analytics need special handling. Geospatial often needs an extra package.
 Spark 4.2 brings those patterns into Spark SQL itself: vector functions, NEAREST BY, QUALIFY, tuple sketches, and native geospatial types.
-The practical takeaway: keep the work next to your data. The first pattern to replace is cross join plus ROW_NUMBER for top-K. Use NEAREST BY instead.</div>
+The practical takeaway: keep the work next to your data. Use vector functions to score embeddings in SQL, and use NEAREST BY when that top-K pattern must run for every query row.</div>
 </section>
 
 <!-- roadmap: Spark SQL 1 -->
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Vector</span><span>2 &middot; SQL</span><span>3 &middot; Sketches</span><span>4 &middot; Geospatial</span></div>
   <div class="eyebrow">Vector Search</div>
-  <h2>Query embeddings where your data lives</h2>
+  <h2>Vector functions: score embeddings in Spark SQL</h2>
   <ul class="points">
-    <li>Embeddings power semantic search, recommendations, dedup, and RAG</li>
+    <li><b>Embeddings are now table data</b> &mdash; semantic search, recommendations, dedup, RAG</li>
     <li>Spark 4.2 adds <b>built-in vector functions</b> &mdash; no extra system to operate
       <ul>
-        <li>Vector distance and similarity functions</li>
-        <li>Vector norm and normalize</li>
-        <li>Vector avg and sum aggregations</li>
+        <li>Similarity &mdash; cosine, inner product</li>
+        <li>Distance &mdash; L2</li>
+        <li>Transforms &mdash; norm, normalize</li>
+        <li>Aggregations &mdash; avg, sum</li>
       </ul></li>
-    <li>Score similarity at Spark scale in SQL or DataFrames &mdash; the scoring building blocks for the new <b>NEAREST BY</b> top-K join</li>
+    <li><b>First step:</b> score candidates in SQL, right next to the data</li>
   </ul>
-  <div class="fdiag">
-    <div class="fbox muted"><div class="ft">Query vector</div><div class="fd">One row&rsquo;s embedding</div></div>
-    <div class="farrow">&#8594;</div>
-    <div class="fbox"><div class="ft">Candidate rows</div><div class="fd">Scored by <b>your expression</b> &mdash; cosine, L2, geo, BM25</div></div>
-    <div class="farrow">&#8594;</div>
-    <div class="fbox accent"><div class="ft">Top-K per query row</div><div class="fd">The K closest, ranked &mdash; computed for <b>every</b> query row</div></div>
-  </div>
-  <p class="fcap">This is the shape <b>NEAREST BY</b> automates next &mdash; one join clause instead of a cross-join + <code>ROW_NUMBER()</code> + filter.</p>
+  <p class="fcap">Next, we turn this scoring pattern into a <b>top-K join</b>.</p>
   <div class="slide-footer"><span>Vector Search</span><span>30</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Query embeddings where your data lives · XIAO · ~0:32
+  <div class="notes" hidden>Vector functions: score embeddings in Spark SQL · XIAO · ~0:38
 
-Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually you run a separate vector system. In 4.2, Spark adds built-in vector functions. So you score similarity where your data already is. Distance and similarity. Norm and normalize. Vector avg and sum. These are the building blocks for the new NEAREST BY join.</div>
+Embeddings are becoming ordinary data — product, document, user, and image embeddings. The first thing we need is simple: compare two vectors where the data already lives. Spark 4.2 adds vector functions for that. You compute cosine similarity and inner product, L2 distance, normalize vectors, and aggregate embeddings — all in SQL. This is not a new index yet. It is the scoring primitive, brought into the engine. Once Spark can score pairs of vectors, the next question is how to turn that into a top-K search.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Vector</span><span>2 &middot; SQL</span><span>3 &middot; Sketches</span><span>4 &middot; Geospatial</span></div>
   <div class="eyebrow">Vector Search <span class="tag">In action</span></div>
-  <h2>Vector functions in action</h2>
-  <pre class="code focus"><span class="c">-- Rank products by similarity to a query embedding</span>
+  <h2>Single-query vector search in SQL</h2>
+  <pre class="code focus"><span class="c">-- One query vector, one candidate table</span>
 <span class="k">SELECT</span> id,
-       <span class="hl">vector_cosine_similarity(embedding, :query_vec)</span> <span class="k">AS</span> score,
-       vector_l2_distance(embedding, :query_vec)       <span class="k">AS</span> dist
+       <span class="hl">vector_cosine_similarity(embedding, :query_vec)</span> <span class="k">AS</span> score
 <span class="k">FROM</span>   products
 <span class="k">ORDER BY</span> score <span class="k">DESC</span>
-<span class="k">LIMIT</span>  10;   <span class="c">-- single query; NEAREST BY does this per row, batched</span>
-
-<span class="c">-- Aggregate embeddings per category</span>
-<span class="k">SELECT</span> category, vector_avg(embedding) <span class="k">AS</span> centroid
-<span class="k">FROM</span>   products
-<span class="k">GROUP BY</span> category;</pre>
+<span class="k">LIMIT</span>  10;</pre>
+  <p class="fcap"><b>Good for</b> one query vector. <b>The pain:</b> you repeat this for every query row &mdash; top products per user, similar docs per doc. That is the next slide.</p>
   <div class="slide-footer"><span>Vector Search</span><span>31</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Vector functions in action · XIAO · ~0:20
+  <div class="notes" hidden>Single-query vector search in SQL · XIAO · ~0:38
 
-(Code slide.) Cosine similarity and L2 distance. Called directly in SQL, on a column of embeddings, at Spark scale.</div>
+Here is the simplest form of vector search. One query embedding, and a table of product embeddings. I compute a similarity score, sort by it, and take the top 10. This is already useful for ad-hoc semantic search, and it shows why vector functions matter — the scoring is now just SQL. But this is still one query vector. Real workloads have many query rows: top products for every user, similar documents for every document. By hand, that becomes a cross join, a window, and a filter. That is the pattern NEAREST BY expresses.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Vector</span><span>2 &middot; SQL</span><span>3 &middot; Sketches</span><span>4 &middot; Geospatial</span></div>
   <div class="eyebrow">Vector Search</div>
-  <h2>NEAREST BY: top-K ranking join</h2>
+  <h2>NEAREST BY: top-K per query row</h2>
+  <p class="sub" style="margin-bottom:8px">For each query row, find the K best candidate rows &mdash; ranked by a scoring expression.</p>
   <div class="baf">
     <div class="col today">
       <div class="hd">Today &mdash; the pain</div>
       <ul>
-        <li>Top-K per query row means a <b>cross join</b>, a <code>ROW_NUMBER()</code> window, a rank, then a filter</li>
+        <li>Top-K per query row means a <b>cross join</b>, a score column, a <code>ROW_NUMBER()</code> window, then a filter</li>
         <li>The optimizer can&rsquo;t see the intent &mdash; so it can&rsquo;t prune or speed it up</li>
         <li>Swapping in an index later means <b>rewriting the query</b></li>
       </ul>
@@ -1701,45 +1691,45 @@ Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually y
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li><b>SPIP SPARK-56395</b>: a first-class JOIN clause &mdash; <code>{APPROX|EXACT} NEAREST k BY {DISTANCE|SIMILARITY} &lt;expr&gt;</code></li>
-        <li>Ranks by <b>any scalar expression</b> &mdash; similarity, L2 distance, geospatial, BM25</li>
-        <li><code>INNER</code> drops unmatched query rows; <code>LEFT OUTER</code> keeps them &middot; <code>EXACT</code> now, <code>APPROX</code> lets future ANN indexes kick in <b>without changing the query</b></li>
+        <li><b>SPIP SPARK-56395</b>: a JOIN clause &mdash; <code>{EXACT|APPROX} NEAREST k BY {SIMILARITY|DISTANCE} &lt;expr&gt;</code></li>
+        <li><b>Vector search is the common case</b>; the ranking expression is general &mdash; similarity, distance, BM25, custom score</li>
+        <li>The optimizer <b>sees the intent</b> &mdash; top-K per query row &mdash; so it can prune and plan</li>
+        <li><code>EXACT</code> ships in 4.2; <code>APPROX</code> is future-facing syntax for index-backed plans</li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Replace your cross-join + <code>ROW_NUMBER()</code> + filter pattern with <b>NEAREST k BY SIMILARITY</b>.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Replace cross-join + <code>ROW_NUMBER()</code> + filter with <b>NEAREST k BY SIMILARITY</b> &mdash; vector search is the common case, but the shape is general.</span></div>
   <div class="slide-footer"><span>Vector Search</span><span>32</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>NEAREST BY: top-K ranking join · XIAO · ~0:45
+  <div class="notes" hidden>NEAREST BY: top-K per query row · XIAO · ~0:45
 
-This is a new join clause. SPIP SPARK-56395. For each query row, it returns the top-K closest rows. Before, you wrote a cross join, a window, a rank, and a filter. It was slow, and the optimizer could not understand it. Now you write NEAREST 10 BY SIMILARITY. One clause, and the optimizer plans it. It can rank by any expression — similarity, distance, geospatial, even BM25. INNER drops rows with no match. LEFT OUTER keeps them. In 4.2, think exact first. EXACT is brute-force KNN, and that is what ships. ANN indexes are out of scope for now. APPROX is the door: a future index can help, without changing your query or your results.</div>
+Now we generalize. The last slide had one query vector; this slide is many query rows. The question: for each row on the left, find the K best rows on the right. The score is often vector similarity — the most common AI case — but the operator is general; it ranks by any expression. Before, people wrote a cross join, a score column, a ROW_NUMBER window, and a filter. That hides the intent from the optimizer. NEAREST BY makes it explicit — a top-K ranking join. For 4.2, think EXACT first. APPROX leaves room for future ANN indexes, but it is not the demo claim today.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Vector</span><span>2 &middot; SQL</span><span>3 &middot; Sketches</span><span>4 &middot; Geospatial</span></div>
   <div class="eyebrow">Vector Search <span class="tag">In action</span></div>
-  <h2>NEAREST BY in action</h2>
-  <pre class="code sm focus"><span class="c">-- Batch: top-10 recommendations for every user (similarity, largest first)</span>
-<span class="k">SELECT</span> q.user_id, t.*
+  <h2>NEAREST BY in action: batch vector search</h2>
+  <pre class="code sm focus"><span class="c">-- Top-10 product recommendations for every user</span>
+<span class="k">SELECT</span> q.user_id, t.product_id, t.name
 <span class="k">FROM</span> users q
 <span class="k">INNER JOIN</span> products t
-  <span class="hl">APPROX NEAREST 10
+  <span class="hl">EXACT NEAREST 10
   BY SIMILARITY vector_cosine_similarity(q.embedding, t.embedding)</span>;
 
 <span class="c">-- Ad-hoc: 5 nearest products to one vector (distance, smallest first)</span>
 <span class="k">SELECT</span> t.*
 <span class="k">FROM</span> (<span class="k">SELECT</span> array(0.12, -0.34, 0.56) <span class="k">AS</span> embedding) q
 <span class="k">INNER JOIN</span> products t
-  <span class="hl">EXACT NEAREST 5
-  BY DISTANCE vector_l2_distance(q.embedding, t.embedding)</span>;
+  EXACT NEAREST 5 <span class="k">BY</span> DISTANCE vector_l2_distance(q.embedding, t.embedding);
 
-<span class="c">-- LEFT OUTER keeps unmatched query rows (base cols NULL);</span>
-<span class="c">-- EXACT = brute force, APPROX &rarr; future ANN indexes</span></pre>
+<span class="c">-- Future-facing: APPROX NEAREST 10 BY SIMILARITY &hellip;  (index-backed plans later)</span></pre>
+  <p class="fcap">Vector search is the common case. <b>NEAREST BY</b> is the general top-K join shape. <code>APPROX</code> keeps the SQL stable for future index-backed plans.</p>
   <div class="slide-footer"><span>Vector Search</span><span>33</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>NEAREST BY in action · XIAO · ~0:20
+  <div class="notes" hidden>NEAREST BY in action: batch vector search · XIAO · ~0:38
 
-(Code slide.) One query: for each row, the five nearest. That is it. No window. No cross join.</div>
+Here is the same vector search, now batched. For every user, the top 10 products by embedding similarity. The important part is the shape, not the function name. We no longer write a cross join, a window, and a filter. We say directly: for each left row, find the nearest 10 right rows by this expression. Vector search is the common case, because embeddings are everywhere. But NEAREST BY is not only for embeddings — it is a first-class way to express top-K ranking joins. In 4.2, demo it as exact. APPROX is the future story — same query, smarter execution later.</div>
 </section>
 
 <!-- roadmap: Spark SQL 2 -->

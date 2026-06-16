@@ -109,19 +109,19 @@ Now debugging. Your UDF runs in a Python worker on an executor, far from your no
 Benefit three: run AI-native analytics in SQL.
 The problem today is not just one missing function. These workflows are scattered. Embeddings often go to a vector system. Top-K ranking becomes a cross join and a window. Approximate analytics need special handling. Geospatial often needs an extra package.
 Spark 4.2 brings those patterns into Spark SQL itself: vector functions, NEAREST BY, QUALIFY, tuple sketches, and native geospatial types.
-The practical takeaway: keep the work next to your data. The first pattern to replace is cross join plus ROW_NUMBER for top-K. Use NEAREST BY instead.
+The practical takeaway: keep the work next to your data. Use vector functions to score embeddings in SQL, and use NEAREST BY when that top-K pattern must run for every query row.
 
-### [30] Query embeddings where your data lives · XIAO · ~0:32
-Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually you run a separate vector system. In 4.2, Spark adds built-in vector functions. So you score similarity where your data already is. Distance and similarity. Norm and normalize. Vector avg and sum. These are the building blocks for the new NEAREST BY join.
+### [30] Vector functions: score embeddings in Spark SQL · XIAO · ~0:38
+Embeddings are becoming ordinary data — product, document, user, and image embeddings. The first thing we need is simple: compare two vectors where the data already lives. Spark 4.2 adds vector functions for that. You compute cosine similarity and inner product, L2 distance, normalize vectors, and aggregate embeddings — all in SQL. This is not a new index yet. It is the scoring primitive, brought into the engine. Once Spark can score pairs of vectors, the next question is how to turn that into a top-K search.
 
-### [31] Vector functions in action · XIAO · ~0:20
-(Code slide.) Cosine similarity and L2 distance. Called directly in SQL, on a column of embeddings, at Spark scale.
+### [31] Single-query vector search in SQL · XIAO · ~0:38
+Here is the simplest form of vector search. One query embedding, and a table of product embeddings. I compute a similarity score, sort by it, and take the top 10. This is already useful for ad-hoc semantic search, and it shows why vector functions matter — the scoring is now just SQL. But this is still one query vector. Real workloads have many query rows: top products for every user, similar documents for every document. By hand, that becomes a cross join, a window, and a filter. That is the pattern NEAREST BY expresses.
 
-### [32] NEAREST BY: top-K ranking join · XIAO · ~0:45
-This is a new join clause. SPIP SPARK-56395. For each query row, it returns the top-K closest rows. Before, you wrote a cross join, a window, a rank, and a filter. It was slow, and the optimizer could not understand it. Now you write NEAREST 10 BY SIMILARITY. One clause, and the optimizer plans it. It can rank by any expression — similarity, distance, geospatial, even BM25. INNER drops rows with no match. LEFT OUTER keeps them. In 4.2, think exact first. EXACT is brute-force KNN, and that is what ships. ANN indexes are out of scope for now. APPROX is the door: a future index can help, without changing your query or your results.
+### [32] NEAREST BY: top-K per query row · XIAO · ~0:45
+Now we generalize. The last slide had one query vector; this slide is many query rows. The question: for each row on the left, find the K best rows on the right. The score is often vector similarity — the most common AI case — but the operator is general; it ranks by any expression. Before, people wrote a cross join, a score column, a ROW_NUMBER window, and a filter. That hides the intent from the optimizer. NEAREST BY makes it explicit — a top-K ranking join. For 4.2, think EXACT first. APPROX leaves room for future ANN indexes, but it is not the demo claim today.
 
-### [33] NEAREST BY in action · XIAO · ~0:20
-(Code slide.) One query: for each row, the five nearest. That is it. No window. No cross join.
+### [33] NEAREST BY in action: batch vector search · XIAO · ~0:38
+Here is the same vector search, now batched. For every user, the top 10 products by embedding similarity. The important part is the shape, not the function name. We no longer write a cross join, a window, and a filter. We say directly: for each left row, find the nearest 10 right rows by this expression. Vector search is the common case, because embeddings are everywhere. But NEAREST BY is not only for embeddings — it is a first-class way to express top-K ranking joins. In 4.2, demo it as exact. APPROX is the future story — same query, smarter execution later.
 
 ### [34] SQL gets more natural · XIAO · ~0:35
 Before and now, four times. Each one removes a pattern we have written for years. QUALIFY: top-N without a subquery. FILTER: conditional aggregates now run over a window too — SUM(...) FILTER (WHERE ...) OVER (...). That was rejected before 4.2. It is SPARK-55702. PIVOT with aliases: readable columns. And cursors: row-by-row logic, in pure SQL. Less boilerplate, more intent. Takeaway: reach for QUALIFY first, and use FILTER over a window where you used a subquery.
