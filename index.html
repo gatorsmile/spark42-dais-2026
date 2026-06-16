@@ -95,6 +95,34 @@
   .slide .demotable td:first-child, .slide .demotable th:first-child { text-align: left; color: var(--c-muted); }
   .slide .demotable tr.bad td { color: var(--c-warn); }
   .slide .demotable tr.good td { color: var(--c-good); font-weight: 700; }
+  .slide .cdctable { border-collapse: collapse; margin-top: 24px; font-size: 21px; align-self: stretch; }
+  .slide .cdctable th, .slide .cdctable td { padding: 10px 18px; text-align: center; border-bottom: 1px solid var(--c-line); }
+  .slide .cdctable th { color: var(--c-accent-2); font-size: 13px; text-transform: uppercase; letter-spacing: .07em; font-weight: 800; }
+  .slide .cdctable td.num { text-align: center; font-variant-numeric: tabular-nums; color: var(--c-text); }
+  .slide .cdctable tr.late td { color: var(--c-warn); font-weight: 700; }
+  .slide .cdctable code { background: var(--c-bg-2); border: 1px solid var(--c-line); border-radius: 6px; padding: 1px 7px; font-size: .82em; color: var(--c-warn); }
+  .slide .cdcflow { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 18px; margin-top: 24px; align-items: stretch; }
+  .slide .cdcflow .box { border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-card); padding: 20px 22px; }
+  .slide .cdcflow .box.accent { border-color: var(--c-accent); background: var(--c-accent-soft); }
+  .slide .cdcflow .label { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--c-accent-2); margin-bottom: 12px; }
+  .slide .cdcflow p { margin: 0; font-size: 22px; line-height: 1.35; color: var(--c-muted); }
+  .slide .cdcflow b { color: var(--c-text); }
+  .slide .cdcflow code { background: var(--c-bg-2); border: 1px solid var(--c-line); border-radius: 6px; padding: 1px 7px; font-size: .82em; color: var(--c-warn); }
+  .slide .cdcaction { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 24px; margin-top: 20px; align-items: stretch; }
+  .slide .cdcaction pre.code { margin: 0; height: 100%; font-size: 16px; line-height: 1.36; }
+  .slide .cdcresults { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .slide .cdcresult { border: 1px solid var(--c-line); border-radius: 12px; background: var(--c-card); padding: 14px 16px 16px; }
+  .slide .cdcresult.ship { border-color: var(--c-accent); background: var(--c-accent-soft); }
+  .slide .cdcresult .rhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .slide .cdcresult .rtitle { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--c-accent-2); }
+  .slide .cdcresult .badge { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--c-good); border: 1px solid currentColor; border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+  .slide .cdcresult.future .badge { color: var(--c-warn); }
+  .slide .cdcresult table { width: 100%; border-collapse: collapse; font-size: 16px; }
+  .slide .cdcresult th, .slide .cdcresult td { padding: 7px 8px; border-bottom: 1px solid var(--c-line); text-align: left; }
+  .slide .cdcresult th { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--c-muted); font-weight: 800; }
+  .slide .cdcresult th, .slide .cdcresult td { text-align: center; }
+  .slide .cdcresult td.num { text-align: center; font-variant-numeric: tabular-nums; }
+  .slide .cdcresult .empty { margin: 8px 0 0; font-size: 15px; color: var(--c-muted); line-height: 1.3; }
   .slide .baq { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 48px; margin-top: 30px; }
   .slide .baq .t { font-weight: 800; color: var(--c-accent-2); font-size: 20px; margin: 0 0 10px; }
   .slide .baq code { display: block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 18px; line-height: 1.5; white-space: pre-wrap; }
@@ -1897,100 +1925,138 @@ Location data is everywhere — delivery, IoT, maps, risk. 4.2 adds GEOMETRY and
   <div class="rule"></div>
   <div class="benefit">Move changing data safely</div>
   <div class="takeaway">
-    <div class="today"><span class="tk-label">Today</span>CDC logic is handwritten foreachBatch plus MERGE &mdash; fragile.</div>
-    <div class="now"><span class="tk-label">Spark 4.2</span>Declare keys, order, and deletes; Spark reconciles it.</div>
-    <div class="mon"><span class="tk-label">Takeaway</span>Replace custom foreachBatch plus MERGE with Auto CDC where it fits.</div>
+    <div class="today"><span class="tk-label">Today</span>CDC logic is handwritten foreachBatch plus MERGE &mdash; easy to get wrong.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Declare the flow; Spark orders, dedupes, and applies changes.</div>
+    <div class="mon"><span class="tk-label">Takeaway</span>Move reconciliation into a declared Auto CDC flow.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep on"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
   <div class="slide-footer"><span>Auto CDC</span><span>40</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Declarative Pipelines &amp; Auto CDC · DB · ~0:12
 
-Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: replace custom foreachBatch plus MERGE with Auto CDC.</div>
+Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: move the reconciliation logic into a declared Auto CDC flow.</div>
 </section>
 
 <section class="slide">
   <div class="eyebrow">Pipelines &amp; Auto CDC</div>
   <h2>Applying a change feed is the hard part</h2>
   <ul class="points">
-    <li>The classic need: keep a lakehouse replica of an operational table in sync &mdash; rows are inserted, updated, and deleted</li>
-    <li>The hard parts: events arrive out of order and across micro-batch boundaries, change events can be partial, and retries must stay idempotent</li>
-    <li>Hand-rolled <code>foreachBatch</code> + MERGE with tombstone tracking easily runs to dozens or hundreds of lines of code</li>
+    <li>The classic need: keep a lakehouse table in sync with an operational change feed &mdash; inserts, updates, and deletes</li>
+    <li>The trap: arrival order is not business order; late events can cross micro-batch boundaries</li>
+    <li>Hand-rolled <code>foreachBatch</code> + MERGE turns simple intent into ordering, dedupe, tombstone, and retry code</li>
   </ul>
-  <div class="fdiag parts">
-    <span class="flead">One CDC event</span>
-    <div class="fbox"><div class="ft">Key</div><div class="fd">row identity</div></div>
-    <div class="fbox"><div class="ft">Operation</div><div class="fd">insert / update / delete</div></div>
-    <div class="fbox"><div class="ft">Sequence</div><div class="fd">when it happened</div></div>
-    <div class="fbox accent"><div class="ft">Payload</div><div class="fd">the changed column values</div></div>
-  </div>
-  <p class="fcap">These four fields are all you <b>declare</b> &mdash; the next slide hands the reconciliation to Spark.</p>
+  <table class="cdctable">
+    <thead><tr><th>Arrival</th><th>customer_id</th><th>op</th><th>city</th><th>version</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="num">101</td><td><code>INSERT</code></td><td>SF</td><td class="num">1</td></tr>
+      <tr><td class="num">2</td><td class="num">101</td><td><code>UPDATE</code></td><td>Seattle</td><td class="num">3</td></tr>
+      <tr class="late"><td class="num">3</td><td class="num">101</td><td><code>UPDATE</code></td><td>LA</td><td class="num">2 &larr; late</td></tr>
+      <tr><td class="num">4</td><td class="num">102</td><td><code>INSERT</code></td><td>NY</td><td class="num">1</td></tr>
+      <tr><td class="num">5</td><td class="num">101</td><td><code>DELETE</code></td><td>null</td><td class="num">4</td></tr>
+    </tbody>
+  </table>
+  <p class="fcap">If you process by arrival, <b>LA</b> can overwrite <b>Seattle</b>. Auto CDC uses the declared sequence column as the real order.</p>
   <div class="slide-footer"><span>Auto CDC</span><span>41</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Applying a change feed is the hard part · DB · ~0:35
+  <div class="notes" hidden>Applying a change feed is the hard part · DB · ~0:40
 
-The common need: keep a copy of an operational table up to date. Rows are inserted, updated, and deleted. A CDC event has four parts: key, operation, sequence, and payload. It sounds easy, but it is not. Events arrive out of order, and across batches. Some are partial. And retries must be safe to repeat. The hand-written version — foreachBatch plus MERGE plus tombstones — is often hundreds of lines. And everyone makes small mistakes.</div>
+The common need: keep a lakehouse table in sync with an operational change feed. Here is one customer. Version 1 says SF. Version 3 says Seattle. Then version 2 arrives late and says LA. If you process by arrival order, LA can overwrite Seattle, even though LA is older. Then version 4 deletes the row. A CDC event has four parts: key, operation, sequence, and payload. The key is the row identity. The sequence is the business order. Hand-written foreachBatch plus MERGE turns that simple intent into ordering, dedupe, tombstone, and retry code. That is where small mistakes happen.</div>
 </section>
 
 <section class="slide">
   <div class="eyebrow">Pipelines &amp; Auto CDC</div>
-  <h2>Auto CDC: declare it, Spark reconciles it</h2>
-  <div class="linescmp">
+  <h2>Auto CDC: key plus sequence is the contract</h2>
+  <div class="cdcflow">
+    <div class="box">
+      <div class="label">CDC events</div>
+      <p>Rows say <b>what changed</b>: key, op, payload, and a version or timestamp.</p>
+    </div>
+    <div class="box accent">
+      <div class="label">Auto CDC flow</div>
+      <p><code>KEYS (customer_id)</code><br/><code>SEQUENCE BY version</code><br/><code>SCD TYPE 1</code><br/><br/>Group changes by customer. Trust version, not arrival time.</p>
+    </div>
+    <div class="box">
+      <div class="label">Target table</div>
+      <p>For SCD Type 1, keep only the latest current value. In the example, customer 101 is deleted by version 4.</p>
+    </div>
+  </div>
+  <div class="linescmp" style="margin-top:22px">
     <div class="col today">
       <div class="hd"><span class="t">By hand</span><span class="lc">~100 lines</span></div>
       <ul>
-        <li>A <code>foreachBatch</code> loop over every micro-batch</li>
-        <li><code>MERGE</code> &mdash; matched rows update, missing rows insert</li>
-        <li>Order by sequence &middot; dedupe within the batch</li>
-        <li>Handle late / out-of-order events</li>
-        <li>Tombstone deletes &middot; keep retries idempotent</li>
+        <li><code>foreachBatch</code> plus <code>MERGE</code></li>
+        <li>Order by sequence across batches</li>
+        <li>Dedupe late and repeated events</li>
+        <li>Tombstones plus idempotent retries</li>
       </ul>
     </div>
     <div class="col now">
-      <div class="hd"><span class="t">Auto CDC</span><span class="lc">~8 lines</span></div>
-      <pre><span class="k">from</span> pyspark <span class="k">import</span> pipelines <span class="k">as</span> dp
-dp.create_streaming_table(<span class="s">"replica"</span>)
-dp.create_auto_cdc_flow(
-  target=&hellip;, source=&hellip;, keys=[<span class="s">"id"</span>],
-  sequence_by=&hellip;, apply_as_deletes=&hellip;,
+      <div class="hd"><span class="t">Auto CDC</span><span class="lc">declare</span></div>
+      <pre>dp.create_auto_cdc_flow(
+  target=<span class="s">"customer_replica"</span>,
+  source=<span class="s">"customer_changes"</span>,
+  keys=[<span class="s">"customer_id"</span>],
+  sequence_by=col(<span class="s">"version"</span>),
+  apply_as_deletes=expr(<span class="s">"op = 'DELETE'"</span>),
   stored_as_scd_type=1)</pre>
-      <p class="owns">You declare keys, sequence, and the delete rule. The <b>pipeline owns</b> ordering, dedupe, late data, and deletes.</p>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Replace hand-written <code>foreachBatch</code> + <code>MERGE</code> with a <b>declared Auto CDC flow</b> &mdash; out-of-order safe; checkpoints and retries handled for you.</span></div>
   <div class="slide-footer"><span>Auto CDC</span><span>42</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Auto CDC: declare it, Spark reconciles it · DB · ~0:40
+  <div class="notes" hidden>Auto CDC: key plus sequence is the contract · DB · ~0:45
 
-Here is the contrast, in line count. By hand it is about a hundred lines — a foreachBatch loop, a MERGE, ordering, dedupe, late data, tombstone deletes, and safe retries. With Auto CDC it is about eight. You declare the keys, the order, and the delete rule. Spark applies each batch in the right order. It is safe with out-of-order data. Inserts and updates become upserts. Deletes come from the feed. New in 4.2: a Python API, create_auto_cdc_flow(), plus Connect support. It stores SCD Type 1; SQL and SCD Type 2 are coming. It runs inside Declarative Pipelines, so checkpoints and retries are handled for you.</div>
+This is the mental model. Spark Declarative Pipelines is the pipeline manager. Auto CDC is one special flow inside it. You give it the key — customer_id — the sequence column — version — and the storage mode, SCD Type 1 in Spark 4.2. That tells Spark: group changes by customer, and trust version as the real order, not arrival time. For customer 101, the logical order is version 1 SF, version 2 LA, version 3 Seattle, version 4 delete. So for SCD Type 1, the target keeps only the latest current value. With the delete, 101 is gone. Without the delete, 101 would be Seattle, not LA. New in 4.2: the Python API, create_auto_cdc_flow(), plus Connect support. It stores SCD Type 1; SQL and SCD Type 2 are coming.</div>
 </section>
 
 <section class="slide">
   <div class="eyebrow">Pipelines &amp; Auto CDC <span class="tag">In action</span></div>
-  <h2>Auto CDC in action</h2>
-  <pre class="code sm focus"><span class="c">-- 1. produce a change feed in SQL (SPARK-55668)</span>
-<span class="k">CREATE STREAMING TABLE</span> user_changes <span class="k">AS</span>
-  <span class="k">SELECT</span> * <span class="k">FROM</span> STREAM users CHANGES <span class="k">FROM</span> VERSION 10;
+  <h2>Auto CDC in action: what the target becomes</h2>
+  <div class="cdcaction">
+    <pre class="code sm focus"><span class="c">-- 1. produce a change feed in SQL (SPARK-55668)</span>
+<span class="k">CREATE STREAMING TABLE</span> customer_changes <span class="k">AS</span>
+  <span class="k">SELECT</span> * <span class="k">FROM</span> STREAM customers CHANGES <span class="k">FROM</span> VERSION 10;
 
-<span class="c"># 2. apply it &mdash; inside a Spark Declarative Pipelines file (SPARK-56249)</span>
+<span class="c"># 2. declare the target flow (SPARK-56249)</span>
 <span class="k">from</span> pyspark <span class="k">import</span> pipelines <span class="k">as</span> dp
 <span class="k">from</span> pyspark.sql.functions <span class="k">import</span> col, expr
 
-dp.create_streaming_table(<span class="s">"user_replica"</span>)
+dp.create_streaming_table(<span class="s">"customer_replica"</span>)
 dp.<span class="hl">create_auto_cdc_flow</span>(
-    target=<span class="s">"user_replica"</span>,
-    source=<span class="s">"user_changes"</span>,
-    keys=[<span class="s">"id"</span>],
-    sequence_by=col(<span class="s">"_commit_timestamp"</span>),
-    apply_as_deletes=expr(<span class="s">"_change_type = 'delete'"</span>),
-    except_column_list=[<span class="s">"_change_type"</span>, <span class="s">"_commit_version"</span>, <span class="s">"_commit_timestamp"</span>],
-    stored_as_scd_type=1,
-)</pre>
+  target=<span class="s">"customer_replica"</span>,
+  source=<span class="s">"customer_changes"</span>,
+  keys=[<span class="s">"customer_id"</span>],
+  sequence_by=col(<span class="s">"version"</span>),
+  apply_as_deletes=expr(<span class="s">"op = 'DELETE'"</span>),
+  stored_as_scd_type=1)</pre>
+    <div class="cdcresults">
+      <div class="cdcresult ship">
+        <div class="rhead"><span class="rtitle">SCD Type 1 result</span><span class="badge">Spark 4.2</span></div>
+        <table>
+          <thead><tr><th>customer_id</th><th>city</th></tr></thead>
+          <tbody><tr><td class="num">102</td><td>NY</td></tr></tbody>
+        </table>
+        <p class="empty">Customer 101 is gone because its latest event is <b>DELETE version 4</b>. Without that delete, 101 would be <b>Seattle</b>, not LA.</p>
+      </div>
+      <div class="cdcresult future">
+        <div class="rhead"><span class="rtitle">SCD Type 2 result</span><span class="badge">Coming</span></div>
+        <table>
+          <thead><tr><th>customer_id</th><th>city</th><th>__START_AT</th><th>__END_AT</th></tr></thead>
+          <tbody>
+            <tr><td class="num">101</td><td>SF</td><td class="num">1</td><td class="num">2</td></tr>
+            <tr><td class="num">101</td><td>LA</td><td class="num">2</td><td class="num">3</td></tr>
+            <tr><td class="num">101</td><td>Seattle</td><td class="num">3</td><td class="num">4</td></tr>
+            <tr><td class="num">102</td><td>NY</td><td class="num">1</td><td class="num">null</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <p class="fcap"><b>Availability:</b> Spark 4.2 ships Auto CDC for SCD Type 1. SCD Type 2 is shown as the history model, but is not available in Spark 4.2.</p>
   <div class="slide-footer"><span>Auto CDC</span><span>43</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Auto CDC in action · DB · ~0:25
+  <div class="notes" hidden>Auto CDC in action · DB · ~0:35
 
-(Code slide.) The whole thing, inside a Declarative Pipelines file. create_auto_cdc_flow registers a flow; it is not a standalone call. Declare the flow. Point it at the feed. Name the keys and the order column. These few lines replace the hundreds we just saw. Now — streaming.</div>
+(Code slide.) Same idea, now in code. This lives inside a Declarative Pipelines file. create_auto_cdc_flow registers a flow; it is not a standalone repair job. The magic is keys plus sequence_by. Keys group the changes. sequence_by gives the real order. For SCD Type 1, Spark keeps the latest current value. In this example, customer 101 is gone because version 4 is a delete, and customer 102 remains NY. If there were no delete, customer 101 would be Seattle, not LA. SCD Type 2 would keep the history — SF, LA, Seattle — and close the active row at delete time. Important caveat: in Spark 4.2, Auto CDC ships for SCD Type 1 only. SCD Type 2 is shown here as the model, but it is coming later. Now — streaming.</div>
 </section>
 
 <!-- ============ Section 06 ============ -->

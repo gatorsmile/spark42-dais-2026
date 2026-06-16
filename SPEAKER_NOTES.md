@@ -142,16 +142,16 @@ Location data is everywhere — delivery, IoT, maps, risk. 4.2 adds GEOMETRY and
 ## Section 05 · Pipelines & Auto CDC — Spark Declarative Pipelines & Auto CDC
 
 ### [40] Section divider — Declarative Pipelines & Auto CDC · DB · ~0:12
-Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: replace custom foreachBatch plus MERGE with Auto CDC.
+Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: move the reconciliation logic into a declared Auto CDC flow.
 
-### [41] Applying a change feed is the hard part · DB · ~0:35
-The common need: keep a copy of an operational table up to date. Rows are inserted, updated, and deleted. A CDC event has four parts: key, operation, sequence, and payload. It sounds easy, but it is not. Events arrive out of order, and across batches. Some are partial. And retries must be safe to repeat. The hand-written version — foreachBatch plus MERGE plus tombstones — is often hundreds of lines. And everyone makes small mistakes.
+### [41] Applying a change feed is the hard part · DB · ~0:40
+The common need: keep a lakehouse table in sync with an operational change feed. Here is one customer. Version 1 says SF. Version 3 says Seattle. Then version 2 arrives late and says LA. If you process by arrival order, LA can overwrite Seattle, even though LA is older. Then version 4 deletes the row. A CDC event has four parts: key, operation, sequence, and payload. The key is the row identity. The sequence is the business order. Hand-written foreachBatch plus MERGE turns that simple intent into ordering, dedupe, tombstone, and retry code. That is where small mistakes happen.
 
-### [42] Auto CDC: declare it, Spark reconciles it · DB · ~0:40
-Here is the contrast, in line count. By hand it is about a hundred lines — a foreachBatch loop, a MERGE, ordering, dedupe, late data, tombstone deletes, and safe retries. With Auto CDC it is about eight. You declare the keys, the order, and the delete rule. Spark applies each batch in the right order. It is safe with out-of-order data. Inserts and updates become upserts. Deletes come from the feed. New in 4.2: a Python API, create_auto_cdc_flow(), plus Connect support. It stores SCD Type 1; SQL and SCD Type 2 are coming. It runs inside Declarative Pipelines, so checkpoints and retries are handled for you.
+### [42] Auto CDC: key plus sequence is the contract · DB · ~0:45
+This is the mental model. Spark Declarative Pipelines is the pipeline manager. Auto CDC is one special flow inside it. You give it the key — customer_id — the sequence column — version — and the storage mode, SCD Type 1 in Spark 4.2. That tells Spark: group changes by customer, and trust version as the real order, not arrival time. For customer 101, the logical order is version 1 SF, version 2 LA, version 3 Seattle, version 4 delete. So for SCD Type 1, the target keeps only the latest current value. With the delete, 101 is gone. Without the delete, 101 would be Seattle, not LA. New in 4.2: the Python API, create_auto_cdc_flow(), plus Connect support. It stores SCD Type 1; SQL and SCD Type 2 are coming.
 
-### [43] Auto CDC in action · DB · ~0:25
-(Code slide.) The whole thing, inside a Declarative Pipelines file. create_auto_cdc_flow registers a flow; it is not a standalone call. Declare the flow. Point it at the feed. Name the keys and the order column. These few lines replace the hundreds we just saw. Now — streaming.
+### [43] Auto CDC in action · DB · ~0:35
+(Code slide.) Same idea, now in code. This lives inside a Declarative Pipelines file. create_auto_cdc_flow registers a flow; it is not a standalone repair job. The magic is keys plus sequence_by. Keys group the changes. sequence_by gives the real order. For SCD Type 1, Spark keeps the latest current value. In this example, customer 101 is gone because version 4 is a delete, and customer 102 remains NY. If there were no delete, customer 101 would be Seattle, not LA. SCD Type 2 would keep the history — SF, LA, Seattle — and close the active row at delete time. Important caveat: in Spark 4.2, Auto CDC ships for SCD Type 1 only. SCD Type 2 is shown here as the model, but it is coming later. Now — streaming.
 
 ## Section 06 · Streaming — Structured Streaming
 
