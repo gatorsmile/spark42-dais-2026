@@ -1932,13 +1932,12 @@ Location data is everywhere — delivery, IoT, maps, risk. 4.2 adds GEOMETRY and
     <div class="now"><span class="tk-label">Spark 4.2</span>Declare the flow; Spark orders, dedupes, and applies changes.</div>
     <div class="mon"><span class="tk-label">Takeaway</span>Move reconciliation into a declared Auto CDC flow.</div>
   </div>
-  <p class="fcap" style="margin-top:18px; max-width:1280px"><b>Full talk:</b> “First-Class CDC Support in Spark 4.2” — Gengliang Wang &amp; Johan Lasperas, June 18, 10:20-11:00, Marriott Level 2 Foothill G</p>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep on"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
   <div class="slide-footer"><span>Auto CDC</span><span>41</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Declarative Pipelines &amp; Auto CDC · DB · ~0:12
 
-Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: move the reconciliation logic into a declared Auto CDC flow. For the full CDC deep dive, see Gengliang Wang and Johan Lasperas's talk, "First-Class CDC Support in Spark 4.2," on June 18 from 10:20 to 11:00 at Marriott Level 2 Foothill G.</div>
+Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: move the reconciliation logic into a declared Auto CDC flow.</div>
 </section>
 
 <section class="slide">
@@ -2267,11 +2266,12 @@ DSv2 has a long history, but the recent momentum is the point. In 4.1 and 4.2, i
     <li>In Spark 4.2, CDC support moves into Spark through the DSv2 <b>ChangeLog</b> contract</li>
     <li>Spark handles carry-over removal, update reconstruction, and net-change computation</li>
   </ul>
+  <p class="fcap"><b>Full talk:</b> “First-Class CDC Support in Spark 4.2” — Gengliang Wang &amp; Johan Lasperas, June 18, 10:20-11:00, Marriott Level 2 Foothill G</p>
   <div class="slide-footer"><span>Data Source V2</span><span>53</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Two problems with CDC today · DB · ~0:40
 
-CDC is one example of DSv2 growing up. Before, table formats used Spark extensions for their own changelog syntax and execution. The result was duplicated complexity and inconsistent behavior. In 4.2, ChangeLog is a DSv2 contract. The connector exposes row identity, row version, and a scan. Spark owns the hard parts — removing carry-over rows, reconstructing updates, and computing net changes.</div>
+CDC is one example of DSv2 growing up. Before, table formats used Spark extensions for their own changelog syntax and execution. The result was duplicated complexity and inconsistent behavior. In 4.2, ChangeLog is a DSv2 contract. The connector exposes row identity, row version, and a scan. Spark owns the hard parts — removing carry-over rows, reconstructing updates, and computing net changes. For the full CDC implementation deep dive, see Gengliang Wang and Johan Lasperas's talk, "First-Class CDC Support in Spark 4.2," on June 18 from 10:20 to 11:00 at Marriott Level 2 Foothill G.</div>
 </section>
 
 <section class="slide">
