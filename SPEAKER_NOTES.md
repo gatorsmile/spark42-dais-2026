@@ -159,7 +159,7 @@ This is the mental model. Spark Declarative Pipelines is the pipeline manager: i
 ## Section 06 · Streaming — Structured Streaming
 
 ### [45] Section divider — Structured Streaming · DB · ~0:12
-Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's OpenLakehouse Summit talk, "Streaming & Batch Engines," happening Thursday, June 18. The arc is: lower latency with real-time mode, safer query evolution with named sources, faster stream-stream joins, and stronger state management. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.
+Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's OpenLakehouse Summit talk, "Streaming & Batch Engines," happening Thursday, June 18 from 1:50 PM to 2:30 PM PDT at Marriott Level 2 Foothill G. The arc is: lower latency with real-time mode, safer query evolution with named sources, faster stream-stream joins, and stronger state management. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.
 
 ### [46] Evolve running pipelines safely · DB · ~0:32
 A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint. Now you name them — IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark, both Classic and Connect. Identity is the name, not the position. The name is tracked in checkpoint metadata, so this becomes the foundation for query evolution. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)
