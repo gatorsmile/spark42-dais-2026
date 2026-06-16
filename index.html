@@ -1365,31 +1365,31 @@ df.select(shipping_cost(<span class="s">"weight"</span>, <span class="s">"zone"<
 <section class="slide">
   <div class="progstrip"><span>1 &middot; No code change</span><span class="on">2 &middot; Small change</span><span>3 &middot; New capability</span><span>4 &middot; Dev experience</span></div>
   <div class="eyebrow">PySpark</div>
-  <h2>Native Arrow UDFs: write on columns, skip the copies</h2>
+  <h2>Native Arrow UDFs: truer types, fewer copies</h2>
   <div class="baf">
     <div class="col today">
       <div class="hd">Today &mdash; the pain</div>
       <ul>
-        <li>A Pandas UDF converts <b>every batch to pandas and back</b> &mdash; extra copies, higher memory</li>
-        <li>You write on pandas Series, not on the columnar data Spark already holds</li>
-        <li>One-time setup (e.g. loading a model) repeats per batch</li>
+        <li>A Pandas UDF converts <b>every batch to pandas and back</b> &mdash; an extra conversion</li>
+        <li><b>Nested types</b> aren&rsquo;t properly represented in pandas objects</li>
+        <li>pandas type pains &mdash; <code>pandas.NA</code>, <code>NaN</code>, <code>NaT</code>, and silent conversion to floats</li>
       </ul>
     </div>
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li><code>@arrow_udf</code> / <code>@arrow_udtf</code> <span class="dim">(since 4.1)</span>: <code>pa.Array</code> in/out &mdash; <b>faster, lower memory</b>, data stays columnar</li>
-        <li>Scalar, aggregate (groupBy / Window), and table functions; <b>iterator mode</b> amortizes setup like model loading</li>
-        <li><code>mapInArrow</code> / <code>applyInArrow</code> at the DataFrame level</li>
+        <li><code>@arrow_udf</code> <span class="dim">(since 4.1)</span>: <code>pa.Array</code> in/out &mdash; <b>removes the pandas round-trip</b> (one less conversion)</li>
+        <li><b>Nested / struct types preserved</b>; Python-standard type coercion &mdash; no <code>NA</code> / <code>NaN</code> / <code>NaT</code> or float surprises</li>
+        <li>Vectorized, <b>SIMD-friendly</b> ops even on nested types &middot; <code>mapInArrow</code> / <code>applyInArrow</code> / <code>toArrow</code> at the DataFrame level</li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Put <code>@arrow_udf</code> on hot paths &mdash; and keep your Pandas UDFs: the Arrow backend speeds them up with <b>no code change</b>.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Reach for <code>@arrow_udf</code> on hot paths &mdash; especially with <b>nested or typed data</b>, where pandas coercion hurts.</span></div>
   <div class="slide-footer"><span>PySpark</span><span>19</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Native Arrow UDFs: write on columns, skip the copies · XIAO · ~0:40
+  <div class="notes" hidden>Native Arrow UDFs: truer types, fewer copies &middot; XIAO &middot; ~0:42
 
-4.2 continues the Arrow-first direction. The decorators are @arrow_udf and @arrow_udtf. They arrived in 4.1, and they are the APIs for hot paths. A PyArrow array goes in, a PyArrow array comes out. The data stays columnar, with no pandas cost. In our benchmarks, about 10% faster and 40% less memory than a pandas UDF. You get scalar, aggregate, and table functions. Iterator mode lets you set up once — for example, load a model per batch. And the Arrow backend makes your existing pandas UDFs about 2x faster, with no code change.</div>
+Spark 4.2 continues the Arrow-first direction. The decorator is @arrow_udf, since 4.1: a PyArrow array in, a PyArrow array out. It removes the pandas round-trip — one less conversion — so in our benchmarks it is about 10% faster and 40% less memory than a pandas UDF. The bigger win is type fidelity. pandas mangles types — NA, NaN, NaT, and integers-with-nulls become floats — and nested types are awkward. Arrow keeps nested and struct types, uses Python-standard coercion, and stays SIMD-friendly even on nested data. At the DataFrame level you also get mapInArrow, applyInArrow, and toArrow.</div>
 </section>
 
 <section class="slide">

@@ -73,8 +73,8 @@ The important part is the default. In 4.2, Arrow Python UDFs are the default. Yo
 ### [18] Python UDFs: same code, now faster · XIAO · ~0:20
 (Code slide.) The same UDF you always write. No new decorator. No rewrite. But the engine moves the data as Arrow. Same code, faster.
 
-### [19] Native Arrow UDFs: write on columns, skip the copies · XIAO · ~0:40
-4.2 continues the Arrow-first direction. The decorators are @arrow_udf and @arrow_udtf. They arrived in 4.1, and they are the APIs for hot paths. A PyArrow array goes in, a PyArrow array comes out. The data stays columnar, with no pandas cost. In our benchmarks, about 10% faster and 40% less memory than a pandas UDF. You get scalar, aggregate, and table functions. Iterator mode lets you set up once — for example, load a model per batch. And the Arrow backend makes your existing pandas UDFs about 2x faster, with no code change.
+### [19] Native Arrow UDFs: truer types, fewer copies · XIAO · ~0:42
+Spark 4.2 continues the Arrow-first direction. The decorator is @arrow_udf, since 4.1: a PyArrow array in, a PyArrow array out. It removes the pandas round-trip — one less conversion — so in our benchmarks it is about 10% faster and 40% less memory than a pandas UDF. The bigger win is type fidelity. pandas mangles types — NA, NaN, NaT, and integers-with-nulls become floats — and nested types are awkward. Arrow keeps nested and struct types, uses Python-standard coercion, and stays SIMD-friendly even on nested data. At the DataFrame level you also get mapInArrow, applyInArrow, and toArrow.
 
 ### [20] Arrow UDFs in action · XIAO · ~0:20
 (Code slide.) The @arrow_udf decorator. Arrays in, arrays out. No to_pandas. No round trip. Columnar from start to end.
