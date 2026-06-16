@@ -64,8 +64,8 @@ In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to 
 
 ## Section 03 · Python — PySpark, Faster by Default
 
-### [16] Section divider — PySpark, Faster by Default · XIAO · ~0:12
-Still benefit two. Now Python — the language most of you use with Spark. The headline is in the title: faster by default. Takeaway: upgrade for free speedups, and use @arrow_udf on hot paths.
+### [16] Section divider — PySpark, Faster by Default · XIAO · ~0:30
+PySpark in Spark 4.2 is moving to an Arrow-first path. Existing Python UDFs get faster by default, hot paths can use native @arrow_udf, and Python teams also get first-class data sources plus better profiling and debugging. The takeaway is simple: upgrade for the free speedup, then optimize only the Python code that matters.
 
 ### [17] Arrow on by default · XIAO · ~0:28
 The important part is the default. In 4.2, Arrow Python UDFs are the default. Your old UDFs just run faster. Arrow IPC between the JVM and Python is on. And Arrow input skips one conversion step. The upgrade story: this speed, with no code change.

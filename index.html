@@ -1302,16 +1302,16 @@ In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to 
   <div class="rule"></div>
   <div class="benefit">Reach Spark from everywhere</div>
   <div class="takeaway">
-    <div class="today"><span class="tk-label">Today</span>Python UDFs are slow, and hard to debug when they hang.</div>
-    <div class="now"><span class="tk-label">Spark 4.2</span>Arrow UDFs by default, @arrow_udf on hot paths, and real profiling.</div>
-    <div class="mon"><span class="tk-label">Takeaway</span>Upgrade for free speedups; use @arrow_udf on hot paths.</div>
+    <div class="today"><span class="tk-label">Today</span>Python is first-class, but hot paths still pay for serialization, pandas copies, connector glue, and worker-debug blind spots.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>PySpark becomes Arrow-first: existing UDFs get faster, native Arrow UDFs skip pandas copies, Python Data Sources are first-class, and profiling/debugging is built in.</div>
+    <div class="mon"><span class="tk-label">Takeaway</span>Upgrade for the free speedup. Then convert only the hot path, measure it, and debug it where it runs.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep on"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
   <div class="slide-footer"><span>PySpark</span><span>16</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Section divider — PySpark, Faster by Default · XIAO · ~0:12
+  <div class="notes" hidden>Section divider — PySpark, Faster by Default · XIAO · ~0:30
 
-Still benefit two. Now Python — the language most of you use with Spark. The headline is in the title: faster by default. Takeaway: upgrade for free speedups, and use @arrow_udf on hot paths.</div>
+PySpark in Spark 4.2 is moving to an Arrow-first path. Existing Python UDFs get faster by default, hot paths can use native @arrow_udf, and Python teams also get first-class data sources plus better profiling and debugging. The takeaway is simple: upgrade for the free speedup, then optimize only the Python code that matters.</div>
 </section>
 
 <!-- roadmap: PySpark 1 -->
