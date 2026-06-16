@@ -2245,7 +2245,7 @@ DSv2 is the standard API for data sources — Delta, Iceberg, and more. Connecto
   <ul class="points">
     <li><b>DML hardening</b>: row-level writes, schema evolution, write summaries, and operation metrics</li>
     <li><b>Transactions</b>: Spark begins a transaction for DML; connectors stage writes, track reads, and validate on commit</li>
-    <li><b>ChangeLog / CHANGES</b>: one Spark API for table changes, instead of per-engine changelog syntax</li>
+    <li><b>ChangeLog / CHANGES</b>: one Spark API for table changes, instead of per-connector changelog syntax</li>
     <li><b>PartitionPredicate</b>: preserve Catalyst partition filters, including UDFs and non-standard expressions</li>
   </ul>
   <div class="fdiag">
