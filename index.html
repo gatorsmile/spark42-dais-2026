@@ -1820,44 +1820,51 @@ A few more compatibility wins. Richer types: the TIME type now works across more
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li>A sketch toolkit as SQL aggregates &mdash; single pass, sublinear memory, ~1&ndash;2% error:<br><b>KLL</b> quantiles, <b>Theta</b> distinct+set ops, <b>Approx Top-K</b> <span class="dim">(all 4.1)</span>, <b>HLL</b> <span class="dim">(3.5)</span></li>
-        <li><b>New in 4.2 &mdash; Tuple sketches</b>: distinct count <i>plus</i> a metric in one pass (<code>tuple_sketch_agg_*</code>)</li>
+        <li>A sketch toolkit exposed as SQL aggregates: single pass, sublinear memory, configurable bounded error:<br><b>KLL</b> quantiles, <b>Theta</b> distinct+set ops, <b>Approx Top-K</b> <span class="dim">(all 4.1)</span>, <b>HLL</b> <span class="dim">(3.5)</span></li>
+        <li><b>New in 4.2 &mdash; Tuple sketches</b>: distinct counts <i>plus</i> a metric in one pass (<code>tuple_sketch_agg_*</code>)</li>
         <li>Interoperable with open <b>Apache DataSketches</b> &mdash; merge across engines</li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Store sketches as <b>Delta columns</b>, then merge any time range in milliseconds &mdash; <b>bounded-error answers, decision-grade when the error budget fits</b>.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Store sketches as <b>Delta columns</b>, then merge sketches for any time range in milliseconds &mdash; <b>bounded-error answers, decision-grade when the error budget fits</b>.</span></div>
   <div class="slide-footer"><span>SQL</span><span>37</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Data sketches: approximate, mergeable analytics · XIAO · ~0:45
 
-Sketches are small, probabilistic summaries. One pass. Small memory. About 1 to 2% error — good enough when the error budget fits. Much of this is already in Spark, as SQL aggregates. KLL for quantiles, Theta for distinct counts and set ops, and Approx Top-K — all since 4.1. HLL since 3.5. New in 4.2: tuple sketches. A distinct count plus a metric, like revenue, in one pass. The best part is they merge. Store them as Delta columns. Then combine any time range in milliseconds, with no rescan. They work with open Apache DataSketches, so they merge across engines.</div>
+Sketches are small, probabilistic summaries. One pass. Small memory. The error is bounded and configurable — good enough when the error budget fits. Much of this is already in Spark, as SQL aggregates. KLL for quantiles, Theta for distinct counts and set ops, and Approx Top-K — all since 4.1. HLL since 3.5. New in 4.2: tuple sketches. A distinct count plus a metric, like revenue, in one pass. The best part is they merge. Store them as Delta columns. Then merge sketches for any time range in milliseconds, with no rescan. They work with open Apache DataSketches, so they merge across engines.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span>1 &middot; Vector</span><span>2 &middot; SQL</span><span class="on">3 &middot; Sketches</span><span>4 &middot; Geospatial</span></div>
   <div class="eyebrow">SQL <span class="tag">In action</span></div>
   <h2>Tuple sketches: distinct counts + a metric, mergeable</h2>
-  <pre class="code focus"><span class="c">-- One mergeable structure = distinct counting + a summed metric, per key</span>
+  <pre class="code focus"><span class="c">-- One mergeable structure: distinct counting plus a summed metric per key</span>
 <span class="c">-- tuple_sketch_agg_double(key, summary [, lgNomEntries=12] [, mode='sum'])</span>
 <span class="k">CREATE TABLE</span> category_sketches <span class="k">AS</span>
 <span class="k">SELECT</span> category,
        <span class="hl">tuple_sketch_agg_double(user_id, revenue)</span> <span class="k">AS</span> sketch
-<span class="k">FROM</span> events <span class="k">GROUP BY</span> category;
+<span class="k">FROM</span> events
+<span class="k">GROUP BY</span> category;
 
-<span class="c">-- Read it back: estimated distinct users + the aggregated metric</span>
+<span class="c">-- Read it back: estimated distinct users and the aggregated metric</span>
 <span class="k">SELECT</span> category,
        <span class="hl">tuple_sketch_estimate_double(sketch)</span> <span class="k">AS</span> approx_users,
-       <span class="hl">tuple_sketch_summary_double(sketch)</span>  <span class="k">AS</span> total_revenue
+       <span class="hl">tuple_sketch_summary_double(sketch)</span>  <span class="k">AS</span> revenue_summary
 <span class="k">FROM</span> category_sketches;
 
-<span class="c">-- Mergeable: roll up daily sketches with no re-scan of the raw rows</span>
-<span class="k">SELECT</span> <span class="hl">tuple_union_agg_double(sketch)</span> <span class="k">AS</span> rollup <span class="k">FROM</span> daily_sketches;</pre>
+<span class="c">-- Roll up daily sketches without rescanning raw rows</span>
+<span class="k">WITH</span> rollup <span class="k">AS</span> (
+  <span class="k">SELECT</span> <span class="hl">tuple_union_agg_double(sketch)</span> <span class="k">AS</span> sketch
+  <span class="k">FROM</span> daily_sketches
+)
+<span class="k">SELECT</span> <span class="hl">tuple_sketch_estimate_double(sketch)</span> <span class="k">AS</span> approx_users,
+       <span class="hl">tuple_sketch_summary_double(sketch)</span>  <span class="k">AS</span> revenue_summary
+<span class="k">FROM</span> rollup;</pre>
   <div class="slide-footer"><span>SQL</span><span>38</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Tuple sketches in action · XIAO · ~0:22
 
-(Code slide.) A tuple sketch. Distinct users and total revenue, in one pass. Then we merge daily sketches into a month — instantly, with no rescan.</div>
+(Code slide.) A tuple sketch. Distinct users and a revenue summary, in one pass. Then we merge daily sketches into a month — instantly, with no rescan.</div>
 </section>
 
 <!-- roadmap: Spark SQL 4 -->
