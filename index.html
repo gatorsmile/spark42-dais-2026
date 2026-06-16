@@ -1975,8 +1975,8 @@ The common need: keep a lakehouse table in sync with an operational change feed.
       <p>Rows say <b>what changed</b>: key, op, payload, and a version or timestamp.</p>
     </div>
     <div class="box accent">
-      <div class="label">Auto CDC flow</div>
-      <p><code>KEYS (customer_id)</code><br/><code>SEQUENCE BY version</code><br/><code>SCD TYPE 1</code><br/><br/>Group changes by customer. Trust version, not arrival time.</p>
+      <div class="label">SDP-managed Auto CDC flow</div>
+      <p><b>SDP</b> runs the pipeline: dependencies, streaming, checkpoints.<br/><br/><b>Auto CDC</b> reconciles the target:<br/><code>KEYS (customer_id)</code><br/><code>SEQUENCE BY version</code><br/><code>SCD TYPE 1</code></p>
     </div>
     <div class="box">
       <div class="label">Target table</div>
@@ -2008,7 +2008,7 @@ The common need: keep a lakehouse table in sync with an operational change feed.
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Auto CDC: key plus sequence is the contract · DB · ~0:45
 
-This is the mental model. Spark Declarative Pipelines is the pipeline manager. Auto CDC is one special flow inside it. You give it the key — customer_id — the sequence column — version — and the storage mode, SCD Type 1 in Spark 4.2. That tells Spark: group changes by customer, and trust version as the real order, not arrival time. For customer 101, the logical order is version 1 SF, version 2 LA, version 3 Seattle, version 4 delete. So for SCD Type 1, the target keeps only the latest current value. With the delete, 101 is gone. Without the delete, 101 would be Seattle, not LA. New in 4.2: the Python API, create_auto_cdc_flow(), plus Connect support. It stores SCD Type 1; SQL and SCD Type 2 are coming.</div>
+This is the mental model. Spark Declarative Pipelines is the pipeline manager: it runs the pipeline, dependencies, streaming, and checkpoints. Auto CDC is one special flow inside it. You give it the key — customer_id — the sequence column — version — and the storage mode, SCD Type 1 in Spark 4.2. That tells Spark: group changes by customer, and trust version as the real order, not arrival time. For customer 101, the logical order is version 1 SF, version 2 LA, version 3 Seattle, version 4 delete. So for SCD Type 1, the target keeps only the latest current value. With the delete, 101 is gone. Without the delete, 101 would be Seattle, not LA. New in 4.2: the Python API, create_auto_cdc_flow(), plus Connect support. It stores SCD Type 1; SQL and SCD Type 2 are coming.</div>
 </section>
 
 <section class="slide">
