@@ -2263,108 +2263,103 @@ DSv2 has a long history, but the recent momentum is the point. In 4.1 and 4.2, i
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Read changes</span><span>2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>CDC: move the changelog logic into Spark</h2>
+  <h2>First-class CDC: one syntax, one algorithm</h2>
   <ul class="points">
-    <li>Prior art: Iceberg and Delta used Spark extensions for custom changelog grammar and execution</li>
-    <li>That meant inconsistent syntax, duplicated logic, and connector-specific behavior</li>
-    <li>In Spark 4.2, CDC support moves into Spark through the DSv2 <b>ChangeLog</b> contract</li>
-    <li>Spark handles carry-over removal, update reconstruction, and net-change computation</li>
+    <li>Before 4.2, Delta, Iceberg, and Hudi each exposed CDC through different APIs and defaults</li>
+    <li>Spark 4.2 adds a common <code>CHANGES</code> surface for SQL, DataFrames, batch, and streaming</li>
+    <li>DSv2 connectors implement a small Changelog contract; Spark owns the shared CDC logic</li>
+    <li>Delta uses the same Spark CDC path for read-time CDC: compute changes when a reader asks</li>
   </ul>
   <p class="fcap"><b>Full talk:</b> “First-Class CDC Support in Spark 4.2” — Gengliang Wang &amp; Johan Lasperas, June 18, 10:20-11:00, Marriott Level 2 Foothill G</p>
   <div class="slide-footer"><span>Data Source V2</span><span>53</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Two problems with CDC today · DB · ~0:40
+  <div class="notes" hidden>First-class CDC: one syntax, one algorithm · DB · ~0:35
 
-CDC is one example of DSv2 growing up. Before, table formats used Spark extensions for their own changelog syntax and execution. The result was duplicated complexity and inconsistent behavior. In 4.2, ChangeLog is a DSv2 contract. The connector exposes row identity, row version, and a scan. Spark owns the hard parts — removing carry-over rows, reconstructing updates, and computing net changes. For the full CDC implementation deep dive, see Gengliang Wang and Johan Lasperas's talk, "First-Class CDC Support in Spark 4.2," on June 18 from 10:20 to 11:00 at Marriott Level 2 Foothill G.</div>
+This is the short version of Gengliang and Johan's CDC implementation talk. The problem they start with is fragmentation: Delta, Iceberg, and Hudi all had change feeds, but each had its own API and defaults. Spark 4.2 makes CDC first-class: one CHANGES syntax, one algorithm in Spark, and a small DSv2 connector contract. Delta then uses that same Spark path for read-time CDC, so the writer does not have to precompute change files for every update. For the full CDC implementation deep dive, see Gengliang Wang and Johan Lasperas's talk, "First-Class CDC Support in Spark 4.2," on June 18 from 10:20 to 11:00 at Marriott Level 2 Foothill G.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Read changes</span><span>2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>One CHANGES API for changelog-capable DSv2 sources</h2>
+  <h2>One CHANGES surface for users</h2>
   <div class="baf">
     <div class="col today">
       <div class="hd">Today &mdash; the pain</div>
       <ul>
-        <li>Each engine ships its <b>own CDC API</b> &mdash; Delta &ne; Iceberg &ne; Hudi</li>
-        <li>Spark extensions duplicate parsing, planning, and execution logic</li>
-        <li>Users learn source-specific syntax for the same concept</li>
+        <li>Each connector/table format exposes a different CDC surface</li>
+        <li>Delta: <code>table_changes()</code></li>
+        <li>Iceberg: changelog view procedure</li>
+        <li>Hudi: incremental-read options</li>
       </ul>
     </div>
     <div class="col now">
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
-        <li>One SQL <code>CHANGES</code> clause &mdash; version/timestamp ranges, or streaming <code>STREAM t CHANGES</code></li>
-        <li>Same in DataFrames: <code>.changes()</code> and <code>.readStream.changes()</code></li>
-        <li>Connectors implement <b>ChangeLog</b>; Spark owns carry-over removal, update reconstruction, and net-change collapse</li>
+        <li>SQL: <code>FROM t CHANGES FROM VERSION 10 TO 20</code></li>
+        <li>Streaming SQL: <code>FROM STREAM t CHANGES</code></li>
+        <li>DataFrames: <code>spark.read.changes()</code> and <code>readStream.changes()</code></li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Read changes with <b>one <code>CHANGES</code> query</b> instead of per-engine functions.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Same user surface for any DSv2 source that implements the changelog contract.</span></div>
   <div class="slide-footer"><span>Data Source V2</span><span>54</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>One CHANGES API for changelog-capable DSv2 sources · DB · ~0:35
+  <div class="notes" hidden>One CHANGES surface for users · DB · ~0:30
 
-The user-facing API is one SQL CHANGES clause — by version or by time, or streaming with STREAM ... CHANGES. The same shape exists in DataFrames: read.changes() and readStream.changes(). Underneath, the connector implements ChangeLog. Spark does the hard part — carry-over removal, update reconstruction, and net-change collapse.</div>
+The first user-facing change is one surface. Today, each connector or table format exposes CDC differently: Delta has table_changes(), Iceberg has a changelog view procedure, and Hudi has incremental-read options. In Spark 4.2, the SQL keyword is CHANGES: ask between two versions, between two timestamps, or stream changes from a table. The same shape exists in DataFrames with read.changes() and readStream.changes(). The point is not that Delta gets a new function. The point is that any DSv2 source can enter through the same Spark door.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Read changes</span><span>2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2 <span class="tag">In action</span></div>
-  <h2>Reading changes in action</h2>
-  <pre class="code sm focus"><span class="c">-- batch · version range</span>
-<span class="k">SELECT</span> * <span class="k">FROM</span> t <span class="hl">CHANGES FROM VERSION 10 TO VERSION 20</span>;
+  <h2>A tiny DSv2 Changelog contract</h2>
+  <pre class="code sm focus"><span class="k">public interface</span> Changelog {
+  Column[] columns();                 <span class="c">// data + change metadata</span>
 
-<span class="c">-- batch · timestamp range, exclusive lower bound</span>
-<span class="k">SELECT</span> * <span class="k">FROM</span> t CHANGES <span class="k">FROM</span> TIMESTAMP <span class="s">'2026-01-01'</span> EXCLUSIVE
-                        <span class="k">TO</span> TIMESTAMP <span class="s">'2026-02-01'</span>;
+  ScanBuilder newScanBuilder(...);    <span class="c">// raw change rows</span>
+  NamedReference[] rowId();           <span class="c">// stable row identity</span>
+  NamedReference rowVersion();        <span class="c">// version that changed the row</span>
 
-<span class="c">-- streaming</span>
-<span class="k">CREATE STREAMING TABLE</span> sink <span class="k">AS</span>
-  <span class="k">SELECT</span> * <span class="k">FROM</span> <span class="hl">STREAM t CHANGES FROM VERSION 10</span>;
-
-<span class="c">// DataFrame API · batch + streaming</span>
-spark.read.option(<span class="s">"startingVersion"</span>, 10)
-          .option(<span class="s">"endingVersion"</span>,  20).changes(<span class="s">"my_table"</span>)
-spark.readStream.changes(<span class="s">"my_table"</span>)
-
-<span class="c">-- output: data columns + _change_type, _commit_version, _commit_timestamp
--- Spark performs carry-over removal, update reconstruction, net-change collapse</span></pre>
+  <span class="k">boolean</span> containsCarryoverRows();
+  <span class="k">boolean</span> containsIntermediateChanges();
+  <span class="k">boolean</span> representsUpdateAsDeleteAndInsert();
+}</pre>
+  <p class="fcap">The connector describes what it can provide. Spark decides which post-processing steps can be skipped.</p>
   <div class="slide-footer"><span>Data Source V2</span><span>55</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Reading changes in action · DB · ~0:20
+  <div class="notes" hidden>A tiny DSv2 Changelog contract · DB · ~0:35
 
-(Code slide.) SELECT ... FROM t CHANGES. A version range in, typed change rows out. The same idea works in streaming and in the DataFrame API. The connector exposes the changelog; Spark normalizes it.</div>
+(Code slide.) The connector side is intentionally tiny. It declares the output columns, provides a scan builder for raw change rows, and names the row identity and row version columns. Then three boolean flags describe the stream. Does it contain carry-over rows from copy-on-write rewrites? Does it contain intermediate changes that need net-change collapse? Are updates represented as delete plus insert? These flags are promises. If the answer is no, Spark can skip that work.</div>
 </section>
 
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Read changes</span><span>2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>Read-time CDC: only pay when you read</h2>
+  <h2>Spark normalizes the raw stream</h2>
   <div class="baf">
     <div class="col today">
-      <div class="hd">Today &mdash; the pain</div>
+      <div class="hd">Spark post-processing</div>
       <ul>
-        <li>Write-time change files tax every update, whether or not anyone reads the changes</li>
-        <li>CDC often must be enabled ahead of time, table by table</li>
-        <li>Each source exposes different CDC setup and syntax</li>
+        <li>Group by <code>rowId</code> and commit to remove carry-over rows</li>
+        <li>Pair delete + insert into <code>update_preimage</code> / <code>update_postimage</code></li>
+        <li>Optionally collapse to the final net change per row</li>
       </ul>
     </div>
     <div class="col now">
-      <div class="hd">Spark 4.2 &mdash; the mechanism</div>
+      <div class="hd">Delta read-time CDC</div>
       <ul>
-        <li>Spark 4.2 makes read-time CDC first-class through DSv2 ChangeLog</li>
-        <li>For Delta with row tracking, changes can be computed when a reader asks &mdash; no write-time CDF setup</li>
-        <li>Write-time CDC remains useful for special workloads that need stored change files</li>
+        <li><code>_metadata.row_id</code> identifies the logical row across file rewrites</li>
+        <li><code>_metadata.row_commit_version</code> separates real changes from copies</li>
+        <li>No stored change files: readers compute changes from the log and data files</li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Use <b>read-time CDC</b> where row tracking supports it; reserve write-time change files for special workloads.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Connectors stay thin; Spark owns the reusable CDC algorithm.</span></div>
   <div class="slide-footer"><span>Data Source V2</span><span>56</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Delta goes read-time — by default · DB · ~0:40
+  <div class="notes" hidden>Spark normalizes the raw stream · DB · ~0:35
 
-The second CDC point is cost. Write-time change files tax every update, even if nobody reads them. In 4.2, Spark makes read-time CDC first-class through DSv2 ChangeLog. For Delta tables with row tracking, changes can be computed when a reader asks, with no Change Data Feed property. Write-time CDC still matters for special workloads that need stored change files.</div>
+This is the engine half. Spark injects common rewrites over the raw stream. First, it groups by row identity and commit to remove carry-over rows and detect updates. A delete and insert with the same row version is just a copied row, so Spark drops it. A delete and insert with a different row version becomes update preimage and postimage. Second, if the query asks for net changes, Spark uses a window to keep the final event per row. Delta's read-time implementation supplies row_id and row_commit_version from row tracking, so Spark can compute CDC without stored change files.</div>
 </section>
 
 <!-- roadmap: Data Source V2 2 -->
