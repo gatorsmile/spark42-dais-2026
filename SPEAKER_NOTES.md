@@ -228,10 +228,10 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
 ## Section 09 · Ongoing Work — Looking Ahead
 
 ### [66] Section divider — Looking Ahead · DB · ~0:12
-Still benefit five. This last part is ongoing work, already in progress for the next releases. It shows where Spark is going. Takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.
+Still benefit five. This last part is ongoing work, already in progress for the next releases. It shows where Spark is going: Feather, portable UDFs, nanosecond time, Spark 4.3 streaming work, and faster releases. Takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.
 
 ### [67] Roadmap (five topics) · DB · ~0:12
-(Gesture across the five.) Five things ahead: Project Feather, a language-agnostic UDF protocol, nanosecond timestamps, real-time mode for stateful streaming, and a faster release cadence. We will touch each one.
+(Gesture across the five.) Five things ahead: Project Feather, a language-agnostic UDF protocol, nanosecond timestamps, the Spark 4.3 streaming roadmap, and a faster release cadence. On streaming, I am borrowing the roadmap from Anish and Jerry's OpenLakehouse Summit talk.
 
 ### [68] Project Feather: fast local queries · DB · ~0:32
 First, Project Feather. The goal: make small queries fast on a laptop. Spark uses one API for big and small jobs. But for small jobs, the fixed costs are too high. A query over less than 100 MB can still take seconds — because planning, scheduling, serialization, and shuffle were built for big clusters. Feather works on three areas: planning and scheduling, the cache format, and shuffle.
@@ -252,8 +252,8 @@ Status: the SPIP vote passed. First code is landing in apache/spark, under /udf/
 ### [73] Nanosecond-precision timestamps · DB · ~0:32
 SPIP SPARK-56822. Today, Spark timestamps stop at microseconds. So nanosecond Parquet either fails, or falls back to a plain long — and loses the timestamp meaning. This adds parameterized types — TIMESTAMP(n), with n from 0 to 9. 6 is micros, 9 is nanos. The value model is compact, and keeps today's date range. It is fully backward compatible. Micro types stay the default. Nanosecond behavior appears only when you ask.
 
-### [74] Real-time mode for stateful streaming · DB · ~0:35
-Earlier I mentioned real-time mode. SPARK-54699 extends it to stateful queries — about 100 milliseconds latency. It builds on stateless real-time mode from 4.1, now with the same low latency for transformWithState and aggregations. Two parts make it work. A streaming shuffle sends data straight to the next task, instead of waiting for the batch. And concurrent stage scheduling runs many stages at once. Last, how we ship all of this.
+### [74] Spark 4.3 streaming roadmap · DB · ~0:35
+From Anish and Jerry's roadmap slide, Spark 4.3 has four streaming themes. First: real-time mode for stateful queries, with concurrent scheduling, streaming shuffle, transformWithState, and latency metrics. Second: operator naming and evolution — a structured way to identify operators inside checkpoints, extending the source naming idea we just covered. Third: ML extensions, including streaming support for k-means search for real-time clustering and vector-search use cases. Fourth: SDP Flow APIs for more advanced stream-processing control and data-flow management. Last, how we ship all of this.
 
 ### [75] Faster, predictable releases · DB · ~0:40
 And how we ship it. SPARK-54633 — a two-layer model: quarterly minor releases, and one major a year. Minors do not change dependencies or defaults, so upgrades stay safe. Majors carry the breaking changes. The last minor of each major is an 18-month LTS. 4.2 is the bridge. The quarterly train starts at 4.3. As a transition exception, the 4.x LTS is 4.5.0 — the last 4.x release, around March 2027 — not 4.3. Then Spark 5.0 follows, around June 2027. Takeaway: plan upgrades around the quarterly cadence, and target the 4.5 LTS.
