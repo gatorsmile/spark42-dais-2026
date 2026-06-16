@@ -2125,7 +2125,7 @@ First, stream-stream joins. In Spark 4.1, virtual column families moved join sta
       <ul>
         <li>State-machine locking gives RocksDB a single owner</li>
         <li>File-level integrity checksums catch checkpoint corruption</li>
-        <li>Robust checkpoint format v2 strengthens state storage</li>
+        <li>Manual recovery paths are still too common</li>
       </ul>
     </div>
     <div class="col now">
@@ -2133,6 +2133,7 @@ First, stream-stream joins. In Spark 4.1, virtual column families moved join sta
       <ul>
         <li><b>Row-level checksum</b> with CRC32C sampling</li>
         <li><b>Automatic snapshot repair</b> recovers corrupted state</li>
+        <li>Robust checkpoint format v2 strengthens state storage</li>
         <li>RocksDB memory usage moves onto the unified memory manager</li>
       </ul>
     </div>
@@ -2142,7 +2143,7 @@ First, stream-stream joins. In Spark 4.1, virtual column families moved join sta
   <div class="progress"><i></i></div>
   <div class="notes" hidden>State-store integrity: repair automatically · DB · ~0:30
 
-Second, state-store integrity. Spark 4.1 added state-machine locking, so RocksDB has a single owner, plus file-level integrity checksums. Spark 4.2 goes finer grained with row-level checksum using CRC32C sampling, and it can automatically repair corrupted snapshots. The talk also calls out storage improvements: RocksDB memory usage on the unified memory manager and robust checkpoint format v2. The practical point is fewer manual recovery paths for stateful streaming.</div>
+Second, state-store integrity. Spark 4.1 added state-machine locking, so RocksDB has a single owner, plus file-level integrity checksums, but manual recovery paths were still too common. Spark 4.2 goes finer grained with row-level checksum using CRC32C sampling, automatic snapshot repair, robust checkpoint format v2, and RocksDB memory usage on the unified memory manager. The practical point is fewer manual recovery paths for stateful streaming.</div>
 </section>
 
 <section class="slide">
