@@ -2256,19 +2256,19 @@ DSv2 has a long history, but the recent momentum is the point. In 4.1 and 4.2, i
 <section class="slide">
   <div class="progstrip"><span class="on">1 &middot; Read changes</span><span>2 &middot; Writes</span><span>3 &middot; Pushdown</span></div>
   <div class="eyebrow">Data Source V2</div>
-  <h2>CDC: move the changelog logic into Spark</h2>
+  <h2>CDC implementation: Spark owns the hard parts</h2>
   <ul class="points">
-    <li>Prior art: Iceberg and Delta used Spark extensions for custom changelog grammar and execution</li>
-    <li>That meant inconsistent syntax, duplicated logic, and connector-specific behavior</li>
-    <li>In Spark 4.2, CDC support moves into Spark through the DSv2 <b>ChangeLog</b> contract</li>
-    <li>Spark handles carry-over removal, update reconstruction, and net-change computation</li>
+    <li><b>One syntax:</b> <code>CHANGES</code> in SQL and DataFrames, batch or streaming, for any DSv2 source</li>
+    <li><b>One small contract:</b> connector exposes schema, scan, row identity, row version, and capability flags</li>
+    <li><b>One Spark algorithm:</b> carry-over removal, update detection, and net-change collapse are written once in Spark</li>
+    <li><b>Delta read-time CDC:</b> row tracking supplies <code>row_id</code> and <code>row_commit_version</code>; no stored change files needed</li>
   </ul>
   <p class="fcap"><b>Full talk:</b> “First-Class CDC Support in Spark 4.2” — Gengliang Wang &amp; Johan Lasperas, June 18, 10:20-11:00, Marriott Level 2 Foothill G</p>
   <div class="slide-footer"><span>Data Source V2</span><span>53</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Two problems with CDC today · DB · ~0:40
+  <div class="notes" hidden>CDC implementation: Spark owns the hard parts · DB · ~0:40
 
-CDC is one example of DSv2 growing up. Before, table formats used Spark extensions for their own changelog syntax and execution. The result was duplicated complexity and inconsistent behavior. In 4.2, ChangeLog is a DSv2 contract. The connector exposes row identity, row version, and a scan. Spark owns the hard parts — removing carry-over rows, reconstructing updates, and computing net changes. For the full CDC implementation deep dive, see Gengliang Wang and Johan Lasperas's talk, "First-Class CDC Support in Spark 4.2," on June 18 from 10:20 to 11:00 at Marriott Level 2 Foothill G.</div>
+This is the short version of Gengliang and Johan's CDC implementation talk. Spark 4.2 makes CDC first-class in the engine: one CHANGES syntax, one algorithm, and a small DSv2 connector contract. The connector declares the output columns, provides a scan builder for the raw change rows, names row identity and row version, and exposes capability flags such as whether the raw stream contains carry-over rows, intermediate changes, or updates represented as delete-plus-insert. Spark owns the post-processing: carry-over removal, update detection into preimage and postimage rows, and optional net-change collapse. Delta is the first implementation path here: row tracking gives Spark _metadata.row_id and _metadata.row_commit_version, so changes can be computed at read time without stored change files. For the full CDC implementation deep dive, see Gengliang Wang and Johan Lasperas's talk, "First-Class CDC Support in Spark 4.2," on June 18 from 10:20 to 11:00 at Marriott Level 2 Foothill G.</div>
 </section>
 
 <section class="slide">
