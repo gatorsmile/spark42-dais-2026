@@ -1767,31 +1767,43 @@ Before and now, four times. Each one removes a pattern we have written for years
 <section class="slide">
   <div class="progstrip"><span>1 &middot; Vector</span><span class="on">2 &middot; SQL</span><span>3 &middot; Sketches</span><span>4 &middot; Geospatial</span></div>
   <div class="eyebrow">SQL <span class="tag">Compatibility</span></div>
-  <h2>SQL compatibility improvements</h2>
-  <div class="baf">
-    <div class="col today">
-      <div class="hd">Today &mdash; the pain</div>
-      <ul>
-        <li>Porting SQL from PostgreSQL and others hits gaps &mdash; names need <b>full paths</b></li>
-        <li>The <code>TIME</code> type is missing across formats; <code>TIMESTAMP WITH LOCAL TIME ZONE</code> isn&rsquo;t in SQL syntax</li>
-        <li>Common built-ins (null handling, top-K, time bucketing) are absent</li>
-      </ul>
-    </div>
-    <div class="col now">
-      <div class="hd">Spark 4.2 &mdash; the mechanism</div>
-      <ul>
-        <li><b>Search path</b> &mdash; <code>SET PATH</code> resolves names across schemas; persisted in views, shown in <code>DESCRIBE</code> &middot; opt-in via <code>spark.sql.path.enabled</code></li>
-        <li><b>Richer types</b> &mdash; <code>TIME</code> <span class="pvtag">Preview</span> across JSON/CSV/XML/ORC/Avro <span class="dim">(opt-in: <code>spark.sql.timeType.enabled</code>)</span>; <code>TIMESTAMP WITH LOCAL TIME ZONE</code> in SQL</li>
-        <li><b>More built-ins</b> &mdash; top-K <code>max_by</code>/<code>min_by</code>, <code>time_bucket</code>, <code>reverse</code> on binary &middot; <code>IGNORE</code>/<code>RESPECT NULLS</code> now honored by <code>array_agg</code>/<code>collect_list</code>/<code>collect_set</code></li>
-      </ul>
-    </div>
-  </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Porting SQL from another database? These <b>close the common gaps</b> &mdash; start with <code>SET PATH</code>.</span></div>
+  <h2>SQL compatibility: shorter names, smoother migrations</h2>
+  <pre class="code sm"><span class="c">-- Before: every reference needs the full path</span>
+<span class="k">SELECT</span> catalog.schema.my_func(x)
+<span class="k">FROM</span>   catalog.schema.my_table;
+
+<span class="c">-- After: set the search path once</span>
+<span class="hl"><span class="k">SET PATH</span> catalog.schema;</span>
+<span class="k">SELECT</span> my_func(x) <span class="k">FROM</span> my_table;</pre>
+  <ul class="points">
+    <li><code>SET PATH</code> defines Spark&rsquo;s <b>SQL search path</b></li>
+    <li>Resolves <b>unqualified names</b> across schemas</li>
+    <li><b>Persisted in views</b> for reproducible resolution</li>
+  </ul>
+  <p class="fcap">Opt-in via <code>spark.sql.path.enabled</code>. Not an import &mdash; objects stay in their catalog / schema.</p>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Porting PostgreSQL-style SQL? <b>Start with SET PATH.</b></span></div>
   <div class="slide-footer"><span>SQL</span><span>35</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>SQL compatibility improvements · XIAO · ~0:40
+  <div class="notes" hidden>SQL compatibility: shorter names, smoother migrations &middot; XIAO &middot; ~0:32
 
-A quick compatibility round. SET PATH finds names across schemas, and it is saved in views, so results stay reproducible. It helps PostgreSQL migration. It is off by default — turn on spark.sql.path.enabled first. The type system is more complete. The TIME type works across more formats. But it is a preview. It is off by default in production, behind spark.sql.timeType.enabled. So do not live-demo it without the flag. TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus max_by/min_by, time_bucket, and reverse on binary. And IGNORE/RESPECT NULLS is now honored by array_agg, collect_list, and collect_set. The clause is not new; these aggregates just gained support. Takeaway: these close common gaps when you port SQL.</div>
+SET PATH is the SQL search path. Before, every name needed its full catalog and schema. Now you set the path once, and unqualified names resolve across schemas. It is saved in views, so resolution stays reproducible. It is opt-in — spark.sql.path.enabled — and it is not an import; objects stay where they are. Takeaway: porting PostgreSQL-style SQL? Start with SET PATH.</div>
+</section>
+
+<section class="slide">
+  <div class="progstrip"><span>1 &middot; Vector</span><span class="on">2 &middot; SQL</span><span>3 &middot; Sketches</span><span>4 &middot; Geospatial</span></div>
+  <div class="eyebrow">SQL <span class="tag">Compatibility</span></div>
+  <h2>More compatibility: richer types &amp; built-ins</h2>
+  <ul class="points">
+    <li><b>Richer types</b> &mdash; <code>TIME</code> <span class="pvtag">Preview</span> across JSON / CSV / XML / ORC / Avro <span class="dim">(opt-in <code>spark.sql.timeType.enabled</code>, off in prod)</span>; <code>TIMESTAMP WITH LOCAL TIME ZONE</code> now in SQL</li>
+    <li><b>More built-ins</b> &mdash; top-K <code>max_by</code> / <code>min_by</code>, <code>time_bucket</code>, and <code>reverse</code> on binary</li>
+    <li><b>Null handling</b> &mdash; <code>IGNORE</code> / <code>RESPECT NULLS</code> now honored by <code>array_agg</code>, <code>collect_list</code>, <code>collect_set</code> <span class="dim">(the clause isn&rsquo;t new; these aggregates gained support)</span></li>
+  </ul>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">More gaps closed for cross-database SQL &mdash; but mind the flags: <code>TIME</code> is a <b>preview</b>, off by default in production.</span></div>
+  <div class="slide-footer"><span>SQL</span><span>36</span></div>
+  <div class="progress"><i></i></div>
+  <div class="notes" hidden>More compatibility: richer types &amp; built-ins &middot; XIAO &middot; ~0:35
+
+A few more compatibility wins. Richer types: the TIME type now works across more formats — but it is a preview, off by default in production behind spark.sql.timeType.enabled, so do not live-demo it unflagged. TIMESTAMP WITH LOCAL TIME ZONE is now in SQL. More built-ins: top-K max_by and min_by, time_bucket, and reverse on binary. And IGNORE/RESPECT NULLS is now honored by array_agg, collect_list, and collect_set — the clause is not new; these aggregates just gained support.</div>
 </section>
 
 <section class="slide">
@@ -1817,7 +1829,7 @@ A quick compatibility round. SET PATH finds names across schemas, and it is save
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Store sketches as <b>Delta columns</b>, then merge any time range in milliseconds &mdash; <b>bounded-error answers, decision-grade when the error budget fits</b>.</span></div>
-  <div class="slide-footer"><span>SQL</span><span>36</span></div>
+  <div class="slide-footer"><span>SQL</span><span>37</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Data sketches: approximate, mergeable analytics · XIAO · ~0:45
 
@@ -1843,7 +1855,7 @@ Sketches are small, probabilistic summaries. One pass. Small memory. About 1 to 
 
 <span class="c">-- Mergeable: roll up daily sketches with no re-scan of the raw rows</span>
 <span class="k">SELECT</span> <span class="hl">tuple_union_agg_double(sketch)</span> <span class="k">AS</span> rollup <span class="k">FROM</span> daily_sketches;</pre>
-  <div class="slide-footer"><span>SQL</span><span>37</span></div>
+  <div class="slide-footer"><span>SQL</span><span>38</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Tuple sketches in action · XIAO · ~0:22
 
@@ -1874,7 +1886,7 @@ Sketches are small, probabilistic summaries. One pass. Small memory. About 1 to 
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Store location data as <b>GEOMETRY/GEOGRAPHY</b> &mdash; no extra packages, and it round-trips cross-engine via Parquet/Iceberg.</span></div>
-  <div class="slide-footer"><span>Geospatial</span><span>38</span></div>
+  <div class="slide-footer"><span>Geospatial</span><span>39</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Native geospatial types · XIAO · ~0:35
 
@@ -1900,7 +1912,7 @@ Location data is everywhere — delivery, IoT, maps, risk. 4.2 adds GEOMETRY and
        <span class="hl">ST_AsBinary(location)</span> <span class="k">AS</span> wkb
 <span class="k">FROM</span> city_points;</pre>
   <p class="sub">Shipped functions: <code>ST_GeomFromWKB</code>, <code>ST_GeogFromWKB</code>, <code>ST_AsBinary</code>, <code>ST_Srid</code>, <code>ST_SetSrid</code></p>
-  <div class="slide-footer"><span>Geospatial</span><span>39</span></div>
+  <div class="slide-footer"><span>Geospatial</span><span>40</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Geospatial in action · XIAO · ~0:35
 
@@ -1920,7 +1932,7 @@ Location data is everywhere — delivery, IoT, maps, risk. 4.2 adds GEOMETRY and
     <div class="mon"><span class="tk-label">Takeaway</span>Move reconciliation into a declared Auto CDC flow.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep on"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
-  <div class="slide-footer"><span>Auto CDC</span><span>40</span></div>
+  <div class="slide-footer"><span>Auto CDC</span><span>41</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Declarative Pipelines &amp; Auto CDC · DB · ~0:12
 
@@ -1946,7 +1958,7 @@ Thank you, Xiao. Benefit four: move changing data safely. Let's start with a har
     </tbody>
   </table>
   <p class="fcap">If you process by arrival, <b>LA</b> can overwrite <b>Seattle</b>. Auto CDC uses the declared sequence column as the real order.</p>
-  <div class="slide-footer"><span>Auto CDC</span><span>41</span></div>
+  <div class="slide-footer"><span>Auto CDC</span><span>42</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Applying a change feed is the hard part · DB · ~0:40
 
@@ -1991,7 +2003,7 @@ The common need: keep a lakehouse table in sync with an operational change feed.
   stored_as_scd_type=1)</pre>
     </div>
   </div>
-  <div class="slide-footer"><span>Auto CDC</span><span>42</span></div>
+  <div class="slide-footer"><span>Auto CDC</span><span>43</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Auto CDC: key plus sequence is the contract · DB · ~0:45
 
@@ -2042,7 +2054,7 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
     </div>
   </div>
   <p class="fcap"><b>Availability:</b> Spark 4.2 ships Auto CDC for SCD Type 1. SCD Type 2 is shown as the history model, but is not available in Spark 4.2.</p>
-  <div class="slide-footer"><span>Auto CDC</span><span>43</span></div>
+  <div class="slide-footer"><span>Auto CDC</span><span>44</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Auto CDC in action · DB · ~0:35
 
@@ -2061,7 +2073,7 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
     <div class="mon"><span class="tk-label">Takeaway</span>Name your streaming sources so you can evolve them safely.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep on"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
-  <div class="slide-footer"><span>Streaming</span><span>44</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>45</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Structured Streaming · DB · ~0:12
 
@@ -2090,7 +2102,7 @@ Still benefit four. Now streaming. Two things: change a running query safely, an
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Name your streaming sources &mdash; <b>IDENTIFIED BY</b> in SQL, <code>DataStreamReader.name()</code> in PySpark &mdash; so you can evolve a running query with no full reprocess.</span></div>
-  <div class="slide-footer"><span>Streaming</span><span>45</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>46</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Evolve running pipelines safely · DB · ~0:32
 
@@ -2112,7 +2124,7 @@ df.writeStream.toTable(<span class="s">"unified"</span>)
 
 <span class="c">-- Later: add, remove, or reorder sources
 -- without breaking the checkpoint</span></pre>
-  <div class="slide-footer"><span>Streaming</span><span>46</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>47</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>IDENTIFIED BY in action · DB · ~0:18
 
@@ -2141,7 +2153,7 @@ df.writeStream.toTable(<span class="s">"unified"</span>)
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Use Inner / LeftSemi stream-stream joins in <b>Update mode</b> &mdash; and drive real-time mode from PySpark.</span></div>
-  <div class="slide-footer"><span>Streaming</span><span>47</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>48</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Richer joins, lower latency · DB · ~0:25
 
@@ -2170,7 +2182,7 @@ Streaming joins get richer. Inner and LeftSemi stream-stream joins now run in Up
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Stateful streaming <b>self-heals</b> now &mdash; fewer pages at night.</span></div>
-  <div class="slide-footer"><span>Streaming</span><span>48</span></div>
+  <div class="slide-footer"><span>Streaming</span><span>49</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>A state store you can trust · DB · ~0:25
 
@@ -2189,7 +2201,7 @@ The state store is the heart of stateful streaming. In 4.2 it is stronger. It re
     <div class="mon"><span class="tk-label">Takeaway</span>Read changes with one CHANGES query, not per-engine functions.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep on"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>49</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>50</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Data Source V2 · DB · ~0:12
 
@@ -2212,7 +2224,7 @@ Still benefit four. Now Data Source V2 — how Spark connects to data. It improv
     <div class="fbox accent"><div class="ft">One contract, four capabilities</div><div class="fchips"><span>Read</span><span>Write &middot; INSERT / MERGE</span><span>Change &middot; CHANGES</span><span>Pushdown</span></div></div>
   </div>
   <p class="fcap">Implement the contract once; Spark drives <b>reads, row-level writes, change feeds, and pushdown</b> through the same source.</p>
-  <div class="slide-footer"><span>Data Source V2</span><span>50</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>51</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One integration API for every data source · DB · ~0:33
 
@@ -2237,7 +2249,7 @@ DSv2 is the standard API for data sources — Delta, Iceberg, and more. Users ge
     <div class="fbox"><div class="ft">Downstream consumers</div><div class="fchips"><span>Incremental ETL</span><span>Audit</span><span>Replication</span><span>Streaming tables</span><span>Vector / MV refresh</span></div></div>
   </div>
   <p class="fcap">CDC is load-bearing infra &mdash; everything downstream stays current by reading <b>what changed</b>, not the whole table.</p>
-  <div class="slide-footer"><span>Data Source V2</span><span>51</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>52</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Ask the table: "what changed?" · DB · ~0:32
 
@@ -2254,7 +2266,7 @@ CDC is the row-level history of a table — which rows were added, updated, or d
     <li>By the numbers: 206M batch CDC queries in 60 days &mdash; and 68% of them need no stored change files at all</li>
     <li>Spark 4.2 makes <b>read-time CDC first-class</b>: only the reader pays, and any engine can write the table</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>52</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>53</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Two problems with CDC today · DB · ~0:40
 
@@ -2284,7 +2296,7 @@ CDC today has two problems. One: every engine built its own. Delta has table_cha
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Read changes with <b>one <code>CHANGES</code> query</b> instead of per-engine functions.</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>53</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>54</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One CHANGES API for changelog-capable DSv2 sources · DB · ~0:35
 
@@ -2312,7 +2324,7 @@ spark.read.option(<span class="s">"startingVersion"</span>, 10)
 spark.readStream.changes(<span class="s">"my_table"</span>)
 
 <span class="c">-- output: data columns + _change_type, _commit_version, _commit_timestamp</span></pre>
-  <div class="slide-footer"><span>Data Source V2</span><span>54</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>55</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Reading changes in action · DB · ~0:20
 
@@ -2342,7 +2354,7 @@ spark.readStream.changes(<span class="s">"my_table"</span>)
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Read changes from Delta tables with <b>row tracking</b> on 4.2 &mdash; no write-time CDF setup. Write-time CDC stays for special workloads.</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>55</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>56</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Delta goes read-time — by default · DB · ~0:40
 
@@ -2373,7 +2385,7 @@ For a Delta table with row tracking, the result is great: read-time CDC, with no
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Drop the manual schema-sync around <code>INSERT</code>/<code>MERGE</code> &mdash; let the target <b>evolve with the data</b>.</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>56</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>57</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Smarter writes: INSERT &amp; MERGE · DB · ~0:30
 
@@ -2396,7 +2408,7 @@ Writes are smarter and safer. INSERT INTO ... WITH SCHEMA EVOLUTION lets the tar
 <span class="c">-- 4.2 also adds:
 --   INSERT INTO ... REPLACE ON / USING
 --   BY NAME combined with REPLACE WHERE</span></pre>
-  <div class="slide-footer"><span>Data Source V2</span><span>57</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>58</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Schema evolution in action · DB · ~0:18
 
@@ -2420,7 +2432,7 @@ Writes are smarter and safer. INSERT INTO ... WITH SCHEMA EVOLUTION lets the tar
     <li>Spark 4.2 begins a <b>transaction for every DML operation</b> and tracks all table reads and writes inside it</li>
     <li>Engine-level today: single-statement DML; multi-statement and cross-catalog transactions are future work</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>58</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>59</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Transactions: atomic, isolated DML · DB · ~0:30
 
@@ -2437,7 +2449,7 @@ DML is read, transform, write back. Without isolation, a writer can overwrite ch
     <li>MERGE and INSERT support <code>WITH SCHEMA EVOLUTION</code>: add or widen columns as data arrives, with the connector deciding which changes are valid (e.g., Delta type widening)</li>
     <li>Consistent table refresh in 4.2: Spark refreshes before writes and non-pinned reads, so views over external tables stay correct</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>59</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>60</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Observable, evolvable DML · DB · ~0:28
 
@@ -2468,7 +2480,7 @@ DML is observable now. MERGE, UPDATE, and DELETE report metrics — rows inserte
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt"><code>WHERE udf(month(ts)) = 'JAN'</code> now <b>prunes partitions</b> in Iceberg and Delta &mdash; less data read, faster queries.</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>60</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>61</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Smarter pushdown: PartitionPredicate · DB · ~0:30
 
@@ -2487,7 +2499,7 @@ This is a real gap, and connectors hit it every day. Before, partition filters w
     <div class="mon"><span class="tk-label">Takeaway</span>Upgrade to 4.2 and pick up speed and stability with no code change.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep"><i>4</i>Move changing data safely</span><span class="bstep on"><i>5</i>Operate &amp; evolve predictably</span></div>
-  <div class="slide-footer"><span>Others</span><span>61</span></div>
+  <div class="slide-footer"><span>Others</span><span>62</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Performance, UI &amp; Operations · DB · ~0:12
 
@@ -2502,7 +2514,7 @@ Benefit five: operate and evolve predictably. First, what makes Spark faster, ea
     <li><b>Interactive SQL plans</b> &mdash; pan, zoom, search, and compare initial vs final AQE plans side by side</li>
     <li>Environment page highlights non-default configs, with one-click export</li>
   </ul>
-  <div class="slide-footer"><span>Others</span><span>62</span></div>
+  <div class="slide-footer"><span>Others</span><span>63</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>A modern Spark Web UI · DB · ~0:25
 
@@ -2518,7 +2530,7 @@ The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL pl
     <li><b>Leaner memory</b> &mdash; bounded external merge and eager memory release cut OOMs</li>
     <li><b>Faster I/O</b> &mdash; zero-copy transfers and lower JVM&harr;Python overhead</li>
   </ul>
-  <div class="slide-footer"><span>Others</span><span>63</span></div>
+  <div class="slide-footer"><span>Others</span><span>64</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Faster &amp; leaner · DB · ~0:28
 
@@ -2538,7 +2550,7 @@ Four performance points. Faster scans — better vectorized Parquet. Smarter pla
     <span class="lp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.915 0 11.7.215C9.515 2.4 7.47 6.39 6.046 10.483c-1.064 1.024-3.633 2.81-3.711 3.551-.093.87 1.746 2.611 1.55 3.235-.198.625-1.304 1.408-1.014 1.939.1.188.823.011 1.277-.491a13.389 13.389 0 0 0-.017 2.14c.076.906.27 1.668.643 2.232.372.563.956.911 1.667.911.397 0 .727-.114 1.024-.264.298-.149.571-.33.91-.5.68-.34 1.634-.666 3.53-.604 1.903.062 2.872.39 3.559.704.687.314 1.15.664 1.925.664.767 0 1.395-.336 1.807-.9.412-.563.631-1.33.72-2.24.06-.623.055-1.32 0-2.066.454.45 1.117.604 1.213.424.29-.53-.816-1.314-1.013-1.937-.198-.624 1.642-2.366 1.549-3.236-.08-.748-2.707-2.568-3.748-3.586C16.428 6.374 14.308 2.394 12.13.215zm.175 6.038a2.95 2.95 0 0 1 2.943 2.942 2.95 2.95 0 0 1-2.943 2.943A2.95 2.95 0 0 1 9.148 8.98a2.95 2.95 0 0 1 2.942-2.942zM8.685 7.983a3.515 3.515 0 0 0-.145.997c0 1.951 1.6 3.55 3.55 3.55 1.95 0 3.55-1.598 3.55-3.55 0-.329-.046-.648-.132-.951.334.095.64.208.915.336a42.699 42.699 0 0 1 2.042 5.829c.678 2.545 1.01 4.92.846 6.607-.082.844-.29 1.51-.606 1.94-.315.431-.713.651-1.315.651-.593 0-.932-.27-1.673-.61-.741-.338-1.825-.694-3.792-.758-1.974-.064-3.073.293-3.821.669-.375.188-.659.373-.911.5s-.466.2-.752.2c-.53 0-.876-.209-1.16-.64-.285-.43-.474-1.101-.545-1.948-.141-1.693.176-4.069.823-6.614a43.155 43.155 0 0 1 1.934-5.783c.348-.167.749-.31 1.192-.425zm-3.382 4.362a.216.216 0 0 1 .13.031c-.166.56-.323 1.116-.463 1.665a33.849 33.849 0 0 0-.547 2.555 3.9 3.9 0 0 0-.2-.39c-.58-1.012-.914-1.642-1.16-2.08.315-.24 1.679-1.755 2.24-1.781zm13.394.01c.562.027 1.926 1.543 2.24 1.783-.246.438-.58 1.068-1.16 2.08a4.428 4.428 0 0 0-.163.309 32.354 32.354 0 0 0-.562-2.49 40.579 40.579 0 0 0-.482-1.652.216.216 0 0 1 .127-.03z"/></svg><span>Java 25</span></span>
     <span class="lp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.204 14.35l.007.01-.999 2.413a5.171 5.171 0 0 1-2.075-2.597l2.578-.437.004.005a.44.44 0 0 1 .484.606zm-.833-2.129a.44.44 0 0 0 .173-.756l.002-.011L7.585 9.7a5.143 5.143 0 0 0-.73 3.255l2.514-.725.002-.009zm1.145-1.98a.44.44 0 0 0 .699-.337l.01-.005.15-2.62a5.144 5.144 0 0 0-3.01 1.442l2.147 1.523.004-.002zm.76 2.75l.723.349.722-.347.18-.78-.5-.623h-.804l-.5.623.179.779zm1.5-3.095a.44.44 0 0 0 .7.336l.008.003 2.134-1.513a5.188 5.188 0 0 0-2.992-1.442l.148 2.615.002.001zm10.876 5.97l-5.773 7.181a1.6 1.6 0 0 1-1.248.594l-9.261.003a1.6 1.6 0 0 1-1.247-.596l-5.776-7.18a1.583 1.583 0 0 1-.307-1.34L2.1 5.573c.108-.47.425-.864.863-1.073L11.305.513a1.606 1.606 0 0 1 1.385 0l8.345 3.985c.438.209.755.604.863 1.073l2.062 8.955c.108.47-.005.963-.308 1.34zm-3.289-2.057c-.042-.01-.103-.026-.145-.034-.174-.033-.315-.025-.479-.038-.35-.037-.638-.067-.895-.148-.105-.04-.18-.165-.216-.216l-.201-.059a6.45 6.45 0 0 0-.105-2.332 6.465 6.465 0 0 0-.936-2.163c.052-.047.15-.133.177-.159.008-.09.001-.183.094-.282.197-.185.444-.338.743-.522.142-.084.273-.137.415-.242.032-.024.076-.062.11-.089.24-.191.295-.52.123-.736-.172-.216-.506-.236-.745-.045-.034.027-.08.062-.111.088-.134.116-.217.23-.33.35-.246.25-.45.458-.673.609-.097.056-.239.037-.303.033l-.19.135a6.545 6.545 0 0 0-4.146-2.003l-.012-.223c-.065-.062-.143-.115-.163-.25-.022-.268.015-.557.057-.905.023-.163.061-.298.068-.475.001-.04-.001-.099-.001-.142 0-.306-.224-.555-.5-.555-.275 0-.499.249-.499.555l.001.014c0 .041-.002.092 0 .128.006.177.044.312.067.475.042.348.078.637.056.906a.545.545 0 0 1-.162.258l-.012.211a6.424 6.424 0 0 0-4.166 2.003 8.373 8.373 0 0 1-.18-.128c-.09.012-.18.04-.297-.029-.223-.15-.427-.358-.673-.608-.113-.12-.195-.234-.329-.349-.03-.026-.077-.062-.111-.088a.594.594 0 0 0-.348-.132.481.481 0 0 0-.398.176c-.172.216-.117.546.123.737l.007.005.104.083c.142.105.272.159.414.242.299.185.546.338.743.522.076.082.09.226.1.288l.16.143a6.462 6.462 0 0 0-1.02 4.506l-.208.06c-.055.072-.133.184-.215.217-.257.081-.546.11-.895.147-.164.014-.305.006-.48.039-.037.007-.09.02-.133.03l-.004.002-.007.002c-.295.071-.484.342-.423.608.061.267.349.429.645.365l.007-.001.01-.003.129-.029c.17-.046.294-.113.448-.172.33-.118.604-.217.87-.256.112-.009.23.069.288.101l.217-.037a6.5 6.5 0 0 0 2.88 3.596l-.09.218c.033.084.069.199.044.282-.097.252-.263.517-.452.813-.091.136-.185.242-.268.399-.02.037-.045.095-.064.134-.128.275-.034.591.213.71.248.12.556-.007.69-.282v-.002c.02-.039.046-.09.062-.127.07-.162.094-.301.144-.458.132-.332.205-.68.387-.897.05-.06.13-.082.215-.105l.113-.205a6.453 6.453 0 0 0 4.609.012l.106.192c.086.028.18.042.256.155.136.232.229.507.342.84.05.156.074.295.145.457.016.037.043.09.062.129.133.276.442.402.69.282.247-.118.341-.435.213-.71-.02-.039-.045-.096-.065-.134-.083-.156-.177-.261-.268-.398-.19-.296-.346-.541-.443-.793-.04-.13.007-.21.038-.294-.018-.022-.059-.144-.083-.202a6.499 6.499 0 0 0 2.88-3.622c.064.01.176.03.213.038.075-.05.144-.114.28-.104.266.039.54.138.87.256.154.06.277.128.448.173.036.01.088.019.13.028l.009.003.007.001c.297.064.584-.098.645-.365.06-.266-.128-.537-.423-.608zM16.4 9.701l-1.95 1.746v.005a.44.44 0 0 0 .173.757l.003.01 2.526.728a5.199 5.199 0 0 0-.108-1.674A5.208 5.208 0 0 0 16.4 9.7zm-4.013 5.325a.437.437 0 0 0-.404-.232.44.44 0 0 0-.372.233h-.002l-1.268 2.292a5.164 5.164 0 0 0 3.326.003l-1.27-2.296h-.01zm1.888-1.293a.44.44 0 0 0-.27.036.44.44 0 0 0-.214.572l-.003.004 1.01 2.438a5.15 5.15 0 0 0 2.081-2.615l-2.6-.44-.004.005z"/></svg><span>Kubernetes</span></span>
   </div>
-  <div class="slide-footer"><span>Others</span><span>64</span></div>
+  <div class="slide-footer"><span>Others</span><span>65</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Runtime &amp; operations · DB · ~0:28
 
@@ -2557,7 +2569,7 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
     <div class="mon"><span class="tk-label">Takeaway</span>Follow the SPIPs, try the previews, and plan around the quarterly cadence.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep"><i>4</i>Move changing data safely</span><span class="bstep on"><i>5</i>Operate &amp; evolve predictably</span></div>
-  <div class="slide-footer"><span>Looking Ahead</span><span>65</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>66</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Looking Ahead · DB · ~0:12
 
@@ -2575,7 +2587,7 @@ Still benefit five. This last part is ongoing work, already in progress for the 
       <li><span class="n">04</span><div class="txt"><h3>Real-time mode for stateful streaming</h3><p>~100 ms latency for stateful queries</p></div></li>
       <li><span class="n">05</span><div class="txt"><h3>Faster, predictable releases</h3><p>A more frequent, predictable release cadence</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Looking Ahead</span><span>66</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>67</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (five topics) · DB · ~0:12
 
@@ -2594,7 +2606,7 @@ Still benefit five. This last part is ongoing work, already in progress for the 
     <li>Three focus areas: query compilation &amp; task scheduling, cache format efficiency, shuffle overhead</li>
   </ul>
   <p class="sub" style="margin-top:30px"><b>Unlike DuckDB or Polars:</b> start small on a laptop and scale to big data later &mdash; no switching APIs, engines, or mental models. A smoother path from prototype to production.</p>
-  <div class="slide-footer"><span>Looking Ahead</span><span>67</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>68</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Project Feather: fast local queries · DB · ~0:32
 
@@ -2614,7 +2626,7 @@ Here is the key difference. Unlike DuckDB or Polars, the value of Feather is thi
     <li><b>Shuffle-free local execution</b> &mdash; a multithreaded local mode where threads pass data through channels instead of shuffle files</li>
   </ul>
   <p class="sub" style="margin-top:30px">Together: Spark that works at laptop scale, with a clear path back to the cluster.</p>
-  <div class="slide-footer"><span>Looking Ahead</span><span>68</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>69</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Project Feather: a three-part plan · DB · ~0:32
 
@@ -2633,7 +2645,7 @@ Feather has three parts. One: faster planning and scheduling. A single-pass anal
     <li>Serialized UDFs are tied to a runtime &mdash; server upgrades can quietly break them</li>
     <li>UDF execution is caged in the cluster: heavy or GPU UDFs force over-sized clusters</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>69</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>70</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Language-agnostic UDF protocol · DB · ~0:35
 
@@ -2655,7 +2667,7 @@ Remember the Connect clients — Go, Rust, Swift, and more. UDFs are the one thi
     <div class="fbox"><div class="ft">3 &middot; Worker spec</div><div class="fd">client declares start / connect / clean up</div><div class="fchips" style="margin-top:8px"><span>local</span><span>container</span><span>remote / GPU</span></div></div>
   </div>
   <p class="fcap">Each pillar is <b>replaceable without touching the others</b> &mdash; that&rsquo;s what makes UDFs portable across languages, runtimes, and hardware.</p>
-  <div class="slide-footer"><span>Looking Ahead</span><span>70</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>71</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Three pillars · DB · ~0:32
 
@@ -2672,7 +2684,7 @@ The design has three parts. One: plan UDFs by their shape — scalar, map, group
     <li>PySpark behavior unchanged: one shared processing core, transport becomes pluggable (socket stays the default; gRPC is opt-in)</li>
     <li>Unlocks UDFs in any language, runtimes that upgrade independently of Spark, and heavy / GPU UDFs on dedicated workers</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>71</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>72</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Status &amp; what it unlocks · DB · ~0:25
 
@@ -2691,7 +2703,7 @@ Status: the SPIP vote passed. First code is landing in apache/spark, under /udf/
     <li>Compact value model: epoch <b>micros</b> (long) + <b>nanos-within-micro</b> (0&ndash;999) &mdash; keeps today's calendar range, avoids the single-INT64-nanos &ldquo;range cliff&rdquo;</li>
     <li><b>Additive &amp; backward compatible</b> &mdash; existing micro types stay the default; nanosecond behavior appears only when <code>(n)</code> is given</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>72</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>73</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Nanosecond-precision timestamps · DB · ~0:32
 
@@ -2709,7 +2721,7 @@ SPIP SPARK-56822. Today, Spark timestamps stop at microseconds. So nanosecond Pa
     <li><b>Streaming shuffle</b>: a push-based exchange streams upstream task output straight to downstream tasks, pipelining work instead of waiting on batch boundaries</li>
     <li><b>Concurrent stage scheduling</b>: multiple plan stages run at once, so stateful operators keep pace with the pipelined data flow</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>73</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>74</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Real-time mode for stateful streaming · DB · ~0:35
 
@@ -2737,7 +2749,7 @@ Earlier I mentioned real-time mode. SPARK-54699 extends it to stateful queries �
     <div class="farrow">&#8594;</div>
     <div class="fbox"><div class="ver">5.0</div><div class="role">next major &middot; ~Jun 2027</div></div>
   </div>
-  <div class="slide-footer"><span>Looking Ahead</span><span>74</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>75</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Faster, predictable releases · DB · ~0:40
 
@@ -2757,7 +2769,7 @@ And how we ship it. SPARK-54633 — a two-layer model: quarterly minor releases,
       <a href="https://spark.apache.org/community/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.805 2.197v.066h.156v.44h.072v-.44h.156v-.066zm.9 0l-.175.353-.172-.353h-.087v.506h.067V2.3l.172.35h.045l.172-.35v.404h.066v-.506zm-4.257 1c-.204.31-.424.66-.66 1.06l-.04.062a44.457 44.457 0 00-1.265 2.29c-.187.36-.38.742-.577 1.146l2.267-.25c.66-.302.955-.578 1.242-.976a15.5 15.5 0 00.23-.342c.23-.363.46-.763.663-1.16.197-.386.37-.767.505-1.11.083-.22.15-.422.198-.6.042-.158.074-.307.1-.45-.884.15-1.965.295-2.668.33zM11.894 7.78l-.077.16c-.078.16-.157.32-.236.488-.086.18-.172.364-.26.552l-.132.287a75.265 75.265 0 00-1.427 3.3c-.163.397-.327.807-.493 1.23-.15.38-.297.765-.45 1.164l-.02.06c-.15.396-.3.802-.453 1.22l-.01.027.72-.08a.213.213 0 01-.042-.006c.863-.106 2.01-.75 2.75-1.547.342-.367.652-.8.94-1.306.213-.377.413-.795.604-1.258.168-.405.328-.843.48-1.318-.196.105-.423.18-.673.235a2.184 2.184 0 01-.273.046c.806-.31 1.314-.905 1.683-1.64a2.816 2.816 0 01-.968.428c-.06.012-.116.022-.174.03l-.043.006h.002c.278-.118.514-.248.718-.403a2.571 2.571 0 00.637-.698l.063-.104.077-.154a8.107 8.107 0 00.367-.85l.03-.088a3.04 3.04 0 00.123-.463.733.733 0 01-.094.065c-.243.145-.66.277-.996.34l.663-.074-.664.073h-.017l-.1.017c.006-.003.01-.006.017-.008l-2.265.25-.013.022zM8.27 16.45c-.117.323-.236.654-.355.992l-.005.015c-.016.046-.032.094-.05.142-.08.227-.15.432-.31.9.264.12.475.435.675.793a1.44 1.44 0 00-.466-.99c1.293.06 2.41-.27 2.99-1.217.05-.084.096-.173.14-.268-.26.333-.59.474-1.2.44 0 0-.004 0-.005.002l.004-.002c.9-.404 1.354-.79 1.754-1.433.094-.153.186-.32.28-.503-.788.81-1.702 1.04-2.664.865l-.72.078a6.43 6.43 0 00-.067.183zM15.42.112c-.376.222-1 .85-1.748 1.763l.686 1.294c.48-.687.97-1.307 1.462-1.836l.058-.062c-.02.02-.04.04-.057.062-.16.176-.644.74-1.375 1.863.703-.035 1.784-.18 2.666-.33.262-1.47-.258-2.142-.258-2.142s-.66-1.07-1.436-.61zm-3.084 6.402a40.253 40.253 0 011.306-2.26l.04-.064c.224-.352.45-.693.677-1.02l-.685-1.293-.157.192c-.197.245-.403.51-.613.79a39.853 39.853 0 00-2.016 2.97l-.022.038.893 1.763c.19-.378.38-.752.575-1.118zm-3.73 8.32c.158-.406.319-.81.483-1.225.156-.394.32-.79.484-1.19a91.133 91.133 0 011.6-3.604l.205-.424c.12-.243.237-.485.36-.724a.125.125 0 01.02-.04l-.895-1.763-.044.07c-.207.34-.414.687-.617 1.042a38.056 38.056 0 00-1.092 2.04l-.094.193a24.573 24.573 0 00-1.258 3.087 18.492 18.492 0 00-.52 1.997l.896 1.77c.117-.317.24-.638.364-.963zm-1.376-.476a13.38 13.38 0 00-.234 1.692c0 .02-.004.04-.005.06-.28-.45-1.03-.888-1.026-.884.537.778.944 1.55 1.005 2.31-.29.058-.684-.027-1.14-.195.475.436.83.556.97.588-.434.03-.89.328-1.346.67.668-.27 1.21-.38 1.596-.29-.61 1.74-1.23 3.655-1.843 5.69a.538.538 0 00.364-.354c.11-.368.84-2.786 1.978-5.965l.097-.27.028-.078c.12-.332.246-.672.374-1.02l.09-.237v-.004L7.24 14.3c-.003.02-.01.04-.012.06z"/></svg><span>spark.apache.org/community</span></a>
     </div>
   </div>
-  <div class="slide-footer"><span>Q &amp; A</span><span>75</span></div>
+  <div class="slide-footer"><span>Q &amp; A</span><span>76</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Join the community today! · DB + XIAO · ~0:20
 

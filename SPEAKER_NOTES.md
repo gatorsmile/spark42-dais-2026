@@ -1,9 +1,9 @@
 # Speaker Notes — The Upcoming Apache Spark™ 4.2
-### DAIS 2026 keynote · two speakers · 77 slides
+### DAIS 2026 keynote · two speakers · 78 slides
 
 **Speakers:** XIAO = Xiao Li (gatorsmile) · DB = DB Tsai (dbtsai)
 
-**Split:** Xiao presents slides 1–39; DB presents 40–75. One handoff, at the end of the Spark SQL section.
+**Split:** Xiao presents slides 1–40; DB presents 41–76. One handoff, at the end of the Spark SQL section.
 
 **Through-line (say it often):** *Spark 4.2 moves more of the modern data and AI stack into the engine itself.* Five benefits — (1) Define truth once · (2) Reach Spark from everywhere · (3) Run AI-native analytics in SQL · (4) Move changing data safely · (5) Operate & evolve predictably.
 
@@ -123,137 +123,140 @@ The same search, now batched: for every user, the top 10 products by similarity.
 ### [34] SQL gets more natural · XIAO · ~0:35
 Before and now, four times. Each one removes a pattern we have written for years. QUALIFY: top-N without a subquery. FILTER: conditional aggregates now run over a window too — SUM(...) FILTER (WHERE ...) OVER (...). That was rejected before 4.2. It is SPARK-55702. PIVOT with aliases: readable columns. And cursors: row-by-row logic, in pure SQL. Less boilerplate, more intent. Takeaway: reach for QUALIFY first, and use FILTER over a window where you used a subquery.
 
-### [35] SQL compatibility improvements · XIAO · ~0:40
-A quick compatibility round. SET PATH finds names across schemas, and it is saved in views, so results stay reproducible. It helps PostgreSQL migration. It is off by default — turn on spark.sql.path.enabled first. The type system is more complete. The TIME type works across more formats. But it is a preview. It is off by default in production, behind spark.sql.timeType.enabled. So do not live-demo it without the flag. TIMESTAMP WITH LOCAL TIME ZONE is in SQL. Plus max_by/min_by, time_bucket, and reverse on binary. And IGNORE/RESPECT NULLS is now honored by array_agg, collect_list, and collect_set. The clause is not new; these aggregates just gained support. Takeaway: these close common gaps when you port SQL.
+### [35] SQL compatibility: shorter names, smoother migrations · XIAO · ~0:32
+SET PATH is the SQL search path. Before, every name needed its full catalog and schema. Now you set the path once, and unqualified names resolve across schemas. It is saved in views, so resolution stays reproducible. It is opt-in — spark.sql.path.enabled — and it is not an import; objects stay where they are. Takeaway: porting PostgreSQL-style SQL? Start with SET PATH.
 
-### [36] Data sketches: approximate, mergeable analytics · XIAO · ~0:45
+### [36] More compatibility: richer types & built-ins · XIAO · ~0:35
+A few more compatibility wins. Richer types: the TIME type now works across more formats — but it is a preview, off by default in production behind spark.sql.timeType.enabled, so do not live-demo it unflagged. TIMESTAMP WITH LOCAL TIME ZONE is now in SQL. More built-ins: top-K max_by and min_by, time_bucket, and reverse on binary. And IGNORE/RESPECT NULLS is now honored by array_agg, collect_list, and collect_set — the clause is not new; these aggregates just gained support.
+
+### [37] Data sketches: approximate, mergeable analytics · XIAO · ~0:45
 Sketches are small, probabilistic summaries. One pass. Small memory. About 1 to 2% error — good enough when the error budget fits. Much of this is already in Spark, as SQL aggregates. KLL for quantiles, Theta for distinct counts and set ops, and Approx Top-K — all since 4.1. HLL since 3.5. New in 4.2: tuple sketches. A distinct count plus a metric, like revenue, in one pass. The best part is they merge. Store them as Delta columns. Then combine any time range in milliseconds, with no rescan. They work with open Apache DataSketches, so they merge across engines.
 
-### [37] Tuple sketches in action · XIAO · ~0:22
+### [38] Tuple sketches in action · XIAO · ~0:22
 (Code slide.) A tuple sketch. Distinct users and total revenue, in one pass. Then we merge daily sketches into a month — instantly, with no rescan.
 
-### [38] Native geospatial types · XIAO · ~0:35
+### [39] Native geospatial types · XIAO · ~0:35
 Location data is everywhere — delivery, IoT, maps, risk. 4.2 adds GEOMETRY and GEOGRAPHY as native SQL types. On by default. No extra package. GEOMETRY is flat. GEOGRAPHY is on the globe. There is full SRID support. You read and write in Parquet, and the type and SRID are kept. It works in SQL, DataFrames, and PySpark. And it follows the open Parquet and Iceberg geospatial spec, so it works across engines.
 
-### [39] Geospatial in action · XIAO · ~0:35
+### [40] Geospatial in action · XIAO · ~0:35
 (Code slide. Claim only the shipped functions.) These ship in 4.2: ST_GeomFromWKB, ST_GeogFromWKB, ST_AsBinary, and the SRID helpers. Build a geometry, write it to Parquet, read it back. The type and SRID stay.
 ▶ HANDOFF — XIAO → DB. (XIAO:) So far, 4.2 brings more logic into the engine — metrics, Python, and SQL. But analytics is not only querying. The data changes underneath you. DB will show how 4.2 makes change itself safer — CDC, streaming, DSv2, and operations. DB.
 
 ## Section 05 · Pipelines & Auto CDC — Spark Declarative Pipelines & Auto CDC
 
-### [40] Section divider — Declarative Pipelines & Auto CDC · DB · ~0:12
+### [41] Section divider — Declarative Pipelines & Auto CDC · DB · ~0:12
 Thank you, Xiao. Benefit four: move changing data safely. Let's start with a hard problem — keeping a table in sync with a stream of changes. Takeaway: move the reconciliation logic into a declared Auto CDC flow.
 
-### [41] Applying a change feed is the hard part · DB · ~0:40
+### [42] Applying a change feed is the hard part · DB · ~0:40
 The common need: keep a lakehouse table in sync with an operational change feed. Here is one customer. Version 1 says SF. Version 3 says Seattle. Then version 2 arrives late and says LA. If you process by arrival order, LA can overwrite Seattle, even though LA is older. Then version 4 deletes the row. A CDC event has four parts: key, operation, sequence, and payload. The key is the row identity. The sequence is the business order. Hand-written foreachBatch plus MERGE turns that simple intent into ordering, dedupe, tombstone, and retry code. That is where small mistakes happen.
 
-### [42] Auto CDC: key plus sequence is the contract · DB · ~0:45
+### [43] Auto CDC: key plus sequence is the contract · DB · ~0:45
 This is the mental model. Spark Declarative Pipelines is the pipeline manager. Auto CDC is one special flow inside it. You give it the key — customer_id — the sequence column — version — and the storage mode, SCD Type 1 in Spark 4.2. That tells Spark: group changes by customer, and trust version as the real order, not arrival time. For customer 101, the logical order is version 1 SF, version 2 LA, version 3 Seattle, version 4 delete. So for SCD Type 1, the target keeps only the latest current value. With the delete, 101 is gone. Without the delete, 101 would be Seattle, not LA. New in 4.2: the Python API, create_auto_cdc_flow(), plus Connect support. It stores SCD Type 1; SQL and SCD Type 2 are coming.
 
-### [43] Auto CDC in action · DB · ~0:35
+### [44] Auto CDC in action · DB · ~0:35
 (Code slide.) Same idea, now in code. This lives inside a Declarative Pipelines file. create_auto_cdc_flow registers a flow; it is not a standalone repair job. The magic is keys plus sequence_by. Keys group the changes. sequence_by gives the real order. For SCD Type 1, Spark keeps the latest current value. In this example, customer 101 is gone because version 4 is a delete, and customer 102 remains NY. If there were no delete, customer 101 would be Seattle, not LA. SCD Type 2 would keep the history — SF, LA, Seattle — and close the active row at delete time. Important caveat: in Spark 4.2, Auto CDC ships for SCD Type 1 only. SCD Type 2 is shown here as the model, but it is coming later. Now — streaming.
 
 ## Section 06 · Streaming — Structured Streaming
 
-### [44] Section divider — Structured Streaming · DB · ~0:12
+### [45] Section divider — Structured Streaming · DB · ~0:12
 Still benefit four. Now streaming. Two things: change a running query safely, and a state store you can trust. Takeaway: name your streaming sources, so you can evolve them safely.
 
-### [45] Evolve running pipelines safely · DB · ~0:32
+### [46] Evolve running pipelines safely · DB · ~0:32
 A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint. Now you name them — IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark, both Classic and Connect. Identity is the name, not the position. So you can change sources in a running query and keep the checkpoint. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)
 
-### [46] IDENTIFIED BY in action · DB · ~0:18
+### [47] IDENTIFIED BY in action · DB · ~0:18
 (Code slide.) Named sources. A query adds a new one, restarts, and keeps its checkpoint. No full reprocess.
 
-### [47] Richer joins, lower latency · DB · ~0:25
+### [48] Richer joins, lower latency · DB · ~0:25
 Streaming joins get richer. Inner and LeftSemi stream-stream joins now run in Update mode. LeftSemi uses less state-store space. And the real-time mode trigger is now in PySpark. Remember it — we come back to it later.
 
-### [48] A state store you can trust · DB · ~0:25
+### [49] A state store you can trust · DB · ~0:25
 The state store is the heart of stateful streaming. In 4.2 it is stronger. It repairs a corrupted snapshot by itself. Checksums catch corruption early. And slow snapshot uploads are handled — on by default. Fewer pages at night.
 
 ## Section 07 · Data Source V2 — Data Source V2
 
-### [49] Section divider — Data Source V2 · DB · ~0:12
+### [50] Section divider — Data Source V2 · DB · ~0:12
 Still benefit four. Now Data Source V2 — how Spark connects to data. It improved a lot this release. Takeaway: read changes with one CHANGES query, not per-engine functions.
 
-### [50] One integration API for every data source · DB · ~0:33
+### [51] One integration API for every data source · DB · ~0:33
 DSv2 is the standard API for data sources — Delta, Iceberg, and more. Users get the same SQL and behavior across sources. Connectors get DML, streaming, and Spark's optimizations. It is growing fast. In 4.1 and 4.2: row-level DML, CDC, schema evolution, transactions, and better pushdown. There is a full talk at this Summit: 'Spark DSV2: Growing Up Fast', by Szehon Ho and Anton Okolnychyi.
 
-### [51] Ask the table: "what changed?" · DB · ~0:32
+### [52] Ask the table: "what changed?" · DB · ~0:32
 CDC is the row-level history of a table — which rows were added, updated, or deleted. It is a typed log, in commit order. Each row is tagged: insert, update before, update after, or delete. Each row has the values, the operation, and the order. CDC is used everywhere — incremental ETL, audit, replication. And it refreshes vector indexes, materialized views, and streaming tables on commit.
 
-### [52] Two problems with CDC today · DB · ~0:40
+### [53] Two problems with CDC today · DB · ~0:40
 CDC today has two problems. One: every engine built its own. Delta has table_changes(). Iceberg has create_changelog_view. Hudi has incremental reads. Same idea, three syntaxes. Two: write-time CDC costs every writer. Change files are written on every update — about 1.2x the write time. You pay this even if no one reads them. Some numbers: 206 million CDC queries in 60 days. And 68% of them needed no stored change files at all. So 4.2 makes read-time CDC built in. Only the reader pays. And any engine can write the table.
 
-### [53] One CHANGES API for changelog-capable DSv2 sources · DB · ~0:35
+### [54] One CHANGES API for changelog-capable DSv2 sources · DB · ~0:35
 The answer is one API. One SQL CHANGES clause — by version or by time, or streaming with STREAM ... CHANGES. The same shape in DataFrames — read.changes() and readStream.changes(). The same syntax for any DSv2 connector that supports a changelog — Delta, Iceberg, and Hudi today. Not every source has it; the connector must ship the interface. Spark does the hard part — removing carry-overs, finding updates, collapsing changes. Connectors ship only a small contract.
 
-### [54] Reading changes in action · DB · ~0:20
+### [55] Reading changes in action · DB · ~0:20
 (Code slide.) SELECT ... FROM t CHANGES. A version range in, typed change rows out. The same query for Delta or Iceberg.
 
-### [55] Delta goes read-time — by default · DB · ~0:40
+### [56] Delta goes read-time — by default · DB · ~0:40
 For a Delta table with row tracking, the result is great: read-time CDC, with no Change Data Feed property. No CDF setting. No ALTER TABLE. No ticket to the owner. And you pay nothing at write time. Changes are computed only when a reader asks. It uses two columns Delta already has — a stable row id and a row commit version. A matched id is an update. A lone add is an insert. A lone remove is a delete. It needs Row Tracking — default in Databricks, opt-in in Delta OSS. Write-time CDC still works for special cases.
 
-### [56] Smarter writes: INSERT & MERGE · DB · ~0:30
+### [57] Smarter writes: INSERT & MERGE · DB · ~0:30
 Writes are smarter and safer. INSERT INTO ... WITH SCHEMA EVOLUTION lets the target grow with the data. A source with fewer columns is fine — missing fields are filled. There is new INSERT ... REPLACE syntax, and BY NAME with REPLACE WHERE. MERGE gets fixes — schema evolution with DELETE, and nested fields kept. And TABLESAMPLE SYSTEM, pushed down to DSv2 and JDBC.
 
-### [57] Schema evolution in action · DB · ~0:18
+### [58] Schema evolution in action · DB · ~0:18
 (Code slide.) A new column appears in the source. With SCHEMA EVOLUTION, the target takes it. No manual ALTER.
 
-### [58] Transactions: atomic, isolated DML · DB · ~0:30
+### [59] Transactions: atomic, isolated DML · DB · ~0:30
 DML is read, transform, write back. Without isolation, a writer can overwrite changes it never saw. So 4.2 starts a transaction for every DML. It tracks all reads and writes in it. Connectors check concurrent commits at commit time. So a stale read fails cleanly, instead of corrupting data. This is single-statement DML today. Multi-statement and cross-catalog are future work.
 
-### [59] Observable, evolvable DML · DB · ~0:28
+### [60] Observable, evolvable DML · DB · ~0:28
 DML is observable now. MERGE, UPDATE, and DELETE report metrics — rows inserted, updated, deleted, copied. You see them where you already look — Delta DESCRIBE HISTORY, Iceberg snapshots. MERGE and INSERT support schema evolution, and the connector decides what is valid. And table refresh is consistent, so views over external tables stay correct.
 
-### [60] Smarter pushdown: PartitionPredicate · DB · ~0:30
+### [61] Smarter pushdown: PartitionPredicate · DB · ~0:30
 This is a real gap, and connectors hit it every day. Before, partition filters with UDFs or unusual expressions were lost between Catalyst and the connectors. File sources could use them. Connectors could not. The new PartitionPredicate API fixes this. Any Catalyst partition filter is checked against the partition values — for scans, DELETE WHERE, and runtime filters. So WHERE udf(month(ts)) = 'JAN' now prunes partitions in Iceberg and Delta. Less data read. Faster queries.
 
 ## Section 08 · Others — Performance, UI & Operations
 
-### [61] Section divider — Performance, UI & Operations · DB · ~0:12
+### [62] Section divider — Performance, UI & Operations · DB · ~0:12
 Benefit five: operate and evolve predictably. First, what makes Spark faster, easier to see, and easier to run. Takeaway: upgrade and get speed and stability, with no code change.
 
-### [62] A modern Spark Web UI · DB · ~0:25
+### [63] A modern Spark Web UI · DB · ~0:25
 The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL plans — you can pan, zoom, search, and compare the first and final AQE plans, side by side. And the environment page shows your non-default configs, with one-click export.
 
-### [63] Faster & leaner · DB · ~0:28
+### [64] Faster & leaner · DB · ~0:28
 Four performance points. Faster scans — better vectorized Parquet. Smarter plans — pre-aggregation for many COUNT(DISTINCT), and more codegen. Leaner memory — bounded merge and early release cut OOMs. And faster I/O — zero-copy transfers, and less JVM-to-Python overhead. All with no code change.
 
-### [64] Runtime & operations · DB · ~0:28
+### [65] Runtime & operations · DB · ~0:28
 On operations: we now run on Java 25. Kubernetes — in-place executor and PVC resizing, smaller images, NetworkPolicy isolation. The History Server scales — multiple log folders, and on-demand loading. And consistent results — query-level retry for indeterminate shuffles, with correct SQL metrics under AQE. That is 4.2. Now — what is next.
 
 ## Section 09 · Ongoing Work — Looking Ahead
 
-### [65] Section divider — Looking Ahead · DB · ~0:12
+### [66] Section divider — Looking Ahead · DB · ~0:12
 Still benefit five. This last part is ongoing work, already in progress for the next releases. It shows where Spark is going. Takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.
 
-### [66] Roadmap (five topics) · DB · ~0:12
+### [67] Roadmap (five topics) · DB · ~0:12
 (Gesture across the five.) Five things ahead: Project Feather, a language-agnostic UDF protocol, nanosecond timestamps, real-time mode for stateful streaming, and a faster release cadence. We will touch each one.
 
-### [67] Project Feather: fast local queries · DB · ~0:32
+### [68] Project Feather: fast local queries · DB · ~0:32
 First, Project Feather. The goal: make small queries fast on a laptop. Spark uses one API for big and small jobs. But for small jobs, the fixed costs are too high. A query over less than 100 MB can still take seconds — because planning, scheduling, serialization, and shuffle were built for big clusters. Feather works on three areas: planning and scheduling, the cache format, and shuffle.
 Here is the key difference. Unlike DuckDB or Polars, the value of Feather is this: many users want to start small on a laptop and scale to big data later — without switching APIs, engines, or mental models. If Spark can feel lightweight for local experimentation while still scaling to production workloads, that is a much smoother path from prototype to production.
 
-### [68] Project Feather: a three-part plan · DB · ~0:32
+### [69] Project Feather: a three-part plan · DB · ~0:32
 Feather has three parts. One: faster planning and scheduling. A single-pass analyzer, and a one-file query that runs as a single task, with no shuffle. Two: an Arrow columnar cache, to replace the row-based df.cache, for faster re-reads. And UDFs now take Arrow as input too — so the data stays Arrow end to end, with no format change across the pipeline. Three: shuffle-free local execution. Threads pass data through channels, instead of shuffle files. Together, Spark works on a laptop, and still scales to the cluster.
 
-### [69] Language-agnostic UDF protocol · DB · ~0:35
+### [70] Language-agnostic UDF protocol · DB · ~0:35
 Remember the Connect clients — Go, Rust, Swift, and more. UDFs are the one thing Connect cannot give most of them. SPIP SPARK-55278 fixes that. Today, each language rebuilds the whole UDF stack. The planning rules are tied to Python. Serialized UDFs are tied to a runtime — a server upgrade can break them. And UDF execution is locked in the cluster. So a heavy or GPU UDF forces an over-sized cluster.
 
-### [70] Three pillars · DB · ~0:32
+### [71] Three pillars · DB · ~0:32
 The design has three parts. One: plan UDFs by their shape — scalar, map, grouped map, table, aggregate — not by language. Two: one execution protocol — init, data, finish — over gRPC and Arrow. It is versioned, and has back-pressure. Three: a worker spec. The client says how to start, connect, and clean up a worker — local, container, or remote GPU. Each part can change without touching the others.
 
-### [71] Status & what it unlocks · DB · ~0:25
+### [72] Status & what it unlocks · DB · ~0:25
 Status: the SPIP vote passed. First code is landing in apache/spark, under /udf/worker. PySpark behavior does not change — one shared core, with pluggable transport. Socket stays the default. gRPC is opt-in. It unlocks UDFs in any language, runtimes that upgrade on their own, and heavy or GPU UDFs on separate workers.
 
-### [72] Nanosecond-precision timestamps · DB · ~0:32
+### [73] Nanosecond-precision timestamps · DB · ~0:32
 SPIP SPARK-56822. Today, Spark timestamps stop at microseconds. So nanosecond Parquet either fails, or falls back to a plain long — and loses the timestamp meaning. This adds parameterized types — TIMESTAMP(n), with n from 0 to 9. 6 is micros, 9 is nanos. The value model is compact, and keeps today's date range. It is fully backward compatible. Micro types stay the default. Nanosecond behavior appears only when you ask.
 
-### [73] Real-time mode for stateful streaming · DB · ~0:35
+### [74] Real-time mode for stateful streaming · DB · ~0:35
 Earlier I mentioned real-time mode. SPARK-54699 extends it to stateful queries — about 100 milliseconds latency. It builds on stateless real-time mode from 4.1, now with the same low latency for transformWithState and aggregations. Two parts make it work. A streaming shuffle sends data straight to the next task, instead of waiting for the batch. And concurrent stage scheduling runs many stages at once. Last, how we ship all of this.
 
-### [74] Faster, predictable releases · DB · ~0:40
+### [75] Faster, predictable releases · DB · ~0:40
 And how we ship it. SPARK-54633 — a two-layer model: quarterly minor releases, and one major a year. Minors do not change dependencies or defaults, so upgrades stay safe. Majors carry the breaking changes. The last minor of each major is an 18-month LTS. 4.2 is the bridge. The quarterly train starts at 4.3. As a transition exception, the 4.x LTS is 4.5.0 — the last 4.x release, around March 2027 — not 4.3. Then Spark 5.0 follows, around June 2027. Takeaway: plan upgrades around the quarterly cadence, and target the 4.5 LTS.
 
-### [75] Join the community today! · DB + XIAO · ~0:20
+### [76] Join the community today! · DB + XIAO · ~0:20
 (DB:) All of this is built by the Apache Spark community. And you can join. Get the release at spark.apache.org. Get the source on GitHub. And join the mailing lists. We welcome your contributions and your bug reports. (XIAO:) Thank you, DAIS. Enjoy the rest of the Summit.
