@@ -1,9 +1,9 @@
 # Speaker Notes — The Upcoming Apache Spark™ 4.2
-### DAIS 2026 keynote · two speakers · 78 slides
+### DAIS 2026 keynote · two speakers · 76 slides
 
 **Speakers:** XIAO = Xiao Li (gatorsmile) · DB = DB Tsai (dbtsai)
 
-**Split:** Xiao presents slides 1–40; DB presents 41–76. One handoff, at the end of the Spark SQL section.
+**Split:** Xiao presents slides 1–40; DB presents 41–74. One handoff, at the end of the Spark SQL section.
 
 **Through-line (say it often):** *Spark 4.2 moves more of the modern data and AI stack into the engine itself.* Five benefits — (1) Define truth once · (2) Reach Spark from everywhere · (3) Run AI-native analytics in SQL · (4) Move changing data safely · (5) Operate & evolve predictably.
 
@@ -159,7 +159,7 @@ This is the mental model. Spark Declarative Pipelines is the pipeline manager: i
 ## Section 06 · Streaming — Structured Streaming
 
 ### [45] Section divider — Structured Streaming · DB · ~0:12
-Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's talk, "Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!," happening Thursday, June 18 from 1:50 PM to 2:30 PM PDT at Marriott Level 2 Foothill G. The Spark 4.2 order is: stream-stream joins with fast watermark eviction, state-store integrity with row-level checksum and automatic snapshot repair, source naming for query evolution, and PySpark support for RTM. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.
+Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's talk, "Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!," happening Thursday, June 18 from 1:50 PM to 2:30 PM PDT at Marriott Level 2 Foothill G. The Spark 4.2 order is: stream-stream joins with fast watermark eviction, state-store integrity with row-level checksum and automatic snapshot repair, and PySpark support for RTM. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.
 
 ### [46] Stream-stream joins: fast watermark eviction · DB · ~0:30
 First, stream-stream joins. In Spark 4.1, virtual column families moved join state into one RocksDB store instead of four, but watermark eviction could still scan too much join state. In Spark 4.2, the State Data Source can read join state directly for debugging, state format v4 adds a secondary index for watermark eviction, and LeftSemi and non-outer joins get internal improvements. The talk's callout is the useful number: eviction scanning goes from about two seconds for a full scan to about thirty milliseconds bounded per million rows, even when there is nothing to evict.
@@ -167,96 +167,90 @@ First, stream-stream joins. In Spark 4.1, virtual column families moved join sta
 ### [47] State-store integrity: repair automatically · DB · ~0:30
 Second, state-store integrity. Spark 4.1 added state-machine locking, so RocksDB has a single owner, plus file-level integrity checksums, but manual recovery paths were still too common. Spark 4.2 goes finer grained with row-level checksum using CRC32C sampling, automatic snapshot repair, robust checkpoint format v2, and RocksDB memory usage on the unified memory manager. The practical point is fewer manual recovery paths for stateful streaming.
 
-### [48] Source naming and query evolution · DB · ~0:30
-Third, source naming and query evolution. A long-time problem: streaming checkpoints identified sources and sinks by position. Add, remove, or reorder a source, and the checkpoint could break. Spark 4.2 lets you name sources with IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark. Those names are tracked in checkpoint metadata, so identity is the name, not the position. This is the foundation for safer query evolution. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)
-
-### [49] IDENTIFIED BY in action · DB · ~0:18
-(Code slide.) Named sources. A query adds a new one, restarts, and keeps its checkpoint. No full reprocess.
-
 ## Section 07 · Data Source V2 — Data Source V2
 
-### [50] Section divider — Data Source V2 · DB · ~0:12
+### [48] Section divider — Data Source V2 · DB · ~0:12
 Still benefit four. Now Data Source V2 — how Spark connects to data. This is the short version of Szehon and Anton's DSv2 talk. The takeaway: use Spark syntax, and let DSv2 connectors expose the table-format features underneath.
 
-### [51] One integration API for every data source · DB · ~0:33
+### [49] One integration API for every data source · DB · ~0:33
 DSv2 is the standard API for data sources — Delta, Iceberg, and more. Connectors provide metadata and small contracts. Spark does the heavy lifting — analysis, planning, optimization, execution. That gives users consistent syntax and behavior across sources. This is only the short version. For the full deep dive, go to Szehon Ho and Anton Okolnychyi's talk, 'Spark DSV2: Growing Up Fast,' on June 18 from 11:30 to 12:10 at Marriott Level 2 Foothill C.
 
-### [52] What grew up in 4.1 and 4.2 · DB · ~0:32
+### [50] What grew up in 4.1 and 4.2 · DB · ~0:32
 DSv2 has a long history, but the recent momentum is the point. In 4.1 and 4.2, it grew into DML hardening, schema evolution, write summaries, transactions, ChangeLog, and PartitionPredicate. The theme is consistent: Spark takes on more of the feature complexity, while connectors expose small contracts.
 
-### [53] First-class CDC: one syntax, one algorithm · DB · ~0:35
+### [51] First-class CDC: one syntax, one algorithm · DB · ~0:35
 This is the short version of Gengliang and Johan's CDC implementation talk. The problem they start with is fragmentation: Delta, Iceberg, and Hudi all had change feeds, but each had its own API and defaults. Spark 4.2 makes CDC first-class: one CHANGES syntax, one algorithm in Spark, and a small DSv2 connector contract. Delta then uses that same Spark path for read-time CDC, so the writer does not have to precompute change files for every update. For the full CDC implementation deep dive, see Gengliang Wang and Johan Lasperas's talk, "First-Class CDC Support in Spark 4.2," on June 18 from 10:20 to 11:00 at Marriott Level 2 Foothill G.
 
-### [54] One CHANGES surface for users · DB · ~0:30
+### [52] One CHANGES surface for users · DB · ~0:30
 The first user-facing change is one surface. Today, each connector or table format exposes CDC differently: Delta has table_changes(), Iceberg has a changelog view procedure, and Hudi has incremental-read options. In Spark 4.2, the SQL keyword is CHANGES: ask between two versions, between two timestamps, or stream changes from a table. The same shape exists in DataFrames with read.changes() and readStream.changes(). The point is not that Delta gets a new function. The point is that any DSv2 source can enter through the same Spark door.
 
-### [55] A tiny DSv2 Changelog contract · DB · ~0:35
+### [53] A tiny DSv2 Changelog contract · DB · ~0:35
 (Code slide.) The connector side is intentionally tiny. It declares the output columns, provides a scan builder for raw change rows, and names the row identity and row version columns. Then three boolean flags describe the stream. Does it contain carry-over rows from copy-on-write rewrites? Does it contain intermediate changes that need net-change collapse? Are updates represented as delete plus insert? These flags are promises. If the answer is no, Spark can skip that work.
 
-### [56] Spark normalizes the raw stream · DB · ~0:35
+### [54] Spark normalizes the raw stream · DB · ~0:35
 This is the engine half. Spark injects common rewrites over the raw stream. First, it groups by row identity and commit to remove carry-over rows and detect updates. A delete and insert with the same row version is just a copied row, so Spark drops it. A delete and insert with a different row version becomes update preimage and postimage. Second, if the query asks for net changes, Spark uses a window to keep the final event per row. Delta's read-time implementation supplies row_id and row_commit_version from row tracking, so Spark can compute CDC without stored change files.
 
-### [57] DML schema evolution: Spark calculates, connector validates · DB · ~0:35
+### [55] DML schema evolution: Spark calculates, connector validates · DB · ~0:35
 Schema evolution is another place where DSv2 grew up. Spark compares the source and target, including nested struct fields. It computes what needs to change — add a column, widen a type, fill missing target fields with null or defaults — then the connector decides what is valid for that table format. Delta and Iceberg do not allow exactly the same widening rules, and DSv2 gives each connector a place to say yes or no.
 
-### [58] Schema evolution in action · DB · ~0:18
+### [56] Schema evolution in action · DB · ~0:18
 (Code slide.) A new column appears in the source. With SCHEMA EVOLUTION, Spark computes the schema change and asks the connector to apply what is valid. The DataFrame APIs mirror the SQL shape.
 
-### [59] Transactions: atomic, isolated DML · DB · ~0:30
+### [57] Transactions: atomic, isolated DML · DB · ~0:30
 DML is read, transform, write back. Without isolation, a writer can overwrite changes it never saw. So Spark 4.2 adds a transaction API. Spark begins a transaction for DML. The connector can stage writes, track reads, validate at commit time, and abort cleanly. The scope today is single DML statements. Multi-statement and cross-catalog transactions are future work.
 
-### [60] DML is observable now · DB · ~0:28
+### [58] DML is observable now · DB · ~0:28
 DML is observable now. Spark 4.1 added MERGE operation metrics. Spark 4.2 adds UPDATE and DELETE metrics. Spark collects row counts while the operation runs, then passes summary objects into the DSv2 commit API. Connectors surface the results where users already look — Delta DESCRIBE HISTORY and Iceberg snapshot summaries.
 
-### [61] Smarter pushdown: PartitionPredicate · DB · ~0:30
+### [59] Smarter pushdown: PartitionPredicate · DB · ~0:30
 This is a real gap, and connectors hit it every day. Built-in file sources use Catalyst directly, so they can evaluate the full power of Spark partition filters. DSv2 connectors used a smaller expression vocabulary, so UDFs and non-standard expressions got lost in translation. PartitionPredicate fixes that. Spark preserves the Catalyst predicate, the connector provides partition values, and Spark evaluates it. Less data read. Faster queries.
 
 ## Section 08 · Others — Performance, UI & Operations
 
-### [62] Section divider — Performance, UI & Operations · DB · ~0:12
+### [60] Section divider — Performance, UI & Operations · DB · ~0:12
 Benefit five: operate and evolve predictably. First, what makes Spark faster, easier to see, and easier to run. Takeaway: upgrade and get speed and stability, with no code change.
 
-### [63] A modern Spark Web UI · DB · ~0:25
+### [61] A modern Spark Web UI · DB · ~0:25
 The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL plans — you can pan, zoom, search, and compare the first and final AQE plans, side by side. And the environment page shows your non-default configs, with one-click export.
 
-### [64] Faster & leaner · DB · ~0:28
+### [62] Faster & leaner · DB · ~0:28
 Four performance points. Faster scans — better vectorized Parquet. Smarter plans — pre-aggregation for many COUNT(DISTINCT), and more codegen. Leaner memory — bounded merge and early release cut OOMs. And faster I/O — Arrow transfers data between the JVM and Python, resulting in lower memory overhead. All with no code change.
 
-### [65] Runtime & operations · DB · ~0:28
+### [63] Runtime & operations · DB · ~0:28
 On operations: we now run on Java 25. Kubernetes — in-place executor and PVC resizing, smaller images, NetworkPolicy isolation. The History Server scales — multiple log folders, and on-demand loading. And consistent results — query-level retry for indeterminate shuffles, with correct SQL metrics under AQE. That is 4.2. Now — what is next.
 
 ## Section 09 · Ongoing Work — Looking Ahead
 
-### [66] Section divider — Looking Ahead · DB · ~0:12
+### [64] Section divider — Looking Ahead · DB · ~0:12
 Still benefit five. This last part is ongoing work, already in progress for the next releases. It shows where Spark is going: Feather, portable UDFs, nanosecond time, Auto CDC SCD Type 2, Spark 4.3 streaming work, and faster releases. Takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.
 
-### [67] Roadmap (five topics) · DB · ~0:12
+### [65] Roadmap (five topics) · DB · ~0:12
 (Gesture across the five.) Five things ahead: Project Feather, a language-agnostic UDF protocol, nanosecond timestamps, the Spark 4.3 streaming and pipeline roadmap, and a faster release cadence. On streaming, I am borrowing the roadmap from Anish and Jerry's talk; on pipelines, note that Auto CDC SCD Type 2 is the natural next step after the SCD Type 1 support in Spark 4.2.
 
-### [68] Project Feather: fast local queries · DB · ~0:32
+### [66] Project Feather: fast local queries · DB · ~0:32
 First, Project Feather. The goal: make small queries fast on a laptop. Spark uses one API for big and small jobs. But for small jobs, the fixed costs are too high. A query over less than 100 MB can still take seconds — because planning, scheduling, serialization, and shuffle were built for big clusters. Feather works on three areas: planning and scheduling, the cache format, and shuffle.
-Here is the key difference. Unlike DuckDB or Polars, the value of Feather is this: many users want to start small on a laptop and scale to big data later — without switching APIs, engines, or mental models. If Spark can feel lightweight for local experimentation while still scaling to production workloads, that is a much smoother path from prototype to production.
+Here is the key difference. Unlike DuckDB or Polars, the value of Feather is this: many users want to start small on a laptop and scale to big data later — without switching APIs, engines, or mental models. If Spark can feel lightweight for local experimentation while still scaling to production workloads, that is a much smoother path from prototype to production. For the deep dive, see Daniel's talk, "Faster Queries in Local Laptop Mode for Apache Spark," Thursday, June 18, 10:20 to 11:00 AM PDT, Marriott Level 2 Foothill C.
 
-### [69] Project Feather: a three-part plan · DB · ~0:32
+### [67] Project Feather: a three-part plan · DB · ~0:32
 Feather has three parts. One: faster planning and scheduling. A single-pass analyzer, and a one-file query that runs as a single task, with no shuffle. Two: an Arrow columnar cache, to replace the row-based df.cache, for faster re-reads. And UDFs now take Arrow as input too — so the data stays Arrow end to end, with no format change across the pipeline. Three: shuffle-free local execution. Threads pass data through channels, instead of shuffle files. Together, Spark works on a laptop, and still scales to the cluster.
 
-### [70] Language-agnostic UDF protocol · DB · ~0:35
-Remember the Connect clients — Go, Rust, Swift, and more. UDFs are the one thing Connect cannot give most of them. SPIP SPARK-55278 fixes that. Today, each language rebuilds the whole UDF stack. The planning rules are tied to Python. Serialized UDFs are tied to a runtime — a server upgrade can break them. And UDF execution is locked in the cluster. So a heavy or GPU UDF forces an over-sized cluster.
+### [68] Language-agnostic UDF protocol · DB · ~0:35
+Remember the Connect clients — Go, Rust, Swift, and more. UDFs are the one thing Connect cannot give most of them. SPIP SPARK-55278 fixes that. Today, each language rebuilds the whole UDF stack. The planning rules are tied to Python. Serialized UDFs are tied to a runtime — a server upgrade can break them. And UDF execution is locked in the cluster. So a heavy or GPU UDF forces an over-sized cluster. For the deep dive, see Haiyang Sun and Tian Gao's talk, "Language-Agnostic UDF Protocol for Spark," June 16, 4:30 to 4:50 PM PDT, South — DevHub, DevConnect Showcase.
 
-### [71] Three pillars · DB · ~0:32
+### [69] Three pillars · DB · ~0:32
 The design has three parts. One: plan UDFs by their shape — scalar, map, grouped map, table, aggregate — not by language. Two: one execution protocol — init, data, finish — over gRPC and Arrow. It is versioned, and has back-pressure. Three: a worker spec. The client says how to start, connect, and clean up a worker — local, container, or remote GPU. Each part can change without touching the others.
 
-### [72] Status & what it unlocks · DB · ~0:25
+### [70] Status & what it unlocks · DB · ~0:25
 Status: the SPIP vote passed. First code is landing in apache/spark, under /udf/worker. PySpark behavior does not change — one shared core, with pluggable transport. Socket stays the default. gRPC is opt-in. It unlocks UDFs in any language, runtimes that upgrade on their own, and heavy or GPU UDFs on separate workers.
 
-### [73] Nanosecond-precision timestamps · DB · ~0:32
+### [71] Nanosecond-precision timestamps · DB · ~0:32
 SPIP SPARK-56822. Today, Spark timestamps stop at microseconds. So nanosecond Parquet either fails, or falls back to a plain long — and loses the timestamp meaning. This adds parameterized types — TIMESTAMP(n), with n from 0 to 9. 6 is micros, 9 is nanos. The value model is compact, and keeps today's date range. It is fully backward compatible. Micro types stay the default. Nanosecond behavior appears only when you ask.
 
-### [74] Spark 4.3 streaming + pipeline roadmap · DB · ~0:35
-From Anish and Jerry's roadmap slide, Spark 4.3 has several streaming themes. First: real-time mode for stateful queries, with concurrent scheduling, streaming shuffle, transformWithState, and latency metrics. Second: operator naming and evolution — a structured way to identify operators inside checkpoints, extending the source naming idea we just covered. Third: ML extensions, including streaming support for k-means search for real-time clustering and vector-search use cases. On the pipeline side, SDP Flow APIs continue the move toward more advanced flow control, and Auto CDC SCD Type 2 is the planned history-preserving follow-up to Spark 4.2's SCD Type 1 support. Last, how we ship all of this.
+### [72] Spark 4.3 streaming + pipeline roadmap · DB · ~0:35
+From Anish and Jerry's roadmap slide, Spark 4.3 has several streaming themes. First: real-time mode for stateful queries, with concurrent scheduling, streaming shuffle, transformWithState, and latency metrics. Second: operator naming and evolution — a structured way to identify operators inside checkpoints. Third: ML extensions, including streaming support for k-means search for real-time clustering and vector-search use cases. On the pipeline side, SDP Flow APIs continue the move toward more advanced flow control, and Auto CDC SCD Type 2 is the planned history-preserving follow-up to Spark 4.2's SCD Type 1 support. Last, how we ship all of this.
 
-### [75] Faster, predictable releases · DB · ~0:40
+### [73] Faster, predictable releases · DB · ~0:40
 And how we ship it. SPARK-54633 — a two-layer model: quarterly minor releases, and one major a year. Minors do not change dependencies or defaults, so upgrades stay safe. Majors carry the breaking changes. The last minor of each major is an 18-month LTS. 4.2 is the bridge. The quarterly train starts at 4.3. As a transition exception, the 4.x LTS is 4.5.0 — the last 4.x release, around March 2027 — not 4.3. Then Spark 5.0 follows, around June 2027. Takeaway: plan upgrades around the quarterly cadence, and target the 4.5 LTS.
 
-### [76] Join the community today! · DB + XIAO · ~0:20
+### [74] Join the community today! · DB + XIAO · ~0:20
 (DB:) All of this is built by the Apache Spark community. And you can join. Get the release at spark.apache.org. Get the source on GitHub. And join the mailing lists. We welcome your contributions and your bug reports. (XIAO:) Thank you, DAIS. Enjoy the rest of the Summit.

@@ -2074,7 +2074,7 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
   <div class="benefit">Move changing data safely</div>
   <div class="takeaway">
     <div class="today"><span class="tk-label">Today</span>Streaming workloads need lower latency, safer evolution, and stronger state.</div>
-    <div class="now"><span class="tk-label">Spark 4.2</span>Fast watermark eviction, state-store integrity, source naming, and PySpark support for RTM.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Fast watermark eviction, state-store integrity, and PySpark support for RTM.</div>
     <div class="mon"><span class="tk-label">Takeaway</span>Structured Streaming keeps moving toward always-on production pipelines.</div>
   </div>
   <p class="fcap" style="margin-top:18px; max-width:1280px"><b>Full talk:</b> “Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!” — Anish Shrigondekar &amp; Jerry Peng, Thursday, June 18, 1:50 PM-2:30 PM PDT, Marriott Level 2 Foothill G</p>
@@ -2083,7 +2083,7 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Structured Streaming · DB · ~0:12
 
-Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's talk, "Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!," happening Thursday, June 18 from 1:50 PM to 2:30 PM PDT at Marriott Level 2 Foothill G. The Spark 4.2 order is: stream-stream joins with fast watermark eviction, state-store integrity with row-level checksum and automatic snapshot repair, source naming for query evolution, and PySpark support for RTM. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.</div>
+Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's talk, "Evolving Apache Spark Structured Streaming in Open Source: A Year in Review and the Road Ahead!," happening Thursday, June 18 from 1:50 PM to 2:30 PM PDT at Marriott Level 2 Foothill G. The Spark 4.2 order is: stream-stream joins with fast watermark eviction, state-store integrity with row-level checksum and automatic snapshot repair, and PySpark support for RTM. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.</div>
 </section>
 
 <section class="slide">
@@ -2146,57 +2146,6 @@ First, stream-stream joins. In Spark 4.1, virtual column families moved join sta
 Second, state-store integrity. Spark 4.1 added state-machine locking, so RocksDB has a single owner, plus file-level integrity checksums, but manual recovery paths were still too common. Spark 4.2 goes finer grained with row-level checksum using CRC32C sampling, automatic snapshot repair, robust checkpoint format v2, and RocksDB memory usage on the unified memory manager. The practical point is fewer manual recovery paths for stateful streaming.</div>
 </section>
 
-<section class="slide">
-  <div class="eyebrow">Streaming</div>
-  <h2>Source naming and query evolution</h2>
-  <div class="baf">
-    <div class="col today">
-      <div class="hd">The problem</div>
-      <ul>
-        <li>Checkpoints pin sources and sinks by <b>position</b></li>
-        <li>Add, remove, or reorder one and the checkpoint can break</li>
-        <li>Position-based identity blocks safer query evolution</li>
-      </ul>
-    </div>
-    <div class="col now">
-      <div class="hd">Spark 4.2</div>
-      <ul>
-        <li>Name sources with <b>IDENTIFIED BY</b></li>
-        <li>PySpark: <code>DataStreamReader.name(&hellip;)</code></li>
-        <li>Names are tracked in checkpoint metadata as the foundation for query evolution</li>
-      </ul>
-    </div>
-  </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Identity becomes the name, not the source position.</span></div>
-  <div class="slide-footer"><span>Streaming</span><span>48</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>Source naming and query evolution · DB · ~0:30
-
-Third, source naming and query evolution. A long-time problem: streaming checkpoints identified sources and sinks by position. Add, remove, or reorder a source, and the checkpoint could break. Spark 4.2 lets you name sources with IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark. Those names are tracked in checkpoint metadata, so identity is the name, not the position. This is the foundation for safer query evolution. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)</div>
-</section>
-
-<section class="slide">
-  <div class="eyebrow">Streaming <span class="tag">In action</span></div>
-  <h2>IDENTIFIED BY in action</h2>
-  <pre class="code focus"><span class="c">-- Name each source: identity is the name, not the position</span>
-<span class="k">CREATE STREAMING TABLE</span> unified <span class="k">AS</span>
-<span class="k">SELECT</span> * <span class="k">FROM</span> STREAM orders   <span class="hl">IDENTIFIED BY orders_src</span>
-<span class="k">UNION ALL</span>
-<span class="k">SELECT</span> * <span class="k">FROM</span> STREAM backfill <span class="hl">IDENTIFIED BY backfill_src</span>;
-
-<span class="c"># PySpark: name the source on DataStreamReader</span>
-spark.readStream.name(<span class="s">"orders_src"</span>).table(<span class="s">"orders"</span>)
-df.writeStream.toTable(<span class="s">"unified"</span>)
-
-<span class="c">-- Later: add, remove, or reorder sources
--- without breaking the checkpoint</span></pre>
-  <div class="slide-footer"><span>Streaming</span><span>49</span></div>
-  <div class="progress"><i></i></div>
-  <div class="notes" hidden>IDENTIFIED BY in action · DB · ~0:18
-
-(Code slide.) Named sources. A query adds a new one, restarts, and keeps its checkpoint. No full reprocess.</div>
-</section>
-
 <!-- ============ Section 07 ============ -->
 <section class="slide break">
   <div class="eyebrow">Section 07 &middot; Data Source V2</div>
@@ -2209,7 +2158,7 @@ df.writeStream.toTable(<span class="s">"unified"</span>)
     <div class="mon"><span class="tk-label">Takeaway</span>Use Spark syntax; let DSv2 connectors expose table-format power.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep on"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>50</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>48</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Data Source V2 · DB · ~0:12
 
@@ -2232,7 +2181,7 @@ Still benefit four. Now Data Source V2 — how Spark connects to data. This is t
     <div class="fbox accent"><div class="ft">One contract, many capabilities</div><div class="fchips"><span>Read</span><span>DML</span><span>ChangeLog</span><span>Transactions</span><span>Pushdown</span></div></div>
   </div>
   <p class="fcap">Implement the contract once; Spark drives <b>reads, row-level writes, change feeds, transactions, and partition pruning</b> through the same source.</p>
-  <div class="slide-footer"><span>Data Source V2</span><span>51</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>49</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One integration API for every data source · DB · ~0:33
 
@@ -2256,7 +2205,7 @@ DSv2 is the standard API for data sources — Delta, Iceberg, and more. Connecto
     <div class="fbox accent"><div class="ft">Spark 4.2</div><div class="fchips"><span>Transactions</span><span>Schema evolution</span><span>ChangeLog</span><span>PartitionPredicate</span><span>Write summaries</span></div></div>
   </div>
   <p class="fcap">The pattern is the same each time: <b>move feature-specific complexity into Spark</b>, and keep connector APIs small.</p>
-  <div class="slide-footer"><span>Data Source V2</span><span>52</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>50</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Ask the table: "what changed?" · DB · ~0:32
 
@@ -2274,7 +2223,7 @@ DSv2 has a long history, but the recent momentum is the point. In 4.1 and 4.2, i
     <li>Delta uses the same Spark CDC path for read-time CDC: compute changes when a reader asks</li>
   </ul>
   <p class="fcap"><b>Full talk:</b> “First-Class CDC Support in Spark 4.2” — Gengliang Wang &amp; Johan Lasperas, June 18, 10:20-11:00, Marriott Level 2 Foothill G</p>
-  <div class="slide-footer"><span>Data Source V2</span><span>53</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>51</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>First-class CDC: one syntax, one algorithm · DB · ~0:35
 
@@ -2305,7 +2254,7 @@ This is the short version of Gengliang and Johan's CDC implementation talk. The 
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Same user surface for any DSv2 source that implements the changelog contract.</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>54</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>52</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One CHANGES surface for users · DB · ~0:30
 
@@ -2328,7 +2277,7 @@ The first user-facing change is one surface. Today, each connector or table form
   <span class="k">boolean</span> representsUpdateAsDeleteAndInsert();
 }</pre>
   <p class="fcap">The connector describes what it can provide. Spark decides which post-processing steps can be skipped.</p>
-  <div class="slide-footer"><span>Data Source V2</span><span>55</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>53</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>A tiny DSv2 Changelog contract · DB · ~0:35
 
@@ -2358,7 +2307,7 @@ The first user-facing change is one surface. Today, each connector or table form
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Connectors stay thin; Spark owns the reusable CDC algorithm.</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>56</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>54</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Spark normalizes the raw stream · DB · ~0:35
 
@@ -2389,7 +2338,7 @@ This is the engine half. Spark injects common rewrites over the raw stream. Firs
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Let Spark compute the schema change; let the connector enforce what its table format allows.</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>57</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>55</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Smarter writes: INSERT &amp; MERGE · DB · ~0:30
 
@@ -2413,7 +2362,7 @@ Schema evolution is another place where DSv2 grew up. Spark compares the source 
 <span class="c">-- DataFrame APIs mirror the SQL shape:
 --   df.writeTo("target").withSchemaEvolution().append()
 --   df.mergeInto("target", cond).withSchemaEvolution().merge()</span></pre>
-  <div class="slide-footer"><span>Data Source V2</span><span>58</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>56</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Schema evolution in action · DB · ~0:18
 
@@ -2438,7 +2387,7 @@ Schema evolution is another place where DSv2 grew up. Spark compares the source 
     <li>Connectors can stage writes, track reads, validate on commit, and abort cleanly</li>
     <li>Current scope: single DML statement; no multi-statement or cross-catalog transactions yet</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>59</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>57</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Transactions: atomic, isolated DML · DB · ~0:30
 
@@ -2455,7 +2404,7 @@ DML is read, transform, write back. Without isolation, a writer can overwrite ch
     <li>Spark collects the row counts and passes summary objects into DSv2 <code>commit()</code></li>
     <li>Surfaced where users already look: Delta <code>DESCRIBE HISTORY</code> and Iceberg snapshot summaries</li>
   </ul>
-  <div class="slide-footer"><span>Data Source V2</span><span>60</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>58</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Observable, evolvable DML · DB · ~0:28
 
@@ -2486,7 +2435,7 @@ DML is observable now. Spark 4.1 added MERGE operation metrics. Spark 4.2 adds U
     </div>
   </div>
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt"><code>WHERE udf(month(ts)) = 'JAN'</code> now <b>prunes partitions</b> in Iceberg and Delta &mdash; less data read, faster queries.</span></div>
-  <div class="slide-footer"><span>Data Source V2</span><span>61</span></div>
+  <div class="slide-footer"><span>Data Source V2</span><span>59</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Smarter pushdown: PartitionPredicate · DB · ~0:30
 
@@ -2505,7 +2454,7 @@ This is a real gap, and connectors hit it every day. Built-in file sources use C
     <div class="mon"><span class="tk-label">Takeaway</span>Upgrade to 4.2 and pick up speed and stability with no code change.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep"><i>4</i>Move changing data safely</span><span class="bstep on"><i>5</i>Operate &amp; evolve predictably</span></div>
-  <div class="slide-footer"><span>Others</span><span>62</span></div>
+  <div class="slide-footer"><span>Others</span><span>60</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Performance, UI &amp; Operations · DB · ~0:12
 
@@ -2520,7 +2469,7 @@ Benefit five: operate and evolve predictably. First, what makes Spark faster, ea
     <li><b>Interactive SQL plans</b> &mdash; pan, zoom, search, and compare initial vs final AQE plans side by side</li>
     <li>Environment page highlights non-default configs, with one-click export</li>
   </ul>
-  <div class="slide-footer"><span>Others</span><span>63</span></div>
+  <div class="slide-footer"><span>Others</span><span>61</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>A modern Spark Web UI · DB · ~0:25
 
@@ -2536,7 +2485,7 @@ The Web UI has a new look. Dark mode, and a faster interface. Interactive SQL pl
     <li><b>Leaner memory</b> &mdash; bounded external merge and eager memory release cut OOMs</li>
     <li><b>Faster I/O</b> &mdash; Arrow transfer between JVM and Python lowers memory overhead</li>
   </ul>
-  <div class="slide-footer"><span>Others</span><span>64</span></div>
+  <div class="slide-footer"><span>Others</span><span>62</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Faster &amp; leaner · DB · ~0:28
 
@@ -2556,7 +2505,7 @@ Four performance points. Faster scans — better vectorized Parquet. Smarter pla
     <span class="lp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.915 0 11.7.215C9.515 2.4 7.47 6.39 6.046 10.483c-1.064 1.024-3.633 2.81-3.711 3.551-.093.87 1.746 2.611 1.55 3.235-.198.625-1.304 1.408-1.014 1.939.1.188.823.011 1.277-.491a13.389 13.389 0 0 0-.017 2.14c.076.906.27 1.668.643 2.232.372.563.956.911 1.667.911.397 0 .727-.114 1.024-.264.298-.149.571-.33.91-.5.68-.34 1.634-.666 3.53-.604 1.903.062 2.872.39 3.559.704.687.314 1.15.664 1.925.664.767 0 1.395-.336 1.807-.9.412-.563.631-1.33.72-2.24.06-.623.055-1.32 0-2.066.454.45 1.117.604 1.213.424.29-.53-.816-1.314-1.013-1.937-.198-.624 1.642-2.366 1.549-3.236-.08-.748-2.707-2.568-3.748-3.586C16.428 6.374 14.308 2.394 12.13.215zm.175 6.038a2.95 2.95 0 0 1 2.943 2.942 2.95 2.95 0 0 1-2.943 2.943A2.95 2.95 0 0 1 9.148 8.98a2.95 2.95 0 0 1 2.942-2.942zM8.685 7.983a3.515 3.515 0 0 0-.145.997c0 1.951 1.6 3.55 3.55 3.55 1.95 0 3.55-1.598 3.55-3.55 0-.329-.046-.648-.132-.951.334.095.64.208.915.336a42.699 42.699 0 0 1 2.042 5.829c.678 2.545 1.01 4.92.846 6.607-.082.844-.29 1.51-.606 1.94-.315.431-.713.651-1.315.651-.593 0-.932-.27-1.673-.61-.741-.338-1.825-.694-3.792-.758-1.974-.064-3.073.293-3.821.669-.375.188-.659.373-.911.5s-.466.2-.752.2c-.53 0-.876-.209-1.16-.64-.285-.43-.474-1.101-.545-1.948-.141-1.693.176-4.069.823-6.614a43.155 43.155 0 0 1 1.934-5.783c.348-.167.749-.31 1.192-.425zm-3.382 4.362a.216.216 0 0 1 .13.031c-.166.56-.323 1.116-.463 1.665a33.849 33.849 0 0 0-.547 2.555 3.9 3.9 0 0 0-.2-.39c-.58-1.012-.914-1.642-1.16-2.08.315-.24 1.679-1.755 2.24-1.781zm13.394.01c.562.027 1.926 1.543 2.24 1.783-.246.438-.58 1.068-1.16 2.08a4.428 4.428 0 0 0-.163.309 32.354 32.354 0 0 0-.562-2.49 40.579 40.579 0 0 0-.482-1.652.216.216 0 0 1 .127-.03z"/></svg><span>Java 25</span></span>
     <span class="lp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.204 14.35l.007.01-.999 2.413a5.171 5.171 0 0 1-2.075-2.597l2.578-.437.004.005a.44.44 0 0 1 .484.606zm-.833-2.129a.44.44 0 0 0 .173-.756l.002-.011L7.585 9.7a5.143 5.143 0 0 0-.73 3.255l2.514-.725.002-.009zm1.145-1.98a.44.44 0 0 0 .699-.337l.01-.005.15-2.62a5.144 5.144 0 0 0-3.01 1.442l2.147 1.523.004-.002zm.76 2.75l.723.349.722-.347.18-.78-.5-.623h-.804l-.5.623.179.779zm1.5-3.095a.44.44 0 0 0 .7.336l.008.003 2.134-1.513a5.188 5.188 0 0 0-2.992-1.442l.148 2.615.002.001zm10.876 5.97l-5.773 7.181a1.6 1.6 0 0 1-1.248.594l-9.261.003a1.6 1.6 0 0 1-1.247-.596l-5.776-7.18a1.583 1.583 0 0 1-.307-1.34L2.1 5.573c.108-.47.425-.864.863-1.073L11.305.513a1.606 1.606 0 0 1 1.385 0l8.345 3.985c.438.209.755.604.863 1.073l2.062 8.955c.108.47-.005.963-.308 1.34zm-3.289-2.057c-.042-.01-.103-.026-.145-.034-.174-.033-.315-.025-.479-.038-.35-.037-.638-.067-.895-.148-.105-.04-.18-.165-.216-.216l-.201-.059a6.45 6.45 0 0 0-.105-2.332 6.465 6.465 0 0 0-.936-2.163c.052-.047.15-.133.177-.159.008-.09.001-.183.094-.282.197-.185.444-.338.743-.522.142-.084.273-.137.415-.242.032-.024.076-.062.11-.089.24-.191.295-.52.123-.736-.172-.216-.506-.236-.745-.045-.034.027-.08.062-.111.088-.134.116-.217.23-.33.35-.246.25-.45.458-.673.609-.097.056-.239.037-.303.033l-.19.135a6.545 6.545 0 0 0-4.146-2.003l-.012-.223c-.065-.062-.143-.115-.163-.25-.022-.268.015-.557.057-.905.023-.163.061-.298.068-.475.001-.04-.001-.099-.001-.142 0-.306-.224-.555-.5-.555-.275 0-.499.249-.499.555l.001.014c0 .041-.002.092 0 .128.006.177.044.312.067.475.042.348.078.637.056.906a.545.545 0 0 1-.162.258l-.012.211a6.424 6.424 0 0 0-4.166 2.003 8.373 8.373 0 0 1-.18-.128c-.09.012-.18.04-.297-.029-.223-.15-.427-.358-.673-.608-.113-.12-.195-.234-.329-.349-.03-.026-.077-.062-.111-.088a.594.594 0 0 0-.348-.132.481.481 0 0 0-.398.176c-.172.216-.117.546.123.737l.007.005.104.083c.142.105.272.159.414.242.299.185.546.338.743.522.076.082.09.226.1.288l.16.143a6.462 6.462 0 0 0-1.02 4.506l-.208.06c-.055.072-.133.184-.215.217-.257.081-.546.11-.895.147-.164.014-.305.006-.48.039-.037.007-.09.02-.133.03l-.004.002-.007.002c-.295.071-.484.342-.423.608.061.267.349.429.645.365l.007-.001.01-.003.129-.029c.17-.046.294-.113.448-.172.33-.118.604-.217.87-.256.112-.009.23.069.288.101l.217-.037a6.5 6.5 0 0 0 2.88 3.596l-.09.218c.033.084.069.199.044.282-.097.252-.263.517-.452.813-.091.136-.185.242-.268.399-.02.037-.045.095-.064.134-.128.275-.034.591.213.71.248.12.556-.007.69-.282v-.002c.02-.039.046-.09.062-.127.07-.162.094-.301.144-.458.132-.332.205-.68.387-.897.05-.06.13-.082.215-.105l.113-.205a6.453 6.453 0 0 0 4.609.012l.106.192c.086.028.18.042.256.155.136.232.229.507.342.84.05.156.074.295.145.457.016.037.043.09.062.129.133.276.442.402.69.282.247-.118.341-.435.213-.71-.02-.039-.045-.096-.065-.134-.083-.156-.177-.261-.268-.398-.19-.296-.346-.541-.443-.793-.04-.13.007-.21.038-.294-.018-.022-.059-.144-.083-.202a6.499 6.499 0 0 0 2.88-3.622c.064.01.176.03.213.038.075-.05.144-.114.28-.104.266.039.54.138.87.256.154.06.277.128.448.173.036.01.088.019.13.028l.009.003.007.001c.297.064.584-.098.645-.365.06-.266-.128-.537-.423-.608zM16.4 9.701l-1.95 1.746v.005a.44.44 0 0 0 .173.757l.003.01 2.526.728a5.199 5.199 0 0 0-.108-1.674A5.208 5.208 0 0 0 16.4 9.7zm-4.013 5.325a.437.437 0 0 0-.404-.232.44.44 0 0 0-.372.233h-.002l-1.268 2.292a5.164 5.164 0 0 0 3.326.003l-1.27-2.296h-.01zm1.888-1.293a.44.44 0 0 0-.27.036.44.44 0 0 0-.214.572l-.003.004 1.01 2.438a5.15 5.15 0 0 0 2.081-2.615l-2.6-.44-.004.005z"/></svg><span>Kubernetes</span></span>
   </div>
-  <div class="slide-footer"><span>Others</span><span>65</span></div>
+  <div class="slide-footer"><span>Others</span><span>63</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Runtime &amp; operations · DB · ~0:28
 
@@ -2575,7 +2524,7 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
     <div class="mon"><span class="tk-label">Takeaway</span>Follow the SPIPs, try the previews, and plan around the quarterly cadence.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep"><i>4</i>Move changing data safely</span><span class="bstep on"><i>5</i>Operate &amp; evolve predictably</span></div>
-  <div class="slide-footer"><span>Looking Ahead</span><span>66</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>64</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Looking Ahead · DB · ~0:12
 
@@ -2593,7 +2542,7 @@ Still benefit five. This last part is ongoing work, already in progress for the 
       <li><span class="n">04</span><div class="txt"><h3>Streaming &amp; pipeline roadmap</h3><p>Real-time mode, query evolution, SDP Flow APIs, and Auto CDC SCD Type 2</p></div></li>
       <li><span class="n">05</span><div class="txt"><h3>Faster, predictable releases</h3><p>A more frequent, predictable release cadence</p></div></li>
   </ol>
-  <div class="slide-footer"><span>Looking Ahead</span><span>67</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>65</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (five topics) · DB · ~0:12
 
@@ -2612,13 +2561,14 @@ Still benefit five. This last part is ongoing work, already in progress for the 
     <li>Three focus areas: query compilation &amp; task scheduling, cache format efficiency, shuffle overhead</li>
   </ul>
   <p class="sub" style="margin-top:30px"><b>Unlike DuckDB or Polars:</b> start small on a laptop and scale to big data later &mdash; no switching APIs, engines, or mental models. A smoother path from prototype to production.</p>
-  <div class="slide-footer"><span>Looking Ahead</span><span>68</span></div>
+  <p class="fcap" style="margin-top:18px; max-width:1280px"><b>Full talk:</b> “Faster Queries in Local Laptop Mode for Apache Spark” — Daniel, Thursday, June 18, 10:20 AM-11:00 AM PDT, Marriott Level 2 Foothill C</p>
+  <div class="slide-footer"><span>Looking Ahead</span><span>66</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Project Feather: fast local queries · DB · ~0:32
 
 First, Project Feather. The goal: make small queries fast on a laptop. Spark uses one API for big and small jobs. But for small jobs, the fixed costs are too high. A query over less than 100 MB can still take seconds — because planning, scheduling, serialization, and shuffle were built for big clusters. Feather works on three areas: planning and scheduling, the cache format, and shuffle.
 
-Here is the key difference. Unlike DuckDB or Polars, the value of Feather is this: many users want to start small on a laptop and scale to big data later — without switching APIs, engines, or mental models. If Spark can feel lightweight for local experimentation while still scaling to production workloads, that is a much smoother path from prototype to production.</div>
+Here is the key difference. Unlike DuckDB or Polars, the value of Feather is this: many users want to start small on a laptop and scale to big data later — without switching APIs, engines, or mental models. If Spark can feel lightweight for local experimentation while still scaling to production workloads, that is a much smoother path from prototype to production. For the deep dive, see Daniel's talk, "Faster Queries in Local Laptop Mode for Apache Spark," Thursday, June 18, 10:20 to 11:00 AM PDT, Marriott Level 2 Foothill C.</div>
 </section>
 
 <!-- 59 -->
@@ -2632,7 +2582,7 @@ Here is the key difference. Unlike DuckDB or Polars, the value of Feather is thi
     <li><b>Shuffle-free local execution</b> &mdash; a multithreaded local mode where threads pass data through channels instead of shuffle files</li>
   </ul>
   <p class="sub" style="margin-top:30px">Together: Spark that works at laptop scale, with a clear path back to the cluster.</p>
-  <div class="slide-footer"><span>Looking Ahead</span><span>69</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>67</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Project Feather: a three-part plan · DB · ~0:32
 
@@ -2651,11 +2601,12 @@ Feather has three parts. One: faster planning and scheduling. A single-pass anal
     <li>Serialized UDFs are tied to a runtime &mdash; server upgrades can quietly break them</li>
     <li>UDF execution is caged in the cluster: heavy or GPU UDFs force over-sized clusters</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>70</span></div>
+  <p class="fcap" style="margin-top:18px; max-width:1280px"><b>Full talk:</b> “Language-Agnostic UDF Protocol for Spark” — Haiyang Sun &amp; Tian Gao, June 16, 4:30 PM-4:50 PM PDT, South | DevHub, DevConnect Showcase</p>
+  <div class="slide-footer"><span>Looking Ahead</span><span>68</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Language-agnostic UDF protocol · DB · ~0:35
 
-Remember the Connect clients — Go, Rust, Swift, and more. UDFs are the one thing Connect cannot give most of them. SPIP SPARK-55278 fixes that. Today, each language rebuilds the whole UDF stack. The planning rules are tied to Python. Serialized UDFs are tied to a runtime — a server upgrade can break them. And UDF execution is locked in the cluster. So a heavy or GPU UDF forces an over-sized cluster.</div>
+Remember the Connect clients — Go, Rust, Swift, and more. UDFs are the one thing Connect cannot give most of them. SPIP SPARK-55278 fixes that. Today, each language rebuilds the whole UDF stack. The planning rules are tied to Python. Serialized UDFs are tied to a runtime — a server upgrade can break them. And UDF execution is locked in the cluster. So a heavy or GPU UDF forces an over-sized cluster. For the deep dive, see Haiyang Sun and Tian Gao's talk, "Language-Agnostic UDF Protocol for Spark," June 16, 4:30 to 4:50 PM PDT, South — DevHub, DevConnect Showcase.</div>
 </section>
 
 <!-- 63 -->
@@ -2673,7 +2624,7 @@ Remember the Connect clients — Go, Rust, Swift, and more. UDFs are the one thi
     <div class="fbox"><div class="ft">3 &middot; Worker spec</div><div class="fd">client declares start / connect / clean up</div><div class="fchips" style="margin-top:8px"><span>local</span><span>container</span><span>remote / GPU</span></div></div>
   </div>
   <p class="fcap">Each pillar is <b>replaceable without touching the others</b> &mdash; that&rsquo;s what makes UDFs portable across languages, runtimes, and hardware.</p>
-  <div class="slide-footer"><span>Looking Ahead</span><span>71</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>69</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Three pillars · DB · ~0:32
 
@@ -2690,7 +2641,7 @@ The design has three parts. One: plan UDFs by their shape — scalar, map, group
     <li>PySpark behavior unchanged: one shared processing core, transport becomes pluggable (socket stays the default; gRPC is opt-in)</li>
     <li>Unlocks UDFs in any language, runtimes that upgrade independently of Spark, and heavy / GPU UDFs on dedicated workers</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>72</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>70</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Status &amp; what it unlocks · DB · ~0:25
 
@@ -2709,7 +2660,7 @@ Status: the SPIP vote passed. First code is landing in apache/spark, under /udf/
     <li>Compact value model: epoch <b>micros</b> (long) + <b>nanos-within-micro</b> (0&ndash;999) &mdash; keeps today's calendar range, avoids the single-INT64-nanos &ldquo;range cliff&rdquo;</li>
     <li><b>Additive &amp; backward compatible</b> &mdash; existing micro types stay the default; nanosecond behavior appears only when <code>(n)</code> is given</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>73</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>71</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Nanosecond-precision timestamps · DB · ~0:32
 
@@ -2727,11 +2678,11 @@ SPIP SPARK-56822. Today, Spark timestamps stop at microseconds. So nanosecond Pa
     <li><b>Machine-learning extensions</b>: streaming support for k-means search, real-time clustering, and vector-search use cases</li>
     <li><b>SDP Flow APIs + Auto CDC SCD Type 2</b>: more flow control, plus history-preserving CDC targets beyond 4.2's SCD Type 1 support</li>
   </ul>
-  <div class="slide-footer"><span>Looking Ahead</span><span>74</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>72</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Spark 4.3 streaming + pipeline roadmap · DB · ~0:35
 
-From Anish and Jerry's roadmap slide, Spark 4.3 has several streaming themes. First: real-time mode for stateful queries, with concurrent scheduling, streaming shuffle, transformWithState, and latency metrics. Second: operator naming and evolution — a structured way to identify operators inside checkpoints, extending the source naming idea we just covered. Third: ML extensions, including streaming support for k-means search for real-time clustering and vector-search use cases. On the pipeline side, SDP Flow APIs continue the move toward more advanced flow control, and Auto CDC SCD Type 2 is the planned history-preserving follow-up to Spark 4.2's SCD Type 1 support. Last, how we ship all of this.</div>
+From Anish and Jerry's roadmap slide, Spark 4.3 has several streaming themes. First: real-time mode for stateful queries, with concurrent scheduling, streaming shuffle, transformWithState, and latency metrics. Second: operator naming and evolution — a structured way to identify operators inside checkpoints. Third: ML extensions, including streaming support for k-means search for real-time clustering and vector-search use cases. On the pipeline side, SDP Flow APIs continue the move toward more advanced flow control, and Auto CDC SCD Type 2 is the planned history-preserving follow-up to Spark 4.2's SCD Type 1 support. Last, how we ship all of this.</div>
 </section>
 
 <section class="slide">
@@ -2755,7 +2706,7 @@ From Anish and Jerry's roadmap slide, Spark 4.3 has several streaming themes. Fi
     <div class="farrow">&#8594;</div>
     <div class="fbox"><div class="ver">5.0</div><div class="role">next major &middot; ~Jun 2027</div></div>
   </div>
-  <div class="slide-footer"><span>Looking Ahead</span><span>75</span></div>
+  <div class="slide-footer"><span>Looking Ahead</span><span>73</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Faster, predictable releases · DB · ~0:40
 
@@ -2775,7 +2726,7 @@ And how we ship it. SPARK-54633 — a two-layer model: quarterly minor releases,
       <a href="https://spark.apache.org/community/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.805 2.197v.066h.156v.44h.072v-.44h.156v-.066zm.9 0l-.175.353-.172-.353h-.087v.506h.067V2.3l.172.35h.045l.172-.35v.404h.066v-.506zm-4.257 1c-.204.31-.424.66-.66 1.06l-.04.062a44.457 44.457 0 00-1.265 2.29c-.187.36-.38.742-.577 1.146l2.267-.25c.66-.302.955-.578 1.242-.976a15.5 15.5 0 00.23-.342c.23-.363.46-.763.663-1.16.197-.386.37-.767.505-1.11.083-.22.15-.422.198-.6.042-.158.074-.307.1-.45-.884.15-1.965.295-2.668.33zM11.894 7.78l-.077.16c-.078.16-.157.32-.236.488-.086.18-.172.364-.26.552l-.132.287a75.265 75.265 0 00-1.427 3.3c-.163.397-.327.807-.493 1.23-.15.38-.297.765-.45 1.164l-.02.06c-.15.396-.3.802-.453 1.22l-.01.027.72-.08a.213.213 0 01-.042-.006c.863-.106 2.01-.75 2.75-1.547.342-.367.652-.8.94-1.306.213-.377.413-.795.604-1.258.168-.405.328-.843.48-1.318-.196.105-.423.18-.673.235a2.184 2.184 0 01-.273.046c.806-.31 1.314-.905 1.683-1.64a2.816 2.816 0 01-.968.428c-.06.012-.116.022-.174.03l-.043.006h.002c.278-.118.514-.248.718-.403a2.571 2.571 0 00.637-.698l.063-.104.077-.154a8.107 8.107 0 00.367-.85l.03-.088a3.04 3.04 0 00.123-.463.733.733 0 01-.094.065c-.243.145-.66.277-.996.34l.663-.074-.664.073h-.017l-.1.017c.006-.003.01-.006.017-.008l-2.265.25-.013.022zM8.27 16.45c-.117.323-.236.654-.355.992l-.005.015c-.016.046-.032.094-.05.142-.08.227-.15.432-.31.9.264.12.475.435.675.793a1.44 1.44 0 00-.466-.99c1.293.06 2.41-.27 2.99-1.217.05-.084.096-.173.14-.268-.26.333-.59.474-1.2.44 0 0-.004 0-.005.002l.004-.002c.9-.404 1.354-.79 1.754-1.433.094-.153.186-.32.28-.503-.788.81-1.702 1.04-2.664.865l-.72.078a6.43 6.43 0 00-.067.183zM15.42.112c-.376.222-1 .85-1.748 1.763l.686 1.294c.48-.687.97-1.307 1.462-1.836l.058-.062c-.02.02-.04.04-.057.062-.16.176-.644.74-1.375 1.863.703-.035 1.784-.18 2.666-.33.262-1.47-.258-2.142-.258-2.142s-.66-1.07-1.436-.61zm-3.084 6.402a40.253 40.253 0 011.306-2.26l.04-.064c.224-.352.45-.693.677-1.02l-.685-1.293-.157.192c-.197.245-.403.51-.613.79a39.853 39.853 0 00-2.016 2.97l-.022.038.893 1.763c.19-.378.38-.752.575-1.118zm-3.73 8.32c.158-.406.319-.81.483-1.225.156-.394.32-.79.484-1.19a91.133 91.133 0 011.6-3.604l.205-.424c.12-.243.237-.485.36-.724a.125.125 0 01.02-.04l-.895-1.763-.044.07c-.207.34-.414.687-.617 1.042a38.056 38.056 0 00-1.092 2.04l-.094.193a24.573 24.573 0 00-1.258 3.087 18.492 18.492 0 00-.52 1.997l.896 1.77c.117-.317.24-.638.364-.963zm-1.376-.476a13.38 13.38 0 00-.234 1.692c0 .02-.004.04-.005.06-.28-.45-1.03-.888-1.026-.884.537.778.944 1.55 1.005 2.31-.29.058-.684-.027-1.14-.195.475.436.83.556.97.588-.434.03-.89.328-1.346.67.668-.27 1.21-.38 1.596-.29-.61 1.74-1.23 3.655-1.843 5.69a.538.538 0 00.364-.354c.11-.368.84-2.786 1.978-5.965l.097-.27.028-.078c.12-.332.246-.672.374-1.02l.09-.237v-.004L7.24 14.3c-.003.02-.01.04-.012.06z"/></svg><span>spark.apache.org/community</span></a>
     </div>
   </div>
-  <div class="slide-footer"><span>Q &amp; A</span><span>76</span></div>
+  <div class="slide-footer"><span>Q &amp; A</span><span>74</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Join the community today! · DB + XIAO · ~0:20
 
