@@ -2279,6 +2279,7 @@ This is the short version of Gengliang and Johan's CDC implementation talk. The 
     <div class="col today">
       <div class="hd">Today &mdash; the pain</div>
       <ul>
+        <li>Each connector/table format exposes a different CDC surface</li>
         <li>Delta: <code>table_changes()</code></li>
         <li>Iceberg: changelog view procedure</li>
         <li>Hudi: incremental-read options</li>
@@ -2298,7 +2299,7 @@ This is the short version of Gengliang and Johan's CDC implementation talk. The 
   <div class="progress"><i></i></div>
   <div class="notes" hidden>One CHANGES surface for users · DB · ~0:30
 
-The first user-facing change is one surface. The SQL keyword is CHANGES: ask between two versions, between two timestamps, or stream changes from a table. The same shape exists in DataFrames with read.changes() and readStream.changes(). The point is not that Delta gets a new function. The point is that any DSv2 source can enter through the same Spark door.</div>
+The first user-facing change is one surface. Today, each connector or table format exposes CDC differently: Delta has table_changes(), Iceberg has a changelog view procedure, and Hudi has incremental-read options. In Spark 4.2, the SQL keyword is CHANGES: ask between two versions, between two timestamps, or stream changes from a table. The same shape exists in DataFrames with read.changes() and readStream.changes(). The point is not that Delta gets a new function. The point is that any DSv2 source can enter through the same Spark door.</div>
 </section>
 
 <section class="slide">
