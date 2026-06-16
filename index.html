@@ -1522,19 +1522,16 @@ New in 4.2: you can profile these Python data sources, like UDFs — for time an
 <section class="slide">
   <div class="progstrip"><span>1 &middot; No code change</span><span>2 &middot; Small change</span><span>3 &middot; New capability</span><span class="on">4 &middot; Dev experience</span></div>
   <div class="eyebrow">PySpark</div>
-  <h2>Better interop &amp; developer experience</h2>
+  <h2>Zero-copy interop with the Arrow ecosystem</h2>
   <ul class="points">
-    <li><b>PyCapsule protocol</b> (Arrow C Data Interface) &mdash; zero-copy exchange with Polars, DuckDB, and the Arrow ecosystem <b>when both sides support it</b></li>
-    <li>Profile Python data sources with the built-in profilers</li>
-    <li><code>SparkSession.builder.create()</code>: spin up a new session without mutating existing configs</li>
-    <li>Optional strict column-resolution mode catches ambiguous DataFrame references early</li>
-    <li>pandas API on Spark: broader axis=1 support (any, all, rank, idxmax, idxmin, nunique)</li>
+    <li><b>PyCapsule protocol</b> &mdash; Spark now speaks the <b>Arrow C Data Interface</b></li>
+    <li><b>Zero-copy exchange</b> with Polars, DuckDB, and other Arrow-native tools &mdash; <b>when both sides support it</b></li>
   </ul>
   <div class="slide-footer"><span>PySpark</span><span>25</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Better interop &amp; developer experience · XIAO · ~0:35
+  <div class="notes" hidden>Zero-copy interop with the Arrow ecosystem · XIAO · ~0:35
 
-Small on their own, but they help every day. PyCapsule: when both sides speak the Arrow C Data Interface, you pass data to Polars, DuckDB, and Arrow tools with no copy. builder.create() makes a new session without changing other configs. A strict mode catches unclear column names early. And pandas-on-Spark adds more axis=1 functions. Each one is small. Together they save you time.</div>
+One interop win worth calling out: the PyCapsule protocol. Spark now speaks the Arrow C Data Interface. So you hand data to Polars, DuckDB, and other Arrow-native tools with no copy — when both sides support it. Less glue and less overhead between Spark and the rest of your Python stack.</div>
 </section>
 
 <section class="slide">
