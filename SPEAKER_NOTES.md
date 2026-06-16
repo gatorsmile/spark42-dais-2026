@@ -105,8 +105,11 @@ Now debugging. Your UDF runs in a Python worker on an executor, far from your no
 
 ## Section 04 · New SQL Analytics — Spark SQL
 
-### [29] Section divider — Spark SQL · XIAO · ~0:12
-Benefit three: AI-native analytics in SQL. This release added the most features here, in four themes. Takeaway: replace a cross-join plus ROW_NUMBER top-K with NEAREST BY.
+### [29] Section divider — Spark SQL · XIAO · ~0:45
+Benefit three: run AI-native analytics in SQL.
+The problem today is not just one missing function. These workflows are scattered. Embeddings often go to a vector system. Top-K ranking becomes a cross join and a window. Approximate analytics need special handling. Geospatial often needs an extra package.
+Spark 4.2 brings those patterns into Spark SQL itself: vector functions, NEAREST BY, QUALIFY, tuple sketches, and native geospatial types.
+The practical takeaway: keep the work next to your data. The first pattern to replace is cross join plus ROW_NUMBER for top-K. Use NEAREST BY instead.
 
 ### [30] Query embeddings where your data lives · XIAO · ~0:32
 Embeddings are everywhere now — search, recommendations, dedup, RAG. Usually you run a separate vector system. In 4.2, Spark adds built-in vector functions. So you score similarity where your data already is. Distance and similarity. Norm and normalize. Vector avg and sum. These are the building blocks for the new NEAREST BY join.

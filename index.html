@@ -1617,16 +1617,19 @@ spark.conf.set(<span class="s">"spark.sql.pyspark.worker.logging.enabled"</span>
   <div class="rule"></div>
   <div class="benefit">Run AI-native analytics in SQL</div>
   <div class="takeaway">
-    <div class="today"><span class="tk-label">Today</span>Vector search and clean window logic need extra systems or verbose SQL.</div>
-    <div class="now"><span class="tk-label">Spark 4.2</span>Vector functions, NEAREST BY, QUALIFY, sketches, and geospatial &mdash; built in.</div>
-    <div class="mon"><span class="tk-label">Takeaway</span>Replace a cross-join plus ROW_NUMBER top-K with NEAREST BY.</div>
+    <div class="today"><span class="tk-label">Today</span>AI, ranking, approximate analytics, and geospatial workflows are split across extra systems, libraries, and verbose SQL patterns.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Spark SQL brings them into the engine: vector functions, NEAREST BY, QUALIFY, tuple sketches, and native GEOMETRY / GEOGRAPHY.</div>
+    <div class="mon"><span class="tk-label">Takeaway</span>Keep AI-native analytics where your tables live. Start by replacing cross-join + ROW_NUMBER top-K patterns with NEAREST BY.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep on"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
   <div class="slide-footer"><span>Spark SQL</span><span>29</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Section divider — Spark SQL · XIAO · ~0:12
+  <div class="notes" hidden>Section divider — Spark SQL · XIAO · ~0:45
 
-Benefit three: AI-native analytics in SQL. This release added the most features here, in four themes. Takeaway: replace a cross-join plus ROW_NUMBER top-K with NEAREST BY.</div>
+Benefit three: run AI-native analytics in SQL.
+The problem today is not just one missing function. These workflows are scattered. Embeddings often go to a vector system. Top-K ranking becomes a cross join and a window. Approximate analytics need special handling. Geospatial often needs an extra package.
+Spark 4.2 brings those patterns into Spark SQL itself: vector functions, NEAREST BY, QUALIFY, tuple sketches, and native geospatial types.
+The practical takeaway: keep the work next to your data. The first pattern to replace is cross join plus ROW_NUMBER for top-K. Use NEAREST BY instead.</div>
 </section>
 
 <!-- roadmap: Spark SQL 1 -->
