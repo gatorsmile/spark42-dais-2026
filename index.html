@@ -1829,9 +1829,9 @@ A few more compatibility wins. Richer types: the TIME type now works across more
   <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Store sketches as <b>Delta columns</b>, then merge sketches for any time range in milliseconds &mdash; <b>bounded-error answers, decision-grade when the error budget fits</b>.</span></div>
   <div class="slide-footer"><span>SQL</span><span>37</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Data sketches: approximate, mergeable analytics · XIAO · ~0:45
+  <div class="notes" hidden>Data sketches: approximate, mergeable analytics · XIAO · ~0:30
 
-Sketches are small, probabilistic summaries. One pass. Small memory. The error is bounded and configurable — good enough when the error budget fits. Much of this is already in Spark, as SQL aggregates. KLL for quantiles, Theta for distinct counts and set ops, and Approx Top-K — all since 4.1. HLL since 3.5. New in 4.2: tuple sketches. A distinct count plus a metric, like revenue, in one pass. The best part is they merge. Store them as Delta columns. Then merge sketches for any time range in milliseconds, with no rescan. They work with open Apache DataSketches, so they merge across engines.</div>
+Sketches are small, probabilistic summaries — one pass, small memory, bounded error. Spark already exposes them as SQL aggregates: KLL, Theta, Approx Top-K, HLL. New in 4.2: tuple sketches — a distinct count plus a metric in one pass. Best of all, they merge: store them as Delta columns, then merge sketches for any time range in milliseconds, no rescan — and they interoperate with open Apache DataSketches.</div>
 </section>
 
 <section class="slide">

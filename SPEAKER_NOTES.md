@@ -129,8 +129,8 @@ SET PATH is the SQL search path. Before, every name needed its full catalog and 
 ### [36] More compatibility: richer types & built-ins · XIAO · ~0:35
 A few more compatibility wins. Richer types: the TIME type now works across more formats — but it is a preview, off by default in production behind spark.sql.timeType.enabled, so do not live-demo it unflagged. TIMESTAMP WITH LOCAL TIME ZONE is now in SQL. More built-ins: top-K max_by and min_by, time_bucket, and reverse on binary. And IGNORE/RESPECT NULLS is now honored by array_agg, collect_list, and collect_set — the clause is not new; these aggregates just gained support.
 
-### [37] Data sketches: approximate, mergeable analytics · XIAO · ~0:45
-Sketches are small, probabilistic summaries. One pass. Small memory. The error is bounded and configurable — good enough when the error budget fits. Much of this is already in Spark, as SQL aggregates. KLL for quantiles, Theta for distinct counts and set ops, and Approx Top-K — all since 4.1. HLL since 3.5. New in 4.2: tuple sketches. A distinct count plus a metric, like revenue, in one pass. The best part is they merge. Store them as Delta columns. Then merge sketches for any time range in milliseconds, with no rescan. They work with open Apache DataSketches, so they merge across engines.
+### [37] Data sketches: approximate, mergeable analytics · XIAO · ~0:30
+Sketches are small, probabilistic summaries — one pass, small memory, bounded error. Spark already exposes them as SQL aggregates: KLL, Theta, Approx Top-K, HLL. New in 4.2: tuple sketches — a distinct count plus a metric in one pass. Best of all, they merge: store them as Delta columns, then merge sketches for any time range in milliseconds, no rescan — and they interoperate with open Apache DataSketches.
 
 ### [38] Tuple sketches in action · XIAO · ~0:22
 (Code slide.) A tuple sketch. Distinct users and a revenue summary, in one pass. Then we merge daily sketches into a month — instantly, with no rescan.
