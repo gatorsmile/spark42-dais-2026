@@ -2569,7 +2569,7 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
   <div class="benefit">Operate &amp; evolve predictably</div>
   <div class="takeaway">
     <div class="today"><span class="tk-label">Today</span>Laptop queries are slow; UDFs are Python/Scala-specific; time stops at micros; streaming still has evolution gaps.</div>
-    <div class="now"><span class="tk-label">Coming</span>Project Feather, portable UDFs, nanosecond time, and Spark 4.3 streaming work.</div>
+    <div class="now"><span class="tk-label">Coming</span>Project Feather, portable UDFs, nanosecond time, Auto CDC SCD Type 2, and Spark 4.3 streaming work.</div>
     <div class="mon"><span class="tk-label">Takeaway</span>Follow the SPIPs, try the previews, and plan around the quarterly cadence.</div>
   </div>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep"><i>4</i>Move changing data safely</span><span class="bstep on"><i>5</i>Operate &amp; evolve predictably</span></div>
@@ -2577,7 +2577,7 @@ On operations: we now run on Java 25. Kubernetes — in-place executor and PVC r
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Looking Ahead · DB · ~0:12
 
-Still benefit five. This last part is ongoing work, already in progress for the next releases. It shows where Spark is going: Feather, portable UDFs, nanosecond time, Spark 4.3 streaming work, and faster releases. Takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.</div>
+Still benefit five. This last part is ongoing work, already in progress for the next releases. It shows where Spark is going: Feather, portable UDFs, nanosecond time, Auto CDC SCD Type 2, Spark 4.3 streaming work, and faster releases. Takeaway: follow the SPIPs, try the previews, and plan around the quarterly cadence.</div>
 </section>
 
 <!-- looking-ahead roadmap 1 -->
@@ -2588,14 +2588,14 @@ Still benefit five. This last part is ongoing work, already in progress for the 
       <li class="active"><span class="n">01</span><div class="txt"><h3>Project Feather</h3><p>Spark that flies on a laptop &mdash; fast local queries</p></div></li>
       <li><span class="n">02</span><div class="txt"><h3>Language-agnostic UDF protocol</h3><p>One execution model for UDFs in any language</p></div></li>
       <li><span class="n">03</span><div class="txt"><h3>Nanosecond-precision timestamps</h3><p>Full-fidelity time types, end to end</p></div></li>
-      <li><span class="n">04</span><div class="txt"><h3>Spark 4.3 streaming roadmap</h3><p>Stateful real-time mode, evolution, ML, and SDP flow APIs</p></div></li>
+      <li><span class="n">04</span><div class="txt"><h3>Streaming &amp; pipeline roadmap</h3><p>Real-time mode, query evolution, SDP Flow APIs, and Auto CDC SCD Type 2</p></div></li>
       <li><span class="n">05</span><div class="txt"><h3>Faster, predictable releases</h3><p>A more frequent, predictable release cadence</p></div></li>
   </ol>
   <div class="slide-footer"><span>Looking Ahead</span><span>67</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Roadmap (five topics) · DB · ~0:12
 
-(Gesture across the five.) Five things ahead: Project Feather, a language-agnostic UDF protocol, nanosecond timestamps, the Spark 4.3 streaming roadmap, and a faster release cadence. On streaming, I am borrowing the roadmap from Anish and Jerry's talk.</div>
+(Gesture across the five.) Five things ahead: Project Feather, a language-agnostic UDF protocol, nanosecond timestamps, the Spark 4.3 streaming and pipeline roadmap, and a faster release cadence. On streaming, I am borrowing the roadmap from Anish and Jerry's talk; on pipelines, note that Auto CDC SCD Type 2 is the natural next step after the SCD Type 1 support in Spark 4.2.</div>
 </section>
 
 <!-- 58 -->
@@ -2718,18 +2718,18 @@ SPIP SPARK-56822. Today, Spark timestamps stop at microseconds. So nanosecond Pa
 <section class="slide">
   <div class="progstrip"><span>1 &middot; Feather</span><span>2 &middot; UDF protocol</span><span>3 &middot; Nanosecond</span><span class="on">4 &middot; Streaming</span><span>5 &middot; Releases</span></div>
   <div class="eyebrow">Looking Ahead <span class="tag">Ongoing SPIP</span></div>
-  <h2>Spark 4.3 streaming roadmap</h2>
+  <h2>Spark 4.3 streaming + pipeline roadmap</h2>
   <ul class="points">
     <li><b>Real-time mode for stateful queries</b>: concurrent scheduling, streaming shuffle, <code>transformWithState</code>, and latency metrics</li>
     <li><b>Operator naming &amp; evolution</b>: structured operator identities in checkpoints, extending the source-naming direction</li>
     <li><b>Machine-learning extensions</b>: streaming support for k-means search, real-time clustering, and vector-search use cases</li>
-    <li><b>SDP Flow APIs</b>: more advanced stream-processing control and data-flow management</li>
+    <li><b>SDP Flow APIs + Auto CDC SCD Type 2</b>: more flow control, plus history-preserving CDC targets beyond 4.2's SCD Type 1 support</li>
   </ul>
   <div class="slide-footer"><span>Looking Ahead</span><span>74</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Spark 4.3 streaming roadmap · DB · ~0:35
+  <div class="notes" hidden>Spark 4.3 streaming + pipeline roadmap · DB · ~0:35
 
-From Anish and Jerry's roadmap slide, Spark 4.3 has four streaming themes. First: real-time mode for stateful queries, with concurrent scheduling, streaming shuffle, transformWithState, and latency metrics. Second: operator naming and evolution — a structured way to identify operators inside checkpoints, extending the source naming idea we just covered. Third: ML extensions, including streaming support for k-means search for real-time clustering and vector-search use cases. Fourth: SDP Flow APIs for more advanced stream-processing control and data-flow management. Last, how we ship all of this.</div>
+From Anish and Jerry's roadmap slide, Spark 4.3 has several streaming themes. First: real-time mode for stateful queries, with concurrent scheduling, streaming shuffle, transformWithState, and latency metrics. Second: operator naming and evolution — a structured way to identify operators inside checkpoints, extending the source naming idea we just covered. Third: ML extensions, including streaming support for k-means search for real-time clustering and vector-search use cases. On the pipeline side, SDP Flow APIs continue the move toward more advanced flow control, and Auto CDC SCD Type 2 is the planned history-preserving follow-up to Spark 4.2's SCD Type 1 support. Last, how we ship all of this.</div>
 </section>
 
 <section class="slide">
