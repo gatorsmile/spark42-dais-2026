@@ -2073,16 +2073,17 @@ dp.<span class="hl">create_auto_cdc_flow</span>(
   <div class="rule"></div>
   <div class="benefit">Move changing data safely</div>
   <div class="takeaway">
-    <div class="today"><span class="tk-label">Today</span>Editing a running query breaks the checkpoint; state can corrupt.</div>
-    <div class="now"><span class="tk-label">Spark 4.2</span>Name sources with IDENTIFIED BY; a self-healing state store.</div>
-    <div class="mon"><span class="tk-label">Takeaway</span>Name your streaming sources so you can evolve them safely.</div>
+    <div class="today"><span class="tk-label">Today</span>Streaming workloads need lower latency, safer evolution, and stronger state.</div>
+    <div class="now"><span class="tk-label">Spark 4.2</span>Source naming, faster joins, and stronger state-store integrity.</div>
+    <div class="mon"><span class="tk-label">Takeaway</span>Structured Streaming keeps moving toward always-on production pipelines.</div>
   </div>
+  <p class="fcap" style="margin-top:18px; max-width:1280px"><b>Full talk:</b> “Streaming &amp; Batch Engines” — Anish Shrigondekar &amp; Jerry Peng, Thursday, June 18, OpenLakehouse Summit</p>
   <div class="benefitbar"><span class="bstep"><i>1</i>Define truth once</span><span class="bstep"><i>2</i>Reach Spark from everywhere</span><span class="bstep"><i>3</i>Run AI-native analytics in SQL</span><span class="bstep on"><i>4</i>Move changing data safely</span><span class="bstep"><i>5</i>Operate &amp; evolve predictably</span></div>
   <div class="slide-footer"><span>Streaming</span><span>45</span></div>
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Section divider — Structured Streaming · DB · ~0:12
 
-Still benefit four. Now streaming. Two things: change a running query safely, and a state store you can trust. Takeaway: name your streaming sources, so you can evolve them safely.</div>
+Still benefit four. Now streaming. This is the short version of Anish Shrigondekar and Jerry Peng's OpenLakehouse Summit talk, "Streaming &amp; Batch Engines," happening Thursday, June 18. The arc is: lower latency with real-time mode, safer query evolution with named sources, faster stream-stream joins, and stronger state management. Takeaway: Structured Streaming keeps moving toward always-on production pipelines.</div>
 </section>
 
 <section class="slide">
@@ -2101,7 +2102,8 @@ Still benefit four. Now streaming. Two things: change a running query safely, an
       <div class="hd">Spark 4.2 &mdash; the mechanism</div>
       <ul>
         <li>Name sources with <b>IDENTIFIED BY</b> &mdash; identity is the name, not the position</li>
-        <li>Add / remove / reorder in a running query <b>without breaking the checkpoint</b></li>
+        <li>Add / remove / reorder sources <b>without breaking the checkpoint</b></li>
+        <li>Names are tracked in checkpoint metadata &mdash; the foundation for query evolution</li>
         <li>In PySpark, the same via <code>DataStreamReader.name(&hellip;)</code> &mdash; Classic + Connect (Scala too)</li>
       </ul>
     </div>
@@ -2111,7 +2113,7 @@ Still benefit four. Now streaming. Two things: change a running query safely, an
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Evolve running pipelines safely · DB · ~0:32
 
-A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint. Now you name them — IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark, both Classic and Connect. Identity is the name, not the position. So you can change sources in a running query and keep the checkpoint. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)</div>
+A long-time problem: streaming sources were identified by position. So you could not add, remove, or reorder them without breaking the checkpoint. Now you name them — IDENTIFIED BY in SQL, and DataStreamReader.name() in PySpark, both Classic and Connect. Identity is the name, not the position. The name is tracked in checkpoint metadata, so this becomes the foundation for query evolution. (Sink naming exists in Scala internally, but it is not a public PySpark API. So do not demo df.writeStream.name().)</div>
 </section>
 
 <section class="slide">
@@ -2138,60 +2140,60 @@ df.writeStream.toTable(<span class="s">"unified"</span>)
 
 <section class="slide">
   <div class="eyebrow">Streaming</div>
-  <h2>Richer joins, lower latency</h2>
+  <h2>Lower latency, faster stream-stream joins</h2>
   <div class="baf">
     <div class="col today">
-      <div class="hd">Today &mdash; the pain</div>
+      <div class="hd">Real-time mode</div>
       <ul>
-        <li>Stream-stream <b>Inner / LeftSemi</b> joins couldn&rsquo;t emit in <b>Update</b> output mode</li>
-        <li>LeftSemi joins held <b>more state-store space</b> than needed</li>
-        <li>The real-time mode trigger was out of reach from PySpark</li>
+        <li>Time-based micro-batches keep processing new data during execution</li>
+        <li>Stages run concurrently instead of waiting at shuffle barriers</li>
+        <li>Streaming shuffle sends mapper output directly to reducers</li>
       </ul>
     </div>
     <div class="col now">
-      <div class="hd">Spark 4.2 &mdash; the mechanism</div>
+      <div class="hd">Join improvements</div>
       <ul>
-        <li>Inner and LeftSemi stream-stream joins now run in <b>Update output mode</b></li>
-        <li>LeftSemi joins use <b>less state-store space</b></li>
-        <li><b>Real-time mode trigger</b> is now accessible from PySpark</li>
+        <li>4.1: virtual column families &mdash; one RocksDB store instead of four</li>
+        <li>4.2: state format v4 adds a secondary index for watermark eviction</li>
+        <li>Eviction scan improves from about <b>2s</b> full scan to about <b>30ms</b> bounded per 1M rows</li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Use Inner / LeftSemi stream-stream joins in <b>Update mode</b> &mdash; and drive real-time mode from PySpark.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Streaming performance improves at both layers: execution mode and state-backed joins.</span></div>
   <div class="slide-footer"><span>Streaming</span><span>48</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>Richer joins, lower latency · DB · ~0:25
+  <div class="notes" hidden>Lower latency, faster stream-stream joins · DB · ~0:35
 
-Streaming joins get richer. Inner and LeftSemi stream-stream joins now run in Update mode. LeftSemi uses less state-store space. And the real-time mode trigger is now in PySpark. Remember it — we come back to it later.</div>
+From Anish and Jerry's streaming talk, there are two performance stories. Real-time mode changes the execution model: micro-batches are time-based, stages run concurrently, and streaming shuffle moves data directly from mappers to reducers instead of waiting for the whole batch. Stream-stream joins also got faster. In 4.1, virtual column families moved join state into one RocksDB store instead of four. In 4.2, state format v4 adds a secondary index for watermark eviction. Their benchmark callout is the nice number: about two seconds for a full scan down to about thirty milliseconds bounded per million rows, even when there is nothing to evict.</div>
 </section>
 
 <section class="slide">
   <div class="eyebrow">Streaming</div>
-  <h2>A state store you can trust</h2>
+  <h2>Stateful streaming is easier to trust</h2>
   <div class="baf">
     <div class="col today">
-      <div class="hd">Today &mdash; the pain</div>
+      <div class="hd">Arbitrary stateful processing</div>
       <ul>
-        <li>A <b>corrupted snapshot</b> meant manual intervention &mdash; or a failed job</li>
-        <li>Corruption surfaced <b>late</b>, after it had already spread</li>
-        <li>Lagging snapshot uploads stalled progress</li>
+        <li><b>TransformWithState</b> is the next-generation stateful API</li>
+        <li>4.1: PySpark API and Spark Connect support</li>
+        <li>4.2: TwsTester unit-tests a StatefulProcessor without a live query</li>
       </ul>
     </div>
     <div class="col now">
-      <div class="hd">Spark 4.2 &mdash; the mechanism</div>
+      <div class="hd">State management</div>
       <ul>
-        <li><b>Automatic snapshot repair</b> recovers corrupted state &mdash; no manual step</li>
-        <li>Row + checkpoint <b>checksums</b> catch corruption early</li>
-        <li>Lagging snapshot uploads handled automatically &mdash; <b>on by default</b></li>
+        <li>4.1: state-machine locking and file-level integrity checksums</li>
+        <li>4.2: row-level checksum with automatic snapshot repair</li>
+        <li>State Data Source reads checkpointed state for debugging and observability</li>
       </ul>
     </div>
   </div>
-  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">Stateful streaming <b>self-heals</b> now &mdash; fewer pages at night.</span></div>
+  <div class="baf-try"><span class="lbl">Takeaway</span><span class="txt">The state store is becoming more testable, observable, and self-repairing.</span></div>
   <div class="slide-footer"><span>Streaming</span><span>49</span></div>
   <div class="progress"><i></i></div>
-  <div class="notes" hidden>A state store you can trust · DB · ~0:25
+  <div class="notes" hidden>Stateful streaming is easier to trust · DB · ~0:35
 
-The state store is the heart of stateful streaming. In 4.2 it is stronger. It repairs a corrupted snapshot by itself. Checksums catch corruption early. And slow snapshot uploads are handled — on by default. Fewer pages at night.</div>
+The other big theme is state. TransformWithState is the next-generation arbitrary stateful processing API. It was introduced in 4.0, and the 4.1 work adds the PySpark API plus Spark Connect support. The streaming talk also calls out 4.2 tooling: TwsTester can unit-test a StatefulProcessor without running a live streaming query. On reliability, 4.1 added state-machine locking and file-level integrity checksums. Spark 4.2 adds row-level checksum and automatic snapshot repair. And the State Data Source can read checkpointed state for debugging and observability. The short version: stateful streaming is becoming more testable, observable, and self-repairing.</div>
 </section>
 
 <!-- ============ Section 07 ============ -->
