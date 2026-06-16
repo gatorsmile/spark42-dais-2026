@@ -1264,7 +1264,7 @@ The idea is simple. Your client builds a plan. It opens a gRPC stream. The serve
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Spark becomes a service API · XIAO · ~0:35
 
-The point is the use case, not the language list. Before Connect, reaching Spark meant wrapping it or embedding it. Now Spark is a service API. A Rust service submits work. A Python notebook connects to a remote cluster. A small app uses Spark without packaging it. Python and Scala ship with Spark. Go, Swift, Rust, R, TypeScript, and .NET speak the same protocol, at different maturity levels. The next step is to make your UDFs portable too. DB comes back to that in Looking Ahead.</div>
+The point is the use case, not the language list. Before Connect, reaching Spark meant wrapping it or embedding it. Now Spark is a service API. A Rust service submits work. A Python notebook connects to a remote cluster. A small app uses Spark without packaging it. Python and Scala ship with Spark. Go, Swift, Rust, R, TypeScript, and .NET speak the same protocol. The next step is to make your UDFs portable too. DB comes back to that in Looking Ahead.</div>
 </section>
 
 <section class="slide">
@@ -1449,7 +1449,7 @@ Spark 4.2 continues the Arrow-first direction. The decorator is @arrow_udf, sinc
   <div class="progress"><i></i></div>
   <div class="notes" hidden>Python Data Sources: connectors in pure Python · XIAO · ~0:40
 
-You can now build readers and writers fully in Python — batch and streaming, no JVM, no Scala. Register it once. Then use spark.read.format, like a built-in source. The API keeps growing — pushdown, Arrow writers, streaming, partitioning. And there is a real ecosystem. The community package pyspark-data-sources has many ready connectors — Hugging Face, Google Sheets, Kaggle, Salesforce. For the AI era, an LLM can draft a long-tail connector. And you still test it and harden it.</div>
+Build Spark readers and writers fully in Python: batch or streaming, no JVM or Scala. Register once, use spark.read.format, and tap a growing ecosystem of connectors. LLMs can draft long-tail sources, but you still test and harden them.</div>
 </section>
 
 <!-- python data sources: logo wall -->

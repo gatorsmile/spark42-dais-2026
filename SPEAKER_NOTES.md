@@ -57,7 +57,7 @@ Benefit two: reach Spark from everywhere. First, Spark Connect. Takeaway: call S
 The idea is simple. Your client builds a plan. It opens a gRPC stream. The server resolves the plan, optimizes it, runs it, and sends Arrow batches back. The client is thin. It needs no full Spark runtime, and no JVM next to your app. So the client and the cluster can change on their own. Before Connect, using Spark from another runtime meant wrapping it or embedding it. With Connect, Spark is a service API. Your app does not need to be a Spark app.
 
 ### [14] Spark becomes a service API · XIAO · ~0:35
-The point is the use case, not the language list. Before Connect, reaching Spark meant wrapping it or embedding it. Now Spark is a service API. A Rust service submits work. A Python notebook connects to a remote cluster. A small app uses Spark without packaging it. Python and Scala ship with Spark. Go, Swift, Rust, R, TypeScript, and .NET speak the same protocol, at different maturity levels. The next step is to make your UDFs portable too. DB comes back to that in Looking Ahead.
+The point is the use case, not the language list. Before Connect, reaching Spark meant wrapping it or embedding it. Now Spark is a service API. A Rust service submits work. A Python notebook connects to a remote cluster. A small app uses Spark without packaging it. Python and Scala ship with Spark. Go, Swift, Rust, R, TypeScript, and .NET speak the same protocol. The next step is to make your UDFs portable too. DB comes back to that in Looking Ahead.
 
 ### [15] Closing the gap with Spark Classic · XIAO · ~0:30
 In 4.2 we keep closing the gap with the classic driver. Old RDD helpers come to Connect — zipWithIndex, toJSON, emptyDataFrame. read.json, csv, and xml can take a DataFrame. There is a new GetStatus API. Errors are clearer — for example, when you use a column from the wrong DataFrame. And client file names and line numbers are kept, so debugging is easier.
@@ -80,7 +80,7 @@ Spark 4.2 continues the Arrow-first direction. The decorator is @arrow_udf, sinc
 (Code slide.) The @arrow_udf decorator. Arrays in, arrays out. No to_pandas. No round trip. Columnar from start to end.
 
 ### [21] Python Data Sources: connectors in pure Python · XIAO · ~0:40
-You can now build readers and writers fully in Python — batch and streaming, no JVM, no Scala. Register it once. Then use spark.read.format, like a built-in source. The API keeps growing — pushdown, Arrow writers, streaming, partitioning. And there is a real ecosystem. The community package pyspark-data-sources has many ready connectors — Hugging Face, Google Sheets, Kaggle, Salesforce. For the AI era, an LLM can draft a long-tail connector. And you still test it and harden it.
+Build Spark readers and writers fully in Python: batch or streaming, no JVM or Scala. Register once, use spark.read.format, and tap a growing ecosystem of connectors. LLMs can draft long-tail sources, but you still test and harden them.
 
 ### [22] A growing Python Data Source ecosystem · XIAO · ~0:20
 (Gesture at the logos.) This is the ecosystem today. Connectors the community already built, in pure Python. Before, you learned the JVM API. Now you just write Python.
